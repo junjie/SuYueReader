@@ -38,15 +38,18 @@ export class OpenSheet {
     const panel = document.createElement('div');
     panel.className = 'sheet-panel';
     panel.innerHTML = `
-      <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
+      <div class="sheet-header">
+        <span class="sheet-nav-back" style="visibility:hidden">‹ Back</span>
+        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
+      </div>
       <div class="sheet-group">
         <button class="sheet-group-row" data-action="builtin">
-          <span>Library</span>
+          <span>Choose from Library</span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" data-action="file">
-          <span>Open File</span>
+          <span>Upload File</span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>

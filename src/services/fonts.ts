@@ -2,7 +2,10 @@ const loadedFonts = new Set<string>();
 
 const FONT_MAP: Record<string, string> = {
   'Noto Serif SC': 'Noto+Serif+SC:wght@400;700',
+  'Noto Serif TC': 'Noto+Serif+TC:wght@400;700',
   'Noto Sans SC': 'Noto+Sans+SC:wght@400;700',
+  'Noto Sans TC': 'Noto+Sans+TC:wght@400;700',
+  'LXGW WenKai': 'LXGW+WenKai:wght@400;700',
   'LXGW WenKai TC': 'LXGW+WenKai+TC:wght@400;700',
   'Ma Shan Zheng': 'Ma+Shan+Zheng',
 };

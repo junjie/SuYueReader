@@ -6,7 +6,7 @@ import { defaultSettings } from '../state/defaults.ts';
 export class SettingsSheet {
   private overlay: HTMLElement | null = null;
   private store: SettingsStore;
-  private view: 'main' | 'advanced' = 'main';
+  private view: 'main' | 'advanced' | 'pinyin' | 'font' = 'main';
 
   constructor(store: SettingsStore) {
     this.store = store;
@@ -67,12 +67,16 @@ export class SettingsSheet {
   private buildMainView(panel: HTMLElement): void {
     this.view = 'main';
     panel.innerHTML = `
-      <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
+      <div class="sheet-header">
+        <span class="sheet-nav-back" style="visibility:hidden">‹ Back</span>
+        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
+      </div>
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>Font Size</label>
+          <label>Font</label>
           <div class="font-size-controls">
+            <button class="pinyin-opts-btn" id="s-font-opts" aria-label="Font Options">⋯</button>
             <button class="size-btn" id="s-fontsize-down">A</button>
             <span id="s-fontsize-val" class="size-value"></span>
             <button class="size-btn size-btn-large" id="s-fontsize-up">A</button>
@@ -104,10 +108,13 @@ export class SettingsSheet {
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static toggle-row">
           <label>Pinyin</label>
-          <label class="ios-switch">
-            <input type="checkbox" id="s-pinyin" />
-            <span class="ios-switch-track"></span>
-          </label>
+          <div class="pinyin-toggle-group">
+            <button class="pinyin-opts-btn" id="s-pinyin-opts" aria-label="Pinyin Options">⋯</button>
+            <label class="ios-switch">
+              <input type="checkbox" id="s-pinyin" />
+              <span class="ios-switch-track"></span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -131,6 +138,12 @@ export class SettingsSheet {
       this.store.update({ fontSize: Math.min(48, s.fontSize + 2) });
     });
 
+    // Font options drill-in
+    panel.querySelector('#s-font-opts')!.addEventListener('click', () => {
+      this.buildFontView(panel);
+      this.syncUI(panel);
+    });
+
     // Theme
     panel.querySelector('#s-theme-group')!.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-theme]');
@@ -148,6 +161,12 @@ export class SettingsSheet {
       this.store.update({ showPinyin: (e.target as HTMLInputElement).checked });
     });
 
+    // Pinyin options drill-in
+    panel.querySelector('#s-pinyin-opts')!.addEventListener('click', () => {
+      this.buildPinyinView(panel);
+      this.syncUI(panel);
+    });
+
     // More options
     panel.querySelector('#s-more')!.addEventListener('click', () => {
       this.buildAdvancedView(panel);
@@ -157,60 +176,47 @@ export class SettingsSheet {
 
   private buildAdvancedView(panel: HTMLElement): void {
     this.view = 'advanced';
-    const s = this.store.get();
     panel.innerHTML = `
-      <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
-
-      <div class="sheet-group">
-        <button class="sheet-group-row" id="s-back">
-          <span class="row-chevron back">‹</span>
-          <span>Back</span>
-        </button>
+      <div class="sheet-header">
+        <button class="sheet-nav-back" id="s-back">‹ Back</button>
+        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label for="s-font">Font Family</label>
-          <select id="s-font" class="inline-select">
-            ${availableFonts.map((f) => `<option value="${f}">${f}</option>`).join('')}
-          </select>
-        </div>
-      </div>
-
-      <div class="sheet-group">
-        <div class="sheet-group-row static slider-row">
-          <label>Line Height <span id="s-lineheight-val"></span></label>
-          <input type="range" id="s-lineheight" min="1.2" max="3.5" step="0.1" />
-        </div>
-        <div class="sheet-group-divider"></div>
-        <div class="sheet-group-row static slider-row">
-          <label>Paragraph Spacing <span id="s-paraspacing-val"></span></label>
-          <input type="range" id="s-paraspacing" min="0" max="4" step="0.25" />
-        </div>
-        <div class="sheet-group-divider"></div>
-        <div class="sheet-group-row static slider-row">
-          <label>H Margin <span id="s-marginh-val"></span></label>
-          <input type="range" id="s-marginh" min="0" max="200" step="8" />
-        </div>
-        <div class="sheet-group-divider"></div>
-        <div class="sheet-group-row static slider-row">
-          <label>V Margin <span id="s-marginv-val"></span></label>
-          <input type="range" id="s-marginv" min="0" max="100" step="4" />
-        </div>
-      </div>
-
-      <div class="sheet-group" id="pinyin-options" style="${s.showPinyin ? '' : 'display:none'}">
-        <div class="sheet-group-row static">
-          <label>Pinyin Position</label>
-          <div class="segmented-control" id="s-pypos-group">
-            <button data-pos="over" class="seg-btn">Above</button>
-            <button data-pos="under" class="seg-btn">Below</button>
+          <label>Line Height</label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-lineheight-down">−</button>
+            <span id="s-lineheight-val" class="size-value"></span>
+            <button class="size-btn" id="s-lineheight-up">+</button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
-        <div class="sheet-group-row static slider-row">
-          <label>Pinyin Size <span id="s-pysize-val"></span></label>
-          <input type="range" id="s-pysize" min="8" max="20" step="1" />
+        <div class="sheet-group-row static">
+          <label>Paragraph Spacing</label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-paraspacing-down">−</button>
+            <span id="s-paraspacing-val" class="size-value"></span>
+            <button class="size-btn" id="s-paraspacing-up">+</button>
+          </div>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static">
+          <label>H Margin</label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-marginh-down">−</button>
+            <span id="s-marginh-val" class="size-value"></span>
+            <button class="size-btn" id="s-marginh-up">+</button>
+          </div>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static">
+          <label>V Margin</label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-marginv-down">−</button>
+            <span id="s-marginv-val" class="size-value"></span>
+            <button class="size-btn" id="s-marginv-up">+</button>
+          </div>
         </div>
       </div>
 
@@ -238,22 +244,10 @@ export class SettingsSheet {
       this.syncUI(panel);
     });
 
-    panel.querySelector<HTMLSelectElement>('#s-font')!.addEventListener('change', (e) => {
-      const font = (e.target as HTMLSelectElement).value;
-      loadFont(font);
-      this.store.update({ fontFamily: font });
-    });
-
-    this.bindSlider(panel, 's-lineheight', (v) => this.store.update({ lineHeight: Number(v) }));
-    this.bindSlider(panel, 's-paraspacing', (v) => this.store.update({ paragraphSpacing: Number(v) }));
-    this.bindSlider(panel, 's-marginh', (v) => this.store.update({ marginH: Number(v) }));
-    this.bindSlider(panel, 's-marginv', (v) => this.store.update({ marginV: Number(v) }));
-    this.bindSlider(panel, 's-pysize', (v) => this.store.update({ pinyinSize: Number(v) }));
-
-    panel.querySelector('#s-pypos-group')?.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-pos]');
-      if (btn) this.store.update({ pinyinPosition: btn.dataset.pos as PinyinPosition });
-    });
+    this.bindStepper(panel, 's-lineheight', 1.2, 3.5, 0.1, 'lineHeight');
+    this.bindStepper(panel, 's-paraspacing', 0, 4, 0.25, 'paragraphSpacing');
+    this.bindStepper(panel, 's-marginh', 0, 200, 8, 'marginH');
+    this.bindStepper(panel, 's-marginv', 0, 100, 4, 'marginV');
 
     panel.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
       this.store.update({ showNumbering: (e.target as HTMLInputElement).checked });
@@ -265,9 +259,111 @@ export class SettingsSheet {
     });
   }
 
-  private bindSlider(panel: HTMLElement, id: string, onChange: (value: string) => void): void {
-    const slider = panel.querySelector<HTMLInputElement>(`#${id}`);
-    slider?.addEventListener('input', () => onChange(slider.value));
+  private buildFontView(panel: HTMLElement): void {
+    this.view = 'font';
+    panel.innerHTML = `
+      <div class="sheet-header">
+        <button class="sheet-nav-back" id="s-back">‹ Back</button>
+        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
+      </div>
+
+      <div class="sheet-group">
+        <div class="sheet-group-row static">
+          <label>Font Size</label>
+          <div class="font-size-controls">
+            <button class="size-btn" id="s-fontsize-down">A</button>
+            <span id="s-fontsize-val" class="size-value"></span>
+            <button class="size-btn size-btn-large" id="s-fontsize-up">A</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="sheet-group" id="s-font-list">
+        ${availableFonts.map((f) => `<button class="font-choice" data-font="${f}"><span class="font-choice-preview" style="font-family:'${f}',serif">Aa 文字</span><span class="font-choice-name">${f}</span></button>`).join('<div class="sheet-group-divider"></div>')}
+      </div>
+    `;
+
+    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
+
+    panel.querySelector('#s-back')!.addEventListener('click', () => {
+      this.buildMainView(panel);
+      this.syncUI(panel);
+    });
+
+    panel.querySelector('#s-fontsize-down')!.addEventListener('click', () => {
+      const s = this.store.get();
+      this.store.update({ fontSize: Math.max(14, s.fontSize - 2) });
+    });
+    panel.querySelector('#s-fontsize-up')!.addEventListener('click', () => {
+      const s = this.store.get();
+      this.store.update({ fontSize: Math.min(48, s.fontSize + 2) });
+    });
+
+    panel.querySelector('#s-font-list')!.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-font]');
+      if (btn) {
+        const font = btn.dataset.font!;
+        loadFont(font);
+        this.store.update({ fontFamily: font });
+      }
+    });
+
+    // Preload all fonts so previews render
+    availableFonts.forEach((f) => loadFont(f));
+  }
+
+  private buildPinyinView(panel: HTMLElement): void {
+    this.view = 'pinyin';
+    panel.innerHTML = `
+      <div class="sheet-header">
+        <button class="sheet-nav-back" id="s-back">‹ Back</button>
+        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
+      </div>
+
+      <div class="sheet-group">
+        <div class="sheet-group-row static">
+          <label>Pinyin Position</label>
+          <div class="segmented-control" id="s-pypos-group">
+            <button data-pos="over" class="seg-btn">Above</button>
+            <button data-pos="under" class="seg-btn">Below</button>
+          </div>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static">
+          <label>Pinyin Size</label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-pysize-down">−</button>
+            <span id="s-pysize-val" class="size-value"></span>
+            <button class="size-btn" id="s-pysize-up">+</button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
+
+    panel.querySelector('#s-back')!.addEventListener('click', () => {
+      this.buildMainView(panel);
+      this.syncUI(panel);
+    });
+
+    panel.querySelector('#s-pypos-group')!.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-pos]');
+      if (btn) this.store.update({ pinyinPosition: btn.dataset.pos as PinyinPosition });
+    });
+
+    this.bindStepper(panel, 's-pysize', 8, 20, 1, 'pinyinSize');
+  }
+
+  private bindStepper(panel: HTMLElement, id: string, min: number, max: number, step: number, key: keyof Settings): void {
+    panel.querySelector(`#${id}-down`)!.addEventListener('click', () => {
+      const cur = this.store.get()[key] as number;
+      this.store.update({ [key]: Math.max(min, Math.round((cur - step) * 100) / 100) });
+    });
+    panel.querySelector(`#${id}-up`)!.addEventListener('click', () => {
+      const cur = this.store.get()[key] as number;
+      this.store.update({ [key]: Math.min(max, Math.round((cur + step) * 100) / 100) });
+    });
   }
 
   private syncUI(panel: HTMLElement): void {
@@ -287,31 +383,34 @@ export class SettingsSheet {
 
       const pyCheck = panel.querySelector<HTMLInputElement>('#s-pinyin');
       if (pyCheck) pyCheck.checked = s.showPinyin;
-    } else {
-      const fontSel = panel.querySelector<HTMLSelectElement>('#s-font');
-      if (fontSel) fontSel.value = s.fontFamily;
 
-      this.setSlider(panel, 's-lineheight', s.lineHeight, `${s.lineHeight}`);
-      this.setSlider(panel, 's-paraspacing', s.paragraphSpacing, `${s.paragraphSpacing}em`);
-      this.setSlider(panel, 's-marginh', s.marginH, `${s.marginH}px`);
-      this.setSlider(panel, 's-marginv', s.marginV, `${s.marginV}px`);
-      this.setSlider(panel, 's-pysize', s.pinyinSize, `${s.pinyinSize}px`);
+      const pyOptsBtn = panel.querySelector<HTMLElement>('#s-pinyin-opts');
+      if (pyOptsBtn) pyOptsBtn.style.display = s.showPinyin ? '' : 'none';
+    } else if (this.view === 'advanced') {
+      this.setStepperVal(panel, 's-lineheight', `${s.lineHeight}`);
+      this.setStepperVal(panel, 's-paraspacing', `${s.paragraphSpacing}em`);
+      this.setStepperVal(panel, 's-marginh', `${s.marginH}px`);
+      this.setStepperVal(panel, 's-marginv', `${s.marginV}px`);
 
-      const pyOpts = panel.querySelector<HTMLElement>('#pinyin-options');
-      if (pyOpts) pyOpts.style.display = s.showPinyin ? '' : 'none';
+      const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');
+      if (numCheck) numCheck.checked = s.showNumbering;
+    } else if (this.view === 'font') {
+      const fsVal = panel.querySelector('#s-fontsize-val');
+      if (fsVal) fsVal.textContent = `${s.fontSize}px`;
 
+      panel.querySelectorAll('#s-font-list .font-choice').forEach((btn) => {
+        btn.classList.toggle('active', (btn as HTMLElement).dataset.font === s.fontFamily);
+      });
+    } else if (this.view === 'pinyin') {
       panel.querySelectorAll('#s-pypos-group .seg-btn').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.pos === s.pinyinPosition);
       });
 
-      const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');
-      if (numCheck) numCheck.checked = s.showNumbering;
+      this.setStepperVal(panel, 's-pysize', `${s.pinyinSize}px`);
     }
   }
 
-  private setSlider(panel: HTMLElement, id: string, value: number, display: string): void {
-    const slider = panel.querySelector<HTMLInputElement>(`#${id}`);
-    if (slider) slider.value = String(value);
+  private setStepperVal(panel: HTMLElement, id: string, display: string): void {
     const valSpan = panel.querySelector(`#${id}-val`);
     if (valSpan) valSpan.textContent = display;
   }
