@@ -1,6 +1,7 @@
 import type { Paragraph } from '../types/index.ts';
 import type { SettingsStore } from '../state/settings.ts';
 import { annotateWithPinyin } from '../services/pinyin.ts';
+import { convertScript } from '../services/script-convert.ts';
 
 export class Reader {
   private container: HTMLElement;
@@ -13,7 +14,7 @@ export class Reader {
 
     document.addEventListener('settings-changed', (e) => {
       const detail = (e as CustomEvent).detail;
-      if (detail.pinyinChanged) {
+      if (detail.pinyinChanged || detail.scriptVariantChanged) {
         this.render();
       }
       if (detail.writingModeChanged) {
@@ -94,11 +95,15 @@ export class Reader {
     const fragments: string[] = [];
 
     for (const para of this.paragraphs) {
+      let text = para.text;
+      if (s.scriptVariant !== 'original') {
+        text = await convertScript(text, s.scriptVariant);
+      }
       let content: string;
       if (s.showPinyin) {
-        content = await annotateWithPinyin(para.text);
+        content = await annotateWithPinyin(text);
       } else {
-        content = this.escapeHtml(para.text);
+        content = this.escapeHtml(text);
       }
       fragments.push(`<p data-index="${para.index}">${content}</p>`);
     }

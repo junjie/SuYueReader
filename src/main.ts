@@ -26,7 +26,7 @@ const textLoader = new TextLoader((text, _title) => {
 
 const openSheet = new OpenSheet(textLoader);
 const settingsSheet = new SettingsSheet(store);
-new Navbar(() => openSheet.toggle(), () => settingsSheet.toggle());
+new Navbar(() => openSheet.toggle(), () => settingsSheet.toggle(), store);
 
 // Load text: URL param or default intro document
 const params = new URLSearchParams(window.location.search);

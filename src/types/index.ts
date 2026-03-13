@@ -6,6 +6,7 @@ export interface Paragraph {
 export type WritingMode = 'horizontal' | 'vertical';
 export type PinyinPosition = 'over' | 'under';
 export type ThemeMode = 'light' | 'dark' | 'sepia';
+export type ScriptVariant = 'original' | 'simplified' | 'traditional';
 
 export interface Settings {
   fontFamily: string;
@@ -22,4 +23,5 @@ export interface Settings {
   pinyinPosition: PinyinPosition;
   pinyinSize: number;
   showNumbering: boolean;
+  scriptVariant: ScriptVariant;
 }
