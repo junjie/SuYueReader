@@ -30,3 +30,19 @@
   --primary-bg: #3b82f6;
   --primary-fg: #fff;
 }
+
+[data-theme="sepia"] {
+  --bg: #f5e6c8;
+  --fg: #5b4636;
+  --fg-muted: #8b7355;
+  --border: #d4c4a8;
+  --toolbar-bg: #eedcbe;
+  --toolbar-border: #d4c4a8;
+  --settings-bg: #eedcbe;
+  --btn-bg: #e8d5b5;
+  --btn-hover: #dcc8a5;
+  --btn-active-bg: #5b4636;
+  --btn-active-fg: #f5e6c8;
+  --primary-bg: #8b6914;
+  --primary-fg: #fff;
+}

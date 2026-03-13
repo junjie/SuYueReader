@@ -1,125 +1,185 @@
-#settings-panel {
+/* Settings Bottom Sheet */
+.settings-sheet-overlay {
   position: fixed;
-  top: 0;
-  right: 0;
-  width: min(360px, 100vw);
-  height: 100%;
-  background: var(--settings-bg);
-  border-left: 1px solid var(--border);
-  transform: translateX(100%);
-  transition: transform 0.25s ease;
+  inset: 0;
+  background: rgba(0, 0, 0, 0);
   z-index: 100;
+  transition: background 0.3s ease;
+}
+
+.settings-sheet-overlay.open {
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.settings-sheet-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--settings-bg);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+  padding: 8px 20px calc(env(safe-area-inset-bottom, 0px) + 16px);
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  z-index: 101;
+  max-height: 55vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.settings-sheet-overlay.open .settings-sheet-panel {
+  transform: translateY(0);
+}
+
+.settings-sheet-body {
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  gap: 16px;
 }
 
-#settings-panel.open {
-  transform: translateX(0);
-}
-
-.settings-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border);
-}
-
-.settings-header h2 {
-  font-size: 18px;
-  color: var(--fg);
-}
-
-.settings-close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-  color: var(--fg);
-  padding: 4px;
-}
-
-.settings-body {
-  padding: 16px 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  overflow-y: auto;
-}
-
-.settings-body section {
+.settings-row {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.settings-body label {
+.settings-row > label {
   font-size: 14px;
   color: var(--fg);
+  font-weight: 500;
+}
+
+.settings-row > label span {
+  color: var(--fg-muted);
+  font-weight: 400;
+  font-size: 13px;
+}
+
+.settings-row.toggle-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Font size controls */
+.font-size-controls {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 12px;
 }
 
-.settings-body label span {
+.font-size-btn {
+  width: 40px;
+  height: 40px;
+  font-size: 14px !important;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+}
+
+.font-size-btn-large {
+  font-size: 20px !important;
+}
+
+.font-size-value {
+  font-size: 14px;
   color: var(--fg-muted);
-  font-size: 13px;
+  min-width: 44px;
+  text-align: center;
 }
 
-.settings-body select {
-  padding: 6px 8px;
-  border: 1px solid var(--border);
-  border-radius: 4px;
+/* Segmented control */
+.segmented-control {
+  display: flex;
+  gap: 0;
   background: var(--btn-bg);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.seg-btn {
+  flex: 1;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
   color: var(--fg);
   font-size: 14px;
-}
-
-.settings-body input[type="range"] {
-  width: 100%;
   cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.settings-body input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
+.seg-btn.active {
+  background: var(--btn-active-bg);
+  color: var(--btn-active-fg);
+}
+
+/* Toggle input */
+.toggle-input {
+  width: 44px;
+  height: 24px;
   cursor: pointer;
+  accent-color: var(--primary-bg);
 }
 
-.btn-group {
-  display: flex;
-  gap: 4px;
-}
-
-.btn-group button {
-  flex: 1;
-  padding: 6px 12px;
+/* Sheet buttons */
+.sheet-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
   border: 1px solid var(--border);
-  border-radius: 4px;
+  border-radius: 8px;
   background: var(--btn-bg);
   color: var(--fg);
   cursor: pointer;
-  font-size: 13px;
-  transition: background 0.15s, color 0.15s;
+  font-size: 14px;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s;
 }
 
-.btn-group button:hover {
+.sheet-btn:active {
   background: var(--btn-hover);
 }
 
-.btn-group button.active {
-  background: var(--btn-active-bg);
-  color: var(--btn-active-fg);
-  border-color: var(--btn-active-bg);
+.sheet-btn.primary {
+  background: var(--primary-bg);
+  color: var(--primary-fg);
+  border-color: var(--primary-bg);
 }
 
-#s-reset {
-  margin-top: 8px;
+.more-btn {
+  width: 100%;
+  justify-content: center;
 }
 
-@media (max-width: 600px) {
-  #settings-panel {
-    width: 100vw;
-  }
+.back-btn {
+  align-self: flex-start;
+  padding: 6px 12px;
+  font-size: 15px;
+}
+
+.reset-btn {
+  width: 100%;
+  color: #e53e3e;
+  border-color: #e53e3e40;
+}
+
+/* Sheet select */
+.sheet-select {
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Sheet range inputs */
+.settings-sheet-panel input[type="range"] {
+  width: 100%;
+  cursor: pointer;
 }

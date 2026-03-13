@@ -5,7 +5,7 @@ export interface Paragraph {
 
 export type WritingMode = 'horizontal' | 'vertical';
 export type PinyinPosition = 'over' | 'under';
-export type ThemeMode = 'light' | 'dark';
+export type ThemeMode = 'light' | 'dark' | 'sepia';
 
 export interface Settings {
   fontFamily: string;

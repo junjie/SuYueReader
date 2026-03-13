@@ -17,7 +17,7 @@
 /* Vertical mode: needs its own horizontal scroll container */
 #reader-container:has(.vertical-mode) {
   overflow-x: auto;
-  height: calc(100vh - 50px);
+  height: 100vh;
 }
 
 #reader.vertical-mode {

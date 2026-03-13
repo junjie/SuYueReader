@@ -1,13 +1,14 @@
 import { SettingsStore } from './state/settings.ts';
 import { Reader } from './components/reader.ts';
 import { TextLoader } from './components/text-loader.ts';
-import { Toolbar } from './components/toolbar.ts';
-import { SettingsPanel } from './components/settings-panel.ts';
+import { FABs } from './components/fab.ts';
+import { ActionSheet } from './components/action-sheet.ts';
+import { SettingsSheet } from './components/settings-sheet.ts';
 import { parseText } from './services/text-parser.ts';
 import { preloadDefaultFont } from './services/fonts.ts';
 import './styles/main.css';
 import './styles/themes.css';
-import './styles/toolbar.css';
+import './styles/fab.css';
 import './styles/reader.css';
 import './styles/settings.css';
 
@@ -23,11 +24,13 @@ const textLoader = new TextLoader((text, _title) => {
   reader.setParagraphs(paragraphs);
 });
 
-const settingsPanelEl = document.getElementById('settings-panel')!;
-const settingsPanel = new SettingsPanel(settingsPanelEl, store);
+const actionSheet = new ActionSheet(textLoader);
+const settingsSheet = new SettingsSheet(store);
 
-const toolbarEl = document.getElementById('toolbar')!;
-new Toolbar(toolbarEl, textLoader, () => settingsPanel.toggle());
+new FABs(
+  () => actionSheet.open(),
+  () => settingsSheet.toggle()
+);
 
 // Handle ?text= URL param
 const params = new URLSearchParams(window.location.search);
