@@ -406,8 +406,9 @@
   border: none;
   background: none;
   color: var(--fg);
-  font-size: 17px;
-  padding: 0;
+  font-size: 22px;
+  font-weight: 300;
+  padding: 4px;
   cursor: pointer;
   text-align: left;
   -webkit-tap-highlight-color: transparent;

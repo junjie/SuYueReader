@@ -2,11 +2,13 @@ import type { Settings } from '../types/index.ts';
 
 export const defaultSettings: Settings = {
   fontFamily: 'Noto Serif SC',
-  fontSize: 24,
-  lineHeight: 2.0,
-  paragraphSpacing: 1.5,
-  marginH: 48,
+  fontSize: 22,
+  lineHeight: 1.5,
+  paragraphSpacing: 1,
+  verticalParagraphSpacing: 0.5,
+  marginH: 32,
   marginV: 32,
+  verticalMarginV: 48,
   writingMode: 'horizontal',
   theme: 'light',
   showPinyin: false,

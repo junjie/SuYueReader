@@ -68,7 +68,7 @@ export class SettingsSheet {
     this.view = 'main';
     panel.innerHTML = `
       <div class="sheet-header">
-        <span class="sheet-nav-back" style="visibility:hidden">‹ Back</span>
+        <span class="sheet-nav-back" style="visibility:hidden">‹</span>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
 
@@ -178,7 +178,7 @@ export class SettingsSheet {
     this.view = 'advanced';
     panel.innerHTML = `
       <div class="sheet-header">
-        <button class="sheet-nav-back" id="s-back">‹ Back</button>
+        <button class="sheet-nav-back" id="s-back">‹</button>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
 
@@ -244,10 +244,11 @@ export class SettingsSheet {
       this.syncUI(panel);
     });
 
+    const isVertical = this.store.get().writingMode === 'vertical';
     this.bindStepper(panel, 's-lineheight', 1.2, 3.5, 0.1, 'lineHeight');
-    this.bindStepper(panel, 's-paraspacing', 0, 4, 0.25, 'paragraphSpacing');
+    this.bindStepper(panel, 's-paraspacing', 0, 4, 0.25, isVertical ? 'verticalParagraphSpacing' : 'paragraphSpacing');
     this.bindStepper(panel, 's-marginh', 0, 200, 8, 'marginH');
-    this.bindStepper(panel, 's-marginv', 0, 100, 4, 'marginV');
+    this.bindStepper(panel, 's-marginv', 0, 100, 4, isVertical ? 'verticalMarginV' : 'marginV');
 
     panel.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
       this.store.update({ showNumbering: (e.target as HTMLInputElement).checked });
@@ -263,7 +264,7 @@ export class SettingsSheet {
     this.view = 'font';
     panel.innerHTML = `
       <div class="sheet-header">
-        <button class="sheet-nav-back" id="s-back">‹ Back</button>
+        <button class="sheet-nav-back" id="s-back">‹</button>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
 
@@ -316,7 +317,7 @@ export class SettingsSheet {
     this.view = 'pinyin';
     panel.innerHTML = `
       <div class="sheet-header">
-        <button class="sheet-nav-back" id="s-back">‹ Back</button>
+        <button class="sheet-nav-back" id="s-back">‹</button>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
 
@@ -387,10 +388,11 @@ export class SettingsSheet {
       const pyOptsBtn = panel.querySelector<HTMLElement>('#s-pinyin-opts');
       if (pyOptsBtn) pyOptsBtn.style.display = s.showPinyin ? '' : 'none';
     } else if (this.view === 'advanced') {
+      const isVertical = s.writingMode === 'vertical';
       this.setStepperVal(panel, 's-lineheight', `${s.lineHeight}`);
-      this.setStepperVal(panel, 's-paraspacing', `${s.paragraphSpacing}em`);
+      this.setStepperVal(panel, 's-paraspacing', `${isVertical ? s.verticalParagraphSpacing : s.paragraphSpacing}em`);
       this.setStepperVal(panel, 's-marginh', `${s.marginH}px`);
-      this.setStepperVal(panel, 's-marginv', `${s.marginV}px`);
+      this.setStepperVal(panel, 's-marginv', `${isVertical ? s.verticalMarginV : s.marginV}px`);
 
       const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');
       if (numCheck) numCheck.checked = s.showNumbering;

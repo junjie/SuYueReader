@@ -16,14 +16,62 @@ export class Reader {
       if (detail.pinyinChanged) {
         this.render();
       }
-      this.updateAttributes();
+      if (detail.writingModeChanged) {
+        const progress = this.getReadingProgress(detail.prevWritingMode);
+        this.updateAttributes();
+        requestAnimationFrame(() => this.setReadingProgress(progress));
+      } else {
+        this.updateAttributes();
+      }
     });
   }
 
   setParagraphs(paragraphs: Paragraph[]): void {
     this.paragraphs = paragraphs;
     this.render();
+    this.scrollToBeginning();
+  }
+
+  private scrollToBeginning(): void {
+    const s = this.store.get();
     window.scrollTo(0, 0);
+    if (s.writingMode === 'vertical') {
+      const scrollContainer = this.container.parentElement;
+      if (scrollContainer) {
+        // In vertical-rl, scrollLeft=0 is the rightmost (beginning) position
+        scrollContainer.scrollLeft = 0;
+      }
+    }
+  }
+
+  private getReadingProgress(writingMode: string): number {
+    if (writingMode === 'vertical') {
+      const scrollContainer = this.container.parentElement;
+      if (!scrollContainer) return 0;
+      const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+      if (maxScroll <= 0) return 0;
+      // scrollLeft is negative in vertical-rl (RTL), progress goes from 0 at right to 1 at left
+      return -scrollContainer.scrollLeft / maxScroll;
+    }
+    const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    if (maxScroll <= 0) return 0;
+    return window.scrollY / maxScroll;
+  }
+
+  private setReadingProgress(progress: number): void {
+    const s = this.store.get();
+    if (s.writingMode === 'vertical') {
+      const scrollContainer = this.container.parentElement;
+      if (!scrollContainer) return;
+      // Wait for layout to settle after mode switch
+      requestAnimationFrame(() => {
+        const maxScroll = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+        scrollContainer.scrollLeft = -(progress * maxScroll);
+      });
+    } else {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo(0, progress * maxScroll);
+    }
   }
 
   private updateAttributes(): void {

@@ -12,8 +12,10 @@ export interface Settings {
   fontSize: number;
   lineHeight: number;
   paragraphSpacing: number;
+  verticalParagraphSpacing: number;
   marginH: number;
   marginV: number;
+  verticalMarginV: number;
   writingMode: WritingMode;
   theme: ThemeMode;
   showPinyin: boolean;

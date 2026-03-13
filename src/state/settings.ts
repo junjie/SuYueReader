@@ -41,10 +41,12 @@ export class SettingsStore {
 
     const pinyinChanged =
       partial.showPinyin !== undefined && partial.showPinyin !== prev.showPinyin;
+    const writingModeChanged =
+      partial.writingMode !== undefined && partial.writingMode !== prev.writingMode;
 
     document.dispatchEvent(
       new CustomEvent('settings-changed', {
-        detail: { settings: this.get(), pinyinChanged },
+        detail: { settings: this.get(), pinyinChanged, writingModeChanged, prevWritingMode: prev.writingMode },
       })
     );
   }
@@ -59,9 +61,10 @@ export class SettingsStore {
     root.setProperty('--reader-font-family', `"${s.fontFamily}", serif`);
     root.setProperty('--reader-font-size', `${s.fontSize}px`);
     root.setProperty('--reader-line-height', `${s.lineHeight}`);
-    root.setProperty('--reader-paragraph-spacing', `${s.paragraphSpacing}em`);
+    const isVertical = s.writingMode === 'vertical';
+    root.setProperty('--reader-paragraph-spacing', `${isVertical ? s.verticalParagraphSpacing : s.paragraphSpacing}em`);
     root.setProperty('--reader-margin-h', `${s.marginH}px`);
-    root.setProperty('--reader-margin-v', `${s.marginV}px`);
+    root.setProperty('--reader-margin-v', `${isVertical ? s.verticalMarginV : s.marginV}px`);
     root.setProperty(
       '--reader-writing-mode',
       s.writingMode === 'vertical' ? 'vertical-rl' : 'horizontal-tb'

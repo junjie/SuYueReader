@@ -18,20 +18,22 @@
 #reader-container:has(.vertical-mode) {
   overflow-x: auto;
   height: 100vh;
+  direction: rtl; /* align short content to the right (beginning of vertical-rl) */
 }
 
 #reader.vertical-mode {
   height: 100%;
   min-height: auto;
+  direction: ltr; /* restore text direction inside the reader */
 }
 
 #reader p {
-  margin-bottom: var(--reader-paragraph-spacing);
+  margin-block-end: var(--reader-paragraph-spacing);
   position: relative;
 }
 
 #reader p:last-child {
-  margin-bottom: 0;
+  margin-block-end: 0;
 }
 
 /* Paragraph numbering */
@@ -46,7 +48,7 @@
 
 /* Numbering position for horizontal mode */
 #reader:not(.vertical-mode).show-numbering p::before {
-  left: -2em;
+  left: calc(-1 * var(--reader-margin-h) + 8px);
   top: 0.4em;
 }
 
