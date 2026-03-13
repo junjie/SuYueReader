@@ -5,7 +5,7 @@
   color: var(--fg);
   background: var(--bg);
   writing-mode: var(--reader-writing-mode);
-  padding: var(--reader-margin-v) var(--reader-margin-h);
+  padding: calc(var(--reader-margin-v) + 48px) var(--reader-margin-h) var(--reader-margin-v);
   min-height: 100%;
 }
 

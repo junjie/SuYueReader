@@ -10,10 +10,6 @@ export class SettingsSheet {
 
   constructor(store: SettingsStore) {
     this.store = store;
-
-    document.addEventListener('sheet-opening', (e: Event) => {
-      if ((e as CustomEvent).detail !== 'settings') this.close();
-    });
   }
 
   toggle(): void {
@@ -30,17 +26,16 @@ export class SettingsSheet {
 
     this.view = 'main';
     this.overlay = document.createElement('div');
-    this.overlay.className = 'settings-sheet-overlay';
+    this.overlay.className = 'sheet-overlay';
 
     const panel = document.createElement('div');
-    panel.className = 'settings-sheet-panel';
+    panel.className = 'sheet-panel';
     this.overlay.appendChild(panel);
     document.body.appendChild(this.overlay);
 
     this.buildMainView(panel);
     this.syncUI(panel);
 
-    // Force reflow then animate
     panel.getBoundingClientRect();
     requestAnimationFrame(() => this.overlay?.classList.add('open'));
 
@@ -48,15 +43,13 @@ export class SettingsSheet {
       if (e.target === this.overlay) this.close();
     });
 
-    // Listen for settings changes to sync UI
     const handler = () => {
       if (this.overlay) {
-        const p = this.overlay.querySelector<HTMLElement>('.settings-sheet-panel');
+        const p = this.overlay.querySelector<HTMLElement>('.sheet-panel');
         if (p) this.syncUI(p);
       }
     };
     document.addEventListener('settings-changed', handler);
-    // Store cleanup ref
     (this.overlay as any)._cleanup = () => document.removeEventListener('settings-changed', handler);
   }
 
@@ -74,58 +67,61 @@ export class SettingsSheet {
   private buildMainView(panel: HTMLElement): void {
     this.view = 'main';
     panel.innerHTML = `
-      <div class="sheet-drag-indicator"></div>
-      <div class="settings-sheet-body">
-        <section class="settings-row">
+      <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
+
+      <div class="sheet-group">
+        <div class="sheet-group-row static">
           <label>Font Size</label>
           <div class="font-size-controls">
-            <button class="sheet-btn font-size-btn" id="s-fontsize-down">A</button>
-            <span id="s-fontsize-val" class="font-size-value"></span>
-            <button class="sheet-btn font-size-btn font-size-btn-large" id="s-fontsize-up">A</button>
+            <button class="size-btn" id="s-fontsize-down">A</button>
+            <span id="s-fontsize-val" class="size-value"></span>
+            <button class="size-btn size-btn-large" id="s-fontsize-up">A</button>
           </div>
-        </section>
-
-        <section class="settings-row">
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static">
           <label>Theme</label>
-          <div class="theme-previews" id="s-theme-group">
-            <button data-theme="light" class="theme-preview" style="background:#faf8f5;color:#1a1a1a;border-color:#ddd" aria-label="Light">
-              <span class="theme-preview-char">读</span>
-              <span class="theme-preview-label">Light</span>
+          <div class="theme-swatches" id="s-theme-group">
+            <button data-theme="light" class="theme-swatch" style="background:#faf8f5;border-color:#ccc" aria-label="Light">
+              <span class="swatch-char" style="color:#1a1a1a">文</span>
             </button>
-            <button data-theme="dark" class="theme-preview" style="background:#1a1a1a;color:#e0ddd8;border-color:#333" aria-label="Dark">
-              <span class="theme-preview-char">读</span>
-              <span class="theme-preview-label">Dark</span>
+            <button data-theme="dark" class="theme-swatch" style="background:#1a1a1a;border-color:#444" aria-label="Dark">
+              <span class="swatch-char" style="color:#e0ddd8">文</span>
             </button>
-            <button data-theme="sepia" class="theme-preview" style="background:#f5e6c8;color:#5b4636;border-color:#d4c4a8" aria-label="Sepia">
-              <span class="theme-preview-char">读</span>
-              <span class="theme-preview-label">Sepia</span>
+            <button data-theme="sepia" class="theme-swatch" style="background:#f5e6c8;border-color:#d4c4a8" aria-label="Sepia">
+              <span class="swatch-char" style="color:#5b4636">文</span>
             </button>
           </div>
-        </section>
-
-        <section class="settings-row">
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static">
           <label>Writing Mode</label>
           <div class="segmented-control" id="s-mode-group">
             <button data-mode="horizontal" class="seg-btn">Horizontal</button>
             <button data-mode="vertical" class="seg-btn">Vertical</button>
           </div>
-        </section>
-
-        <section class="settings-row toggle-row">
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static toggle-row">
           <label>Pinyin</label>
           <label class="ios-switch">
             <input type="checkbox" id="s-pinyin" />
             <span class="ios-switch-track"></span>
           </label>
-        </section>
+        </div>
+      </div>
 
-        <section class="settings-row more-row">
-          <button class="sheet-btn more-btn" id="s-more">More Options ›</button>
-        </section>
+      <div class="sheet-group">
+        <button class="sheet-group-row" id="s-more">
+          <span>More Options</span>
+          <span class="row-chevron">›</span>
+        </button>
       </div>
     `;
 
-    // Font size buttons
+    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
+
+    // Font size
     panel.querySelector('#s-fontsize-down')!.addEventListener('click', () => {
       const s = this.store.get();
       this.store.update({ fontSize: Math.max(14, s.fontSize - 2) });
@@ -163,95 +159,106 @@ export class SettingsSheet {
     this.view = 'advanced';
     const s = this.store.get();
     panel.innerHTML = `
-      <div class="sheet-drag-indicator"></div>
-      <div class="settings-sheet-body">
-        <section class="settings-row">
-          <button class="sheet-btn back-btn" id="s-back">‹ Back</button>
-        </section>
+      <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
 
-        <section class="settings-row">
+      <div class="sheet-group">
+        <button class="sheet-group-row" id="s-back">
+          <span class="row-chevron back">‹</span>
+          <span>Back</span>
+        </button>
+      </div>
+
+      <div class="sheet-group">
+        <div class="sheet-group-row static">
           <label for="s-font">Font Family</label>
-          <select id="s-font" class="sheet-select">
+          <select id="s-font" class="inline-select">
             ${availableFonts.map((f) => `<option value="${f}">${f}</option>`).join('')}
           </select>
-        </section>
+        </div>
+      </div>
 
-        <section class="settings-row">
-          <label>Line Height: <span id="s-lineheight-val"></span></label>
+      <div class="sheet-group">
+        <div class="sheet-group-row static slider-row">
+          <label>Line Height <span id="s-lineheight-val"></span></label>
           <input type="range" id="s-lineheight" min="1.2" max="3.5" step="0.1" />
-        </section>
-
-        <section class="settings-row">
-          <label>Paragraph Spacing: <span id="s-paraspacing-val"></span></label>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static slider-row">
+          <label>Paragraph Spacing <span id="s-paraspacing-val"></span></label>
           <input type="range" id="s-paraspacing" min="0" max="4" step="0.25" />
-        </section>
-
-        <section class="settings-row">
-          <label>Horizontal Margin: <span id="s-marginh-val"></span></label>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static slider-row">
+          <label>H Margin <span id="s-marginh-val"></span></label>
           <input type="range" id="s-marginh" min="0" max="200" step="8" />
-        </section>
-
-        <section class="settings-row">
-          <label>Vertical Margin: <span id="s-marginv-val"></span></label>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static slider-row">
+          <label>V Margin <span id="s-marginv-val"></span></label>
           <input type="range" id="s-marginv" min="0" max="100" step="4" />
-        </section>
+        </div>
+      </div>
 
-        <section class="settings-row" id="pinyin-options" style="${s.showPinyin ? '' : 'display:none'}">
+      <div class="sheet-group" id="pinyin-options" style="${s.showPinyin ? '' : 'display:none'}">
+        <div class="sheet-group-row static">
           <label>Pinyin Position</label>
           <div class="segmented-control" id="s-pypos-group">
             <button data-pos="over" class="seg-btn">Above</button>
             <button data-pos="under" class="seg-btn">Below</button>
           </div>
-          <label>Pinyin Size: <span id="s-pysize-val"></span></label>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static slider-row">
+          <label>Pinyin Size <span id="s-pysize-val"></span></label>
           <input type="range" id="s-pysize" min="8" max="20" step="1" />
-        </section>
+        </div>
+      </div>
 
-        <section class="settings-row toggle-row">
+      <div class="sheet-group">
+        <div class="sheet-group-row static toggle-row">
           <label>Paragraph Numbers</label>
           <label class="ios-switch">
             <input type="checkbox" id="s-numbering" />
             <span class="ios-switch-track"></span>
           </label>
-        </section>
+        </div>
+      </div>
 
-        <section class="settings-row">
-          <button class="sheet-btn reset-btn" id="s-reset">Reset to Defaults</button>
-        </section>
+      <div class="sheet-group">
+        <button class="sheet-group-row reset-row" id="s-reset">
+          <span>Reset to Defaults</span>
+        </button>
       </div>
     `;
 
-    // Back
+    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
+
     panel.querySelector('#s-back')!.addEventListener('click', () => {
       this.buildMainView(panel);
       this.syncUI(panel);
     });
 
-    // Font
     panel.querySelector<HTMLSelectElement>('#s-font')!.addEventListener('change', (e) => {
       const font = (e.target as HTMLSelectElement).value;
       loadFont(font);
       this.store.update({ fontFamily: font });
     });
 
-    // Sliders
     this.bindSlider(panel, 's-lineheight', (v) => this.store.update({ lineHeight: Number(v) }));
     this.bindSlider(panel, 's-paraspacing', (v) => this.store.update({ paragraphSpacing: Number(v) }));
     this.bindSlider(panel, 's-marginh', (v) => this.store.update({ marginH: Number(v) }));
     this.bindSlider(panel, 's-marginv', (v) => this.store.update({ marginV: Number(v) }));
     this.bindSlider(panel, 's-pysize', (v) => this.store.update({ pinyinSize: Number(v) }));
 
-    // Pinyin position
     panel.querySelector('#s-pypos-group')?.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-pos]');
       if (btn) this.store.update({ pinyinPosition: btn.dataset.pos as PinyinPosition });
     });
 
-    // Numbering
     panel.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
       this.store.update({ showNumbering: (e.target as HTMLInputElement).checked });
     });
 
-    // Reset
     panel.querySelector('#s-reset')!.addEventListener('click', () => {
       this.store.reset();
       loadFont(defaultSettings.fontFamily);
@@ -267,45 +274,36 @@ export class SettingsSheet {
     const s: Settings = this.store.get();
 
     if (this.view === 'main') {
-      // Font size display
       const fsVal = panel.querySelector('#s-fontsize-val');
       if (fsVal) fsVal.textContent = `${s.fontSize}px`;
 
-      // Theme previews
-      panel.querySelectorAll('#s-theme-group .theme-preview').forEach((btn) => {
+      panel.querySelectorAll('#s-theme-group .theme-swatch').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.theme === s.theme);
       });
 
-      // Writing mode buttons
       panel.querySelectorAll('#s-mode-group .seg-btn').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.mode === s.writingMode);
       });
 
-      // Pinyin checkbox
       const pyCheck = panel.querySelector<HTMLInputElement>('#s-pinyin');
       if (pyCheck) pyCheck.checked = s.showPinyin;
     } else {
-      // Font select
       const fontSel = panel.querySelector<HTMLSelectElement>('#s-font');
       if (fontSel) fontSel.value = s.fontFamily;
 
-      // Sliders
       this.setSlider(panel, 's-lineheight', s.lineHeight, `${s.lineHeight}`);
       this.setSlider(panel, 's-paraspacing', s.paragraphSpacing, `${s.paragraphSpacing}em`);
       this.setSlider(panel, 's-marginh', s.marginH, `${s.marginH}px`);
       this.setSlider(panel, 's-marginv', s.marginV, `${s.marginV}px`);
       this.setSlider(panel, 's-pysize', s.pinyinSize, `${s.pinyinSize}px`);
 
-      // Pinyin options visibility
       const pyOpts = panel.querySelector<HTMLElement>('#pinyin-options');
       if (pyOpts) pyOpts.style.display = s.showPinyin ? '' : 'none';
 
-      // Pinyin position buttons
       panel.querySelectorAll('#s-pypos-group .seg-btn').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.pos === s.pinyinPosition);
       });
 
-      // Numbering checkbox
       const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');
       if (numCheck) numCheck.checked = s.showNumbering;
     }

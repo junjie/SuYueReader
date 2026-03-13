@@ -1,0 +1,43 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) 16px 8px;
+  z-index: 50;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: transform 0.3s ease;
+}
+
+.navbar.hidden,
+.navbar.navbar-scroll-hidden {
+  transform: translateY(-100%);
+  pointer-events: none;
+}
+
+.navbar-btn {
+  border: none;
+  background: none;
+  color: var(--fg);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 8px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.navbar-btn:active {
+  background: var(--btn-hover);
+}
+
+.navbar-btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+}
