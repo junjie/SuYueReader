@@ -69,7 +69,16 @@ export class SettingsStore {
     root.setProperty('--pinyin-size', `${s.pinyinSize}px`);
   }
 
+  private static themeColors: Record<string, string> = {
+    light: '#faf8f5',
+    dark: '#1a1a1a',
+    sepia: '#f5e6c8',
+  };
+
   private syncTheme(): void {
-    document.documentElement.setAttribute('data-theme', this.settings.theme);
+    const theme = this.settings.theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
+    if (meta) meta.content = SettingsStore.themeColors[theme] || SettingsStore.themeColors.light;
   }
 }

@@ -116,12 +116,86 @@
   color: var(--btn-active-fg);
 }
 
-/* Toggle input */
-.toggle-input {
-  width: 44px;
-  height: 24px;
+/* Theme preview buttons */
+.theme-previews {
+  display: flex;
+  gap: 10px;
+}
+
+.theme-preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 8px 8px;
+  border: 2px solid;
+  border-radius: 10px;
   cursor: pointer;
-  accent-color: var(--primary-bg);
+  transition: transform 0.15s, box-shadow 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-preview.active {
+  box-shadow: 0 0 0 2px var(--primary-bg);
+  transform: scale(1.05);
+}
+
+.theme-preview-char {
+  font-size: 26px;
+  line-height: 1.2;
+  font-family: var(--reader-font-family, serif);
+}
+
+.theme-preview-label {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+/* iOS-style toggle switch */
+.ios-switch {
+  position: relative;
+  display: inline-block;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+
+.ios-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.ios-switch-track {
+  position: absolute;
+  inset: 0;
+  background: var(--btn-bg);
+  border-radius: 31px;
+  transition: background 0.25s ease;
+  cursor: pointer;
+}
+
+.ios-switch-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s ease;
+}
+
+.ios-switch input:checked + .ios-switch-track {
+  background: #34c759;
+}
+
+.ios-switch input:checked + .ios-switch-track::after {
+  transform: translateX(20px);
 }
 
 /* Sheet buttons */

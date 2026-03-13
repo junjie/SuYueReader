@@ -87,10 +87,19 @@ export class SettingsSheet {
 
         <section class="settings-row">
           <label>Theme</label>
-          <div class="segmented-control" id="s-theme-group">
-            <button data-theme="light" class="seg-btn">Light</button>
-            <button data-theme="dark" class="seg-btn">Dark</button>
-            <button data-theme="sepia" class="seg-btn">Sepia</button>
+          <div class="theme-previews" id="s-theme-group">
+            <button data-theme="light" class="theme-preview" style="background:#faf8f5;color:#1a1a1a;border-color:#ddd" aria-label="Light">
+              <span class="theme-preview-char">读</span>
+              <span class="theme-preview-label">Light</span>
+            </button>
+            <button data-theme="dark" class="theme-preview" style="background:#1a1a1a;color:#e0ddd8;border-color:#333" aria-label="Dark">
+              <span class="theme-preview-char">读</span>
+              <span class="theme-preview-label">Dark</span>
+            </button>
+            <button data-theme="sepia" class="theme-preview" style="background:#f5e6c8;color:#5b4636;border-color:#d4c4a8" aria-label="Sepia">
+              <span class="theme-preview-char">读</span>
+              <span class="theme-preview-label">Sepia</span>
+            </button>
           </div>
         </section>
 
@@ -103,8 +112,11 @@ export class SettingsSheet {
         </section>
 
         <section class="settings-row toggle-row">
-          <label for="s-pinyin">Pinyin</label>
-          <input type="checkbox" id="s-pinyin" class="toggle-input" />
+          <label>Pinyin</label>
+          <label class="ios-switch">
+            <input type="checkbox" id="s-pinyin" />
+            <span class="ios-switch-track"></span>
+          </label>
         </section>
 
         <section class="settings-row more-row">
@@ -195,8 +207,11 @@ export class SettingsSheet {
         </section>
 
         <section class="settings-row toggle-row">
-          <label for="s-numbering">Paragraph Numbers</label>
-          <input type="checkbox" id="s-numbering" class="toggle-input" />
+          <label>Paragraph Numbers</label>
+          <label class="ios-switch">
+            <input type="checkbox" id="s-numbering" />
+            <span class="ios-switch-track"></span>
+          </label>
         </section>
 
         <section class="settings-row">
@@ -256,8 +271,8 @@ export class SettingsSheet {
       const fsVal = panel.querySelector('#s-fontsize-val');
       if (fsVal) fsVal.textContent = `${s.fontSize}px`;
 
-      // Theme buttons
-      panel.querySelectorAll('#s-theme-group .seg-btn').forEach((btn) => {
+      // Theme previews
+      panel.querySelectorAll('#s-theme-group .theme-preview').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.theme === s.theme);
       });
 
