@@ -1,0 +1,125 @@
+#settings-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: min(360px, 100vw);
+  height: 100%;
+  background: var(--settings-bg);
+  border-left: 1px solid var(--border);
+  transform: translateX(100%);
+  transition: transform 0.25s ease;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+#settings-panel.open {
+  transform: translateX(0);
+}
+
+.settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-header h2 {
+  font-size: 18px;
+  color: var(--fg);
+}
+
+.settings-close {
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--fg);
+  padding: 4px;
+}
+
+.settings-body {
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  overflow-y: auto;
+}
+
+.settings-body section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-body label {
+  font-size: 14px;
+  color: var(--fg);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.settings-body label span {
+  color: var(--fg-muted);
+  font-size: 13px;
+}
+
+.settings-body select {
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--btn-bg);
+  color: var(--fg);
+  font-size: 14px;
+}
+
+.settings-body input[type="range"] {
+  width: 100%;
+  cursor: pointer;
+}
+
+.settings-body input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+.btn-group {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-group button {
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--btn-bg);
+  color: var(--fg);
+  cursor: pointer;
+  font-size: 13px;
+  transition: background 0.15s, color 0.15s;
+}
+
+.btn-group button:hover {
+  background: var(--btn-hover);
+}
+
+.btn-group button.active {
+  background: var(--btn-active-bg);
+  color: var(--btn-active-fg);
+  border-color: var(--btn-active-bg);
+}
+
+#s-reset {
+  margin-top: 8px;
+}
+
+@media (max-width: 600px) {
+  #settings-panel {
+    width: 100vw;
+  }
+}

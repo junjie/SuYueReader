@@ -1,0 +1,80 @@
+#reader {
+  font-family: var(--reader-font-family);
+  font-size: var(--reader-font-size);
+  line-height: var(--reader-line-height);
+  color: var(--fg);
+  background: var(--bg);
+  writing-mode: var(--reader-writing-mode);
+  padding: var(--reader-margin-v) var(--reader-margin-h);
+  min-height: 100%;
+}
+
+/* Horizontal mode: vertical scroll on container */
+#reader-container {
+  background: var(--bg);
+}
+
+/* Vertical mode: horizontal scroll */
+#reader.vertical-mode {
+  height: 100%;
+  min-height: auto;
+}
+
+#reader p {
+  margin-bottom: var(--reader-paragraph-spacing);
+  position: relative;
+}
+
+#reader p:last-child {
+  margin-bottom: 0;
+}
+
+/* Paragraph numbering */
+#reader.show-numbering p::before {
+  content: attr(data-index);
+  position: absolute;
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-family: system-ui, sans-serif;
+  opacity: 0.5;
+}
+
+/* Numbering position for horizontal mode */
+#reader:not(.vertical-mode).show-numbering p::before {
+  left: -2em;
+  top: 0.4em;
+}
+
+/* Numbering position for vertical mode */
+#reader.vertical-mode.show-numbering p::before {
+  top: -1.5em;
+  right: 0;
+  writing-mode: horizontal-tb;
+}
+
+/* Ruby / Pinyin */
+#reader ruby {
+  ruby-align: center;
+}
+
+#reader rt {
+  font-size: var(--pinyin-size);
+  font-family: system-ui, sans-serif;
+  color: var(--fg-muted);
+}
+
+#reader[data-pinyin-position="over"] ruby {
+  ruby-position: over;
+}
+
+#reader[data-pinyin-position="under"] ruby {
+  ruby-position: under;
+}
+
+/* Placeholder */
+.reader-placeholder {
+  color: var(--fg-muted);
+  font-style: italic;
+  text-align: center;
+  padding-top: 20vh;
+}

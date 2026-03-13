@@ -1,0 +1,32 @@
+:root,
+[data-theme="light"] {
+  --bg: #faf8f5;
+  --fg: #1a1a1a;
+  --fg-muted: #888;
+  --border: #ddd;
+  --toolbar-bg: #fff;
+  --toolbar-border: #e0e0e0;
+  --settings-bg: #fff;
+  --btn-bg: #f0eeeb;
+  --btn-hover: #e5e2de;
+  --btn-active-bg: #333;
+  --btn-active-fg: #fff;
+  --primary-bg: #2563eb;
+  --primary-fg: #fff;
+}
+
+[data-theme="dark"] {
+  --bg: #1a1a1a;
+  --fg: #e0ddd8;
+  --fg-muted: #666;
+  --border: #333;
+  --toolbar-bg: #222;
+  --toolbar-border: #333;
+  --settings-bg: #222;
+  --btn-bg: #333;
+  --btn-hover: #444;
+  --btn-active-bg: #e0ddd8;
+  --btn-active-fg: #1a1a1a;
+  --primary-bg: #3b82f6;
+  --primary-fg: #fff;
+}
