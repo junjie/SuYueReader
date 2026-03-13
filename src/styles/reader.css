@@ -5,8 +5,14 @@
   color: var(--fg);
   background: var(--bg);
   writing-mode: var(--reader-writing-mode);
-  padding: calc(var(--reader-margin-v) + 48px) var(--reader-margin-h) var(--reader-margin-v);
+  padding: var(--reader-margin-v) var(--reader-margin-h);
   min-height: 100%;
+}
+
+/* Horizontal mode: navbar offset on top */
+#reader:not(.vertical-mode) {
+  padding-top: calc(var(--reader-margin-v) + var(--navbar-offset, 48px));
+  transition: padding-top 0.3s ease;
 }
 
 /* Horizontal mode: body scrolls naturally */
@@ -14,17 +20,29 @@
   background: var(--bg);
 }
 
-/* Vertical mode: needs its own horizontal scroll container */
+/* Vertical mode: lock body scroll, use container for horizontal scroll */
+html:has(.vertical-mode) {
+  overflow: hidden;
+  height: 100vh;
+  height: 100dvh; /* actual visible viewport on iOS */
+}
+
 #reader-container:has(.vertical-mode) {
   overflow-x: auto;
+  overflow-y: hidden;
   height: 100vh;
+  height: 100dvh;
   direction: rtl; /* align short content to the right (beginning of vertical-rl) */
 }
 
 #reader.vertical-mode {
+  padding-top: calc(var(--reader-margin-v) + env(safe-area-inset-top, 0px));
+  padding-right: calc(var(--reader-margin-h) + var(--navbar-offset, 48px));
+  padding-bottom: calc(var(--reader-margin-v) + env(safe-area-inset-bottom, 0px));
   height: 100%;
   min-height: auto;
   direction: ltr; /* restore text direction inside the reader */
+  transition: padding-right 0.3s ease;
 }
 
 #reader p {
@@ -52,10 +70,17 @@
   top: 0.4em;
 }
 
+/* Adjust numbering when pinyin is above text */
+#reader:not(.vertical-mode).show-numbering[data-pinyin-position="over"]:has(ruby) p::before {
+  top: calc(0.4em + var(--pinyin-size));
+}
+
 /* Numbering position for vertical mode */
 #reader.vertical-mode.show-numbering p::before {
   top: -1.5em;
   right: 0;
+  width: calc(1em * var(--reader-line-height));
+  text-align: center;
   writing-mode: horizontal-tb;
 }
 

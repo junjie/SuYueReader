@@ -41,3 +41,54 @@
   justify-content: center;
   padding: 8px;
 }
+
+/* Script variant segmented control */
+.navbar-script-seg {
+  display: flex;
+  background: var(--btn-bg);
+  border-radius: 8px;
+  padding: 2px;
+}
+
+.nseg-btn {
+  border: none;
+  background: transparent;
+  color: var(--fg);
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nseg-btn.active {
+  background: var(--btn-active-bg);
+  color: var(--btn-active-fg);
+}
+
+/* Vertical navbar orientation */
+.navbar.navbar-vertical {
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: auto;
+  flex-direction: column;
+  justify-content: center;
+  width: 48px;
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px 8px;
+}
+
+.navbar.navbar-vertical.hidden,
+.navbar.navbar-vertical.navbar-scroll-hidden {
+  transform: translateX(100%);
+}
+
+.navbar.navbar-vertical .navbar-script-seg {
+  flex-direction: column;
+}
+
+.navbar.navbar-vertical .navbar-btn {
+  padding: 8px;
+}
