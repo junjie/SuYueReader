@@ -21,17 +21,19 @@ export class Navbar {
     this.nav = document.createElement('nav');
     this.nav.className = 'navbar';
     this.nav.innerHTML = `
-      <button class="navbar-btn navbar-btn-icon" id="navbar-open" aria-label="Open">
-        ${documentIcon()}
-      </button>
-      <div class="navbar-script-seg">
-        <button data-variant="original" class="nseg-btn">原</button>
-        <button data-variant="simplified" class="nseg-btn">简</button>
-        <button data-variant="traditional" class="nseg-btn">繁</button>
+      <div class="navbar-inner">
+        <button class="navbar-btn navbar-btn-icon" id="navbar-open" aria-label="Open">
+          ${documentIcon()}
+        </button>
+        <div class="navbar-script-seg">
+          <button data-variant="original" class="nseg-btn">原</button>
+          <button data-variant="simplified" class="nseg-btn">简</button>
+          <button data-variant="traditional" class="nseg-btn">繁</button>
+        </div>
+        <button class="navbar-btn navbar-btn-icon" id="navbar-settings" aria-label="Settings">
+          ${gearIcon()}
+        </button>
       </div>
-      <button class="navbar-btn navbar-btn-icon" id="navbar-settings" aria-label="Settings">
-        ${gearIcon()}
-      </button>
     `;
     document.body.appendChild(this.nav);
 

@@ -98,7 +98,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>Writing Mode</label>
+          <label>Layout</label>
           <div class="segmented-control" id="s-mode-group">
             <button data-mode="horizontal" class="seg-btn">Horizontal</button>
             <button data-mode="vertical" class="seg-btn">Vertical</button>

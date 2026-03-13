@@ -65,7 +65,7 @@ html:has(.vertical-mode) {
   color: var(--fg-muted);
   font-size: 12px;
   font-family: system-ui, sans-serif;
-  opacity: 0.5;
+  opacity: 0.8;
 }
 
 /* Numbering position for horizontal mode */
