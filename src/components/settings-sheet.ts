@@ -201,11 +201,11 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>H Margin</label>
+          <label>Line Length</label>
           <div class="stepper-controls">
-            <button class="size-btn" id="s-marginh-down">−</button>
-            <span id="s-marginh-val" class="size-value"></span>
-            <button class="size-btn" id="s-marginh-up">+</button>
+            <button class="size-btn" id="s-linelen-down">−</button>
+            <span id="s-linelen-val" class="size-value"></span>
+            <button class="size-btn" id="s-linelen-up">+</button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
@@ -246,7 +246,7 @@ export class SettingsSheet {
     const isVertical = this.store.get().writingMode === 'vertical';
     this.bindStepper(panel, 's-lineheight', 1.2, 3.5, 0.1, 'lineHeight');
     this.bindStepper(panel, 's-paraspacing', 0, 4, 0.25, isVertical ? 'verticalParagraphSpacing' : 'paragraphSpacing');
-    this.bindStepper(panel, 's-marginh', 0, 200, 8, 'marginH');
+    this.bindStepper(panel, 's-linelen', 20, 60, 5, 'lineLength');
     this.bindStepper(panel, 's-marginv', 0, 100, 4, isVertical ? 'verticalMarginV' : 'marginV');
 
     panel.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
@@ -390,7 +390,7 @@ export class SettingsSheet {
       const isVertical = s.writingMode === 'vertical';
       this.setStepperVal(panel, 's-lineheight', `${s.lineHeight}`);
       this.setStepperVal(panel, 's-paraspacing', `${isVertical ? s.verticalParagraphSpacing : s.paragraphSpacing}em`);
-      this.setStepperVal(panel, 's-marginh', `${s.marginH}px`);
+      this.setStepperVal(panel, 's-linelen', `${s.lineLength}字`);
       this.setStepperVal(panel, 's-marginv', `${isVertical ? s.verticalMarginV : s.marginV}px`);
 
       const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');

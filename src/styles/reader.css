@@ -6,6 +6,8 @@
   background: var(--bg);
   writing-mode: var(--reader-writing-mode);
   padding: var(--reader-margin-v) var(--reader-margin-h);
+  max-inline-size: var(--reader-max-line-length);
+  margin-inline: auto;
   min-height: 100%;
 }
 
@@ -33,13 +35,15 @@ html:has(.vertical-mode) {
   height: 100vh;
   height: 100dvh;
   direction: rtl; /* align short content to the right (beginning of vertical-rl) */
+  display: flex;
+  align-items: center;
 }
 
 #reader.vertical-mode {
   padding-top: calc(var(--reader-margin-v) + env(safe-area-inset-top, 0px));
   padding-right: calc(var(--reader-margin-h) + var(--navbar-offset, 48px));
   padding-bottom: calc(var(--reader-margin-v) + env(safe-area-inset-bottom, 0px));
-  height: 100%;
+  height: auto;
   min-height: auto;
   direction: ltr; /* restore text direction inside the reader */
   transition: padding-right 0.3s ease;

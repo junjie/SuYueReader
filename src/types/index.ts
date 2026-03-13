@@ -24,4 +24,5 @@ export interface Settings {
   pinyinSize: number;
   showNumbering: boolean;
   scriptVariant: ScriptVariant;
+  lineLength: number;
 }

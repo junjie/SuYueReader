@@ -89,6 +89,7 @@ export class SettingsStore {
       '--reader-writing-mode',
       s.writingMode === 'vertical' ? 'vertical-rl' : 'horizontal-tb'
     );
+    root.setProperty('--reader-max-line-length', `${s.lineLength}em`);
     root.setProperty('--pinyin-size', `${s.pinyinSize}px`);
   }
 

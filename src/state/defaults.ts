@@ -16,4 +16,5 @@ export const defaultSettings: Settings = {
   pinyinSize: 12,
   showNumbering: true,
   scriptVariant: 'original',
+  lineLength: 35,
 };
