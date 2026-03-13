@@ -23,6 +23,7 @@ export class Reader {
   setParagraphs(paragraphs: Paragraph[]): void {
     this.paragraphs = paragraphs;
     this.render();
+    window.scrollTo(0, 0);
   }
 
   private updateAttributes(): void {

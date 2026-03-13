@@ -5,19 +5,10 @@
 }
 
 html, body {
-  height: 100%;
   font-family: system-ui, sans-serif;
 }
 
-body {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 #reader-container {
-  flex: 1;
-  overflow: auto;
   position: relative;
 }
 
