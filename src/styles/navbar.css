@@ -76,6 +76,7 @@
   left: auto;
   flex-direction: column;
   justify-content: center;
+  gap: 16px;
   width: 48px;
   padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px 8px;
 }

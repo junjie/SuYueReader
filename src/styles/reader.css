@@ -66,14 +66,10 @@ html:has(.vertical-mode) {
 
 /* Numbering position for horizontal mode */
 #reader:not(.vertical-mode).show-numbering p::before {
-  left: calc(-1 * var(--reader-margin-h) + 8px);
-  top: 0.4em;
+  right: calc(100% + 6px);
+  top: 0;
 }
 
-/* Adjust numbering when pinyin is above text */
-#reader:not(.vertical-mode).show-numbering[data-pinyin-position="over"]:has(ruby) p::before {
-  top: calc(0.4em + var(--pinyin-size));
-}
 
 /* Numbering position for vertical mode */
 #reader.vertical-mode.show-numbering p::before {
