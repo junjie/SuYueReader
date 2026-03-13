@@ -1,7 +1,7 @@
 import type { Settings } from '../types/index.ts';
 
 export const defaultSettings: Settings = {
-  fontFamily: 'Noto Serif SC',
+  fontFamily: 'Noto Serif',
   fontSize: 22,
   lineHeight: 1.5,
   paragraphSpacing: 1,
@@ -15,4 +15,5 @@ export const defaultSettings: Settings = {
   pinyinPosition: 'over',
   pinyinSize: 12,
   showNumbering: true,
+  scriptVariant: 'original',
 };

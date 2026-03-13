@@ -1,7 +1,6 @@
 import type { SettingsStore } from '../state/settings.ts';
 import type { Settings, WritingMode, PinyinPosition, ThemeMode } from '../types/index.ts';
-import { availableFonts, loadFont } from '../services/fonts.ts';
-import { defaultSettings } from '../state/defaults.ts';
+import { displayFonts, previewFontName, loadFontPreview } from '../services/fonts.ts';
 
 export class SettingsSheet {
   private overlay: HTMLElement | null = null;
@@ -256,7 +255,7 @@ export class SettingsSheet {
 
     panel.querySelector('#s-reset')!.addEventListener('click', () => {
       this.store.reset();
-      loadFont(defaultSettings.fontFamily);
+      // Font will be loaded via syncCSS on reset
     });
   }
 
@@ -279,8 +278,8 @@ export class SettingsSheet {
         </div>
       </div>
 
-      <div class="sheet-group" id="s-font-list">
-        ${availableFonts.map((f) => `<button class="font-choice" data-font="${f}"><span class="font-choice-preview" style="font-family:'${f}',serif">Aa 文字</span><span class="font-choice-name">${f}</span></button>`).join('<div class="sheet-group-divider"></div>')}
+      <div class="font-scroll-row" id="s-font-list">
+        ${displayFonts.map((f) => `<button class="font-card" data-font="${f}"><span class="font-card-preview" style="font-family:'${previewFontName(f)}',serif">文字</span><span class="font-card-name">${f}</span></button>`).join('')}
       </div>
     `;
 
@@ -304,13 +303,13 @@ export class SettingsSheet {
       const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-font]');
       if (btn) {
         const font = btn.dataset.font!;
-        loadFont(font);
+        // Font loading happens in syncCSS via resolveFont
         this.store.update({ fontFamily: font });
       }
     });
 
-    // Preload all fonts so previews render
-    availableFonts.forEach((f) => loadFont(f));
+    // Load lightweight previews (only a few glyphs each)
+    displayFonts.forEach((f) => loadFontPreview(f));
   }
 
   private buildPinyinView(panel: HTMLElement): void {
@@ -400,7 +399,7 @@ export class SettingsSheet {
       const fsVal = panel.querySelector('#s-fontsize-val');
       if (fsVal) fsVal.textContent = `${s.fontSize}px`;
 
-      panel.querySelectorAll('#s-font-list .font-choice').forEach((btn) => {
+      panel.querySelectorAll('#s-font-list .font-card').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.font === s.fontFamily);
       });
     } else if (this.view === 'pinyin') {

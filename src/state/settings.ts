@@ -1,5 +1,6 @@
 import type { Settings } from '../types/index.ts';
 import { defaultSettings } from './defaults.ts';
+import { resolveFont, loadFont } from '../services/fonts.ts';
 
 const STORAGE_KEY = 'chinese-reader-settings';
 
@@ -12,11 +13,26 @@ export class SettingsStore {
     this.syncTheme();
   }
 
+  /** Migrate old SC/TC-specific font names to display names */
+  private static FONT_MIGRATION: Record<string, string> = {
+    'Noto Serif SC': 'Noto Serif',
+    'Noto Serif TC': 'Noto Serif',
+    'Noto Sans SC': 'Noto Sans',
+    'Noto Sans TC': 'Noto Sans',
+    'LXGW WenKai': 'LXGW WenKai',
+    'LXGW WenKai TC': 'LXGW WenKai',
+  };
+
   private load(): Settings {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        return { ...defaultSettings, ...JSON.parse(stored) };
+        const parsed = JSON.parse(stored);
+        // Migrate old font names
+        if (parsed.fontFamily && SettingsStore.FONT_MIGRATION[parsed.fontFamily]) {
+          parsed.fontFamily = SettingsStore.FONT_MIGRATION[parsed.fontFamily];
+        }
+        return { ...defaultSettings, ...parsed };
       }
     } catch {
       // ignore
@@ -43,10 +59,12 @@ export class SettingsStore {
       partial.showPinyin !== undefined && partial.showPinyin !== prev.showPinyin;
     const writingModeChanged =
       partial.writingMode !== undefined && partial.writingMode !== prev.writingMode;
+    const scriptVariantChanged =
+      partial.scriptVariant !== undefined && partial.scriptVariant !== prev.scriptVariant;
 
     document.dispatchEvent(
       new CustomEvent('settings-changed', {
-        detail: { settings: this.get(), pinyinChanged, writingModeChanged, prevWritingMode: prev.writingMode },
+        detail: { settings: this.get(), pinyinChanged, writingModeChanged, scriptVariantChanged, prevWritingMode: prev.writingMode },
       })
     );
   }
@@ -58,7 +76,9 @@ export class SettingsStore {
   private syncCSS(): void {
     const s = this.settings;
     const root = document.documentElement.style;
-    root.setProperty('--reader-font-family', `"${s.fontFamily}", serif`);
+    const effectiveFont = resolveFont(s.fontFamily, s.scriptVariant);
+    loadFont(effectiveFont);
+    root.setProperty('--reader-font-family', `"${effectiveFont}", serif`);
     root.setProperty('--reader-font-size', `${s.fontSize}px`);
     root.setProperty('--reader-line-height', `${s.lineHeight}`);
     const isVertical = s.writingMode === 'vertical';
