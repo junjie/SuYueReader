@@ -170,12 +170,13 @@ export class DefinitionPopup {
   }
 
   private async drillDown(char: string): Promise<void> {
+    this.cancelHide();
     if (this.currentWord) {
       this.history.push(this.currentWord);
     }
     this.currentWord = char;
 
-    // Set flag to prevent iPad dismissal
+    // Set flag to prevent dismissal from residual touch events
     this._justDrilledDown = true;
     requestAnimationFrame(() => {
       this._justDrilledDown = false;
@@ -194,11 +195,12 @@ export class DefinitionPopup {
   }
 
   private async goBack(): Promise<void> {
+    this.cancelHide();
     const prev = this.history.pop();
     if (!prev) return;
     this.currentWord = prev;
 
-    // Set flag to prevent iPad dismissal
+    // Set flag to prevent dismissal from residual touch events
     this._justDrilledDown = true;
     requestAnimationFrame(() => {
       this._justDrilledDown = false;
