@@ -16,7 +16,7 @@ export interface FootnoteRange {
 export interface Paragraph {
   index: number;
   text: string;
-  type?: 'heading2' | 'heading3';
+  type?: 'heading2' | 'heading3' | 'list-bullet' | 'list-ordered';
   formatting?: InlineFormat[];
   footnoteRanges?: FootnoteRange[];
 }

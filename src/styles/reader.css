@@ -63,15 +63,38 @@ html:has(.vertical-mode) {
   margin-block-end: 0;
 }
 
+/* Lists */
+#reader ul,
+#reader ol {
+  margin-block-start: 0;
+  margin-block-end: var(--reader-paragraph-spacing);
+  padding-inline-start: 1.5em;
+  position: relative;
+}
+
+#reader ul:last-child,
+#reader ol:last-child {
+  margin-block-end: 0;
+}
+
+#reader li {
+  margin-block-end: 0.25em;
+  position: relative;
+}
+
+#reader li:last-child {
+  margin-block-end: 0;
+}
+
 /* Headings */
 #reader h2 {
-  font-size: 1.5em;
+  font-size: 1.2em;
   font-weight: 700;
   line-height: 1.3;
 }
 
 #reader h3 {
-  font-size: 1.25em;
+  font-size: 1.1em;
   font-weight: 700;
   line-height: 1.3;
 }
@@ -86,14 +109,30 @@ html:has(.vertical-mode) {
   opacity: 0.8;
 }
 
+/* List items use the parent ul/ol for numbering, not individual li */
+#reader.show-numbering li[data-index]::before {
+  content: none;
+}
+
+#reader.show-numbering [data-list-index]::before {
+  content: attr(data-list-index);
+  position: absolute;
+  color: var(--fg-muted);
+  font-size: 12px;
+  font-family: system-ui, sans-serif;
+  opacity: 0.8;
+}
+
 /* Numbering position for horizontal mode */
-#reader:not(.vertical-mode).show-numbering [data-index]::before {
+#reader:not(.vertical-mode).show-numbering [data-index]::before,
+#reader:not(.vertical-mode).show-numbering [data-list-index]::before {
   right: calc(100% + 6px);
   top: 0;
 }
 
 /* Numbering position for vertical mode */
-#reader.vertical-mode.show-numbering [data-index]::before {
+#reader.vertical-mode.show-numbering [data-index]::before,
+#reader.vertical-mode.show-numbering [data-list-index]::before {
   top: -1.5em;
   right: 0;
   width: calc(1em * var(--reader-line-height));

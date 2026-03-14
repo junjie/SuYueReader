@@ -222,6 +222,33 @@ export function parseText(raw: string): ParseResult {
       }
     }
 
+    // Check if block contains list items (each line starts with - or * or 1.)
+    // Lines may have trailing whitespace (e.g. markdown `  \n` line breaks)
+    {
+      const lines = text.split('\n').map(l => l.trimEnd());
+      const allBullets = lines.every(l => /^[-*]\s+/.test(l));
+      const allOrdered = lines.every(l => /^\d+[.)]\s+/.test(l));
+      if (allBullets || allOrdered) {
+        const listType = allBullets ? 'list-bullet' : 'list-ordered';
+        const re = allBullets ? /^[-*]\s+(.+)$/ : /^\d+[.)]\s+(.+)$/;
+        const groupIndex = index++;
+        for (const line of lines) {
+          const m = line.match(re);
+          if (m) {
+            const { cleanText, formatting, footnoteRanges } = parseInlineFormatting(m[1]);
+            paragraphs.push({
+              index: groupIndex,
+              text: cleanText,
+              type: listType,
+              formatting: formatting.length > 0 ? formatting : undefined,
+              footnoteRanges: footnoteRanges.length > 0 ? footnoteRanges : undefined,
+            });
+          }
+        }
+        continue;
+      }
+    }
+
     // Regular paragraph
     const { cleanText, formatting, footnoteRanges } = parseInlineFormatting(text);
     paragraphs.push({

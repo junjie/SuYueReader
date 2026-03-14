@@ -238,10 +238,25 @@ export class Reader {
 
   private renderPlain(scriptVariant: string | null): void {
     const fragments: string[] = [];
-    for (const para of this.paragraphs) {
-      const tag = para.type === 'heading2' ? 'h2' : para.type === 'heading3' ? 'h3' : 'p';
+    for (let i = 0; i < this.paragraphs.length; i++) {
+      const para = this.paragraphs[i];
       const html = para.text.split('\n').map(line => this.escapeHtml(line)).join('<br>');
-      fragments.push(`<${tag} data-index="${para.index}">${html}</${tag}>`);
+
+      if (para.type === 'list-bullet' || para.type === 'list-ordered') {
+        const listTag = para.type === 'list-bullet' ? 'ul' : 'ol';
+        const prev = this.paragraphs[i - 1];
+        const next = this.paragraphs[i + 1];
+        const isFirst = prev?.type !== para.type || prev?.index !== para.index;
+        const isLast = next?.type !== para.type || next?.index !== para.index;
+        let out = '';
+        if (isFirst) out += `<${listTag} data-list-index="${para.index}">`;
+        out += `<li data-index="${para.index}">${html}</li>`;
+        if (isLast) out += `</${listTag}>`;
+        fragments.push(out);
+      } else {
+        const tag = para.type === 'heading2' ? 'h2' : para.type === 'heading3' ? 'h3' : 'p';
+        fragments.push(`<${tag} data-index="${para.index}">${html}</${tag}>`);
+      }
     }
     this.container.innerHTML = fragments.join('');
 
@@ -357,28 +372,38 @@ export class Reader {
     let pIdx = 0;
     let charPos = 0;
 
+    // Track currently open formatting spans so we can open/close them
+    // at segment boundaries, allowing one span to wrap multiple segments.
+    const activeFormats = new Set<InlineFormat>();
+
     for (const seg of segments) {
       const chars = [...seg.text];
       const segLen = chars.length;
       const segEnd = charPos + segLen;
       const hasCjk = chars.some((c) => CJK_RE.test(c));
 
-      // Determine formatting wrappers
-      const fmtOpen: string[] = [];
-      const fmtClose: string[] = [];
+      // Close formats that end at or before this segment's start
+      for (const f of activeFormats) {
+        if (f.end <= charPos) {
+          result += this.fmtCloseTag(f);
+          activeFormats.delete(f);
+        }
+      }
+
+      // Open formats that start at or before this segment and end after its start
       if (formatting.length > 0) {
         for (const f of formatting) {
-          if (charPos < f.end && segEnd > f.start) {
-            if (f.type === 'bold') {
-              fmtOpen.push('<strong>');
-              fmtClose.unshift('</strong>');
-            } else if (f.type === 'underline') {
-              fmtOpen.push('<u>');
-              fmtClose.unshift('</u>');
-            } else if (f.type === 'highlight' && f.color) {
-              fmtOpen.push(`<span class="hl-${f.color}">`);
-              fmtClose.unshift('</span>');
-            }
+          if (!activeFormats.has(f) && f.start <= charPos && f.end > charPos) {
+            result += this.fmtOpenTag(f);
+            activeFormats.add(f);
+          }
+        }
+        for (const f of formatting) {
+          if (!activeFormats.has(f) && f.start >= charPos && f.start < segEnd) {
+            // Format starts mid-segment — we still open it here since we
+            // don't split segments at formatting boundaries
+            result += this.fmtOpenTag(f);
+            activeFormats.add(f);
           }
         }
       }
@@ -402,11 +427,8 @@ export class Reader {
           pIdx++;
         }
         const fnKeyAttr = matchedFootnote ? ` data-footnote-key="${this.escapeAttr(matchedFootnote.key)}"` : '';
-        result += fmtOpen.join('');
         result += `<span class="word${hasNote ? ' has-footnote' : ''}" data-word="${this.escapeAttr(seg.text)}"${fnKeyAttr}>${inner}</span>`;
-        result += fmtClose.join('');
       } else {
-        result += fmtOpen.join('');
         for (const char of chars) {
           if (showPinyin && pinyinArr && CJK_RE.test(char)) {
             const py = pinyinArr[pIdx] || '';
@@ -416,10 +438,14 @@ export class Reader {
           }
           pIdx++;
         }
-        result += fmtClose.join('');
       }
 
       charPos = segEnd;
+    }
+
+    // Close any remaining open formats
+    for (const f of activeFormats) {
+      result += this.fmtCloseTag(f);
     }
 
     return result;
@@ -433,5 +459,19 @@ export class Reader {
 
   private escapeAttr(text: string): string {
     return text.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  private fmtOpenTag(f: InlineFormat): string {
+    if (f.type === 'bold') return '<strong>';
+    if (f.type === 'underline') return '<u>';
+    if (f.type === 'highlight' && f.color) return `<span class="hl-${f.color}">`;
+    return '';
+  }
+
+  private fmtCloseTag(f: InlineFormat): string {
+    if (f.type === 'bold') return '</strong>';
+    if (f.type === 'underline') return '</u>';
+    if (f.type === 'highlight') return '</span>';
+    return '';
   }
 }
