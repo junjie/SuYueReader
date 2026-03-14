@@ -2,9 +2,9 @@ import type { Paragraph, InlineFormat, FootnoteRange, CRDRFile } from '../types/
 import type { SettingsStore } from '../state/settings.ts';
 import { getPinyinArray } from '../services/pinyin.ts';
 import { convertScript } from '../services/script-convert.ts';
-import { segmentText, type Segment } from '../services/segmenter.ts';
+import { segmentText, refineSegments, type Segment } from '../services/segmenter.ts';
 import { DefinitionPopup } from './definition-popup.ts';
-import { preloadWords, clearCache, hasFootnote, exportCache, loadFromBundle } from '../services/dictionary.ts';
+import { preloadWords, clearCache, hasFootnote, exportCache, loadFromBundle, ensureReady, hasEntry } from '../services/dictionary.ts';
 
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
 
@@ -272,6 +272,10 @@ export class Reader {
     const total = this.paragraphs.length;
     const batchSize = 20;
 
+    // Load dictionaries so hasEntry() works synchronously during segmentation
+    await ensureReady();
+    if (this.renderGeneration !== generation) return uniqueWords;
+
     for (let i = 0; i < total; i += batchSize) {
       if (this.renderGeneration !== generation) return uniqueWords;
 
@@ -322,6 +326,9 @@ export class Reader {
           } else {
             lineSegments = segmentWithFootnotes(line, lineFootnoteRanges);
           }
+
+          // Refine segments: split 3+ CJK char words with no dict entry
+          lineSegments = refineSegments(lineSegments, hasEntry);
 
           paraSegmentLines.push(lineSegments);
 

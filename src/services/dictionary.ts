@@ -113,6 +113,26 @@ export function isLoaded(): boolean {
   return cedictMap !== null || cvdictMap !== null;
 }
 
+/** Load both dictionaries and the simplified converter. Call before sync hasEntry(). */
+export async function ensureReady(): Promise<void> {
+  await loadDict();
+  await ensureSimplifiedConverter();
+}
+
+/** Sync check whether a word has a dictionary entry. Requires ensureReady() called first. */
+export function hasEntry(word: string): boolean {
+  const simplified = toSimplifiedFn ? toSimplifiedFn(word) : null;
+  if (cedictMap) {
+    if (cedictMap.has(word)) return true;
+    if (simplified && simplified !== word && cedictMap.has(simplified)) return true;
+  }
+  if (cvdictMap) {
+    if (cvdictMap.has(word)) return true;
+    if (simplified && simplified !== word && cvdictMap.has(simplified)) return true;
+  }
+  return false;
+}
+
 // --- Per-text definition cache ---
 
 let textCache: Map<string, DictEntry[] | null> | null = null;
