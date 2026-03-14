@@ -38,6 +38,14 @@ export class SettingsSheet {
     panel.getBoundingClientRect();
     requestAnimationFrame(() => this.overlay?.classList.add('open'));
 
+    // Touch: dismiss on touchstart and prevent click synthesis
+    this.overlay.addEventListener('touchstart', (e) => {
+      if (e.target === this.overlay) {
+        e.preventDefault();
+        this.close();
+      }
+    }, { passive: false });
+    // Mouse: dismiss on click
     this.overlay.addEventListener('click', (e) => {
       if (e.target === this.overlay) this.close();
     });

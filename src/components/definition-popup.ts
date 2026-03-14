@@ -277,7 +277,11 @@ export class DefinitionPopup {
 
   scheduleShow(word: string, anchor: HTMLElement, isVertical: boolean): void {
     this.cancelShow();
-    this.showTimeout = setTimeout(() => this.show(word, anchor, isVertical), 200);
+    // Apply highlight immediately so hover feels instant
+    this.clearActive();
+    this.activeAnchor = anchor;
+    anchor.classList.add('active');
+    this.showTimeout = setTimeout(() => this.show(word, anchor, isVertical), 50);
   }
 
   hide(): void {

@@ -79,6 +79,14 @@ export class OpenSheet {
     panel.getBoundingClientRect();
     requestAnimationFrame(() => this.overlay?.classList.add('open'));
 
+    // Touch: dismiss on touchstart and prevent click synthesis
+    this.overlay.addEventListener('touchstart', (e) => {
+      if (e.target === this.overlay) {
+        e.preventDefault();
+        this.close();
+      }
+    }, { passive: false });
+    // Mouse: dismiss on click
     this.overlay.addEventListener('click', (e) => {
       if (e.target === this.overlay) this.close();
     });
@@ -123,6 +131,12 @@ export class OpenSheet {
     };
 
     popup.querySelector('.popup-close')!.addEventListener('click', closePopup);
+    popup.addEventListener('touchstart', (e) => {
+      if (e.target === popup) {
+        e.preventDefault();
+        closePopup();
+      }
+    }, { passive: false });
     popup.addEventListener('click', (e) => {
       if (e.target === popup) closePopup();
     });
@@ -161,6 +175,12 @@ export class OpenSheet {
     };
 
     overlay.querySelector('#modal-cancel')!.addEventListener('click', close);
+    overlay.addEventListener('touchstart', (e) => {
+      if (e.target === overlay) {
+        e.preventDefault();
+        close();
+      }
+    }, { passive: false });
     overlay.addEventListener('click', (e) => {
       if (e.target === overlay) close();
     });
