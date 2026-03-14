@@ -22,30 +22,20 @@
   opacity: 0.5;
 }
 
-/* Bottom Sheet Overlay */
+/* Dropdown Menu Overlay */
 .sheet-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0);
+  background: transparent;
   z-index: 100;
-  transition: background 0.3s ease;
-}
-
-.sheet-overlay.open {
-  background: rgba(0, 0, 0, 0.3);
 }
 
 .sheet-panel {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: var(--bg);
-  border-radius: 16px 16px 0 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
-  padding: 16px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  position: fixed;
+  background: var(--settings-bg);
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  padding: 16px;
   z-index: 101;
   max-height: 85vh;
   overflow-y: auto;
@@ -53,17 +43,33 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: auto;
+  min-width: 280px;
+  max-width: 360px;
+  opacity: 0;
+  transform: scale(0.97) translateY(-8px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
 }
 
 .sheet-overlay.open .sheet-panel {
-  transform: translateY(0);
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  pointer-events: auto;
 }
+
+/* Position is set dynamically via inline styles in JS based on trigger button rect */
 
 /* Grouped card (iOS Settings style) */
 .sheet-group {
   background: var(--settings-bg);
   border-radius: 12px;
   overflow: hidden;
+}
+
+/* Inside dropdown panels, groups need a further-elevated background */
+.sheet-panel .sheet-group {
+  background: var(--btn-bg);
 }
 
 .sheet-group-row {

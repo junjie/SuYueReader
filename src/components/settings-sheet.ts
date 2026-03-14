@@ -29,6 +29,7 @@ export class SettingsSheet {
 
     const panel = document.createElement('div');
     panel.className = 'sheet-panel';
+    this.positionPanel(panel);
     this.overlay.appendChild(panel);
     document.body.appendChild(this.overlay);
 
@@ -65,10 +66,41 @@ export class SettingsSheet {
     const overlay = this.overlay;
     (overlay as any)._cleanup?.();
     overlay.classList.remove('open');
-    overlay.addEventListener('transitionend', () => overlay.remove(), { once: true });
-    setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 350);
+    const panel = overlay.querySelector('.sheet-panel');
+    if (panel) {
+      panel.addEventListener('transitionend', () => overlay.remove(), { once: true });
+    }
+    setTimeout(() => { if (overlay.parentNode) overlay.remove(); }, 250);
     this.overlay = null;
     document.dispatchEvent(new CustomEvent('sheet-closed'));
+  }
+
+  private positionPanel(panel: HTMLElement): void {
+    const btn = document.getElementById('navbar-settings');
+    const nav = document.querySelector('.navbar');
+    const isVertical = nav?.classList.contains('navbar-vertical');
+    if (btn) {
+      const rect = btn.getBoundingClientRect();
+      const margin = 8;
+      if (isVertical) {
+        // Place to the left of the sidebar
+        panel.style.right = `${window.innerWidth - rect.left + margin}px`;
+        // Prefer aligning top with button, but clamp so panel stays in viewport
+        panel.style.top = `${rect.top}px`;
+        panel.style.maxHeight = `${window.innerHeight - rect.top - margin}px`;
+        // If button is in bottom half, anchor to bottom instead so panel grows upward
+        if (rect.top > window.innerHeight / 2) {
+          panel.style.top = '';
+          panel.style.bottom = `${window.innerHeight - rect.bottom}px`;
+          panel.style.maxHeight = `${rect.bottom - margin}px`;
+        }
+      } else {
+        // Place below navbar, right edge aligned with button's right edge
+        panel.style.top = `${rect.bottom + margin}px`;
+        panel.style.right = `${window.innerWidth - rect.right}px`;
+        panel.style.maxHeight = `${window.innerHeight - rect.bottom - margin * 2}px`;
+      }
+    }
   }
 
   private buildMainView(panel: HTMLElement): void {

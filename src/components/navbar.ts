@@ -57,15 +57,8 @@ export class Navbar {
       this.nav.classList.add('navbar-vertical');
     }
 
-    // Sheet coordination
-    document.addEventListener('sheet-opening', () => {
-      this.nav.classList.add('hidden');
-      this.setNavbarOffset(false);
-    });
-    document.addEventListener('sheet-closed', () => {
-      this.nav.classList.remove('hidden');
-      this.setNavbarOffset(true);
-    });
+    // Sheet coordination: close sheets on mutual exclusion (handled by sheets themselves)
+    // Navbar stays visible when sheets are open
 
     // Scroll-aware hide/show
     this.boundScrollHandler = this.onScroll.bind(this);
