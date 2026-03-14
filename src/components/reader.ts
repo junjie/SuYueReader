@@ -80,21 +80,8 @@ export class Reader {
   }
 
   private setupInteraction(): void {
-    // Hover: show popup on mouse, with debounce
-    this.container.addEventListener('pointerover', (e) => {
-      const target = (e.target as HTMLElement).closest('.word') as HTMLElement | null;
-      if (!target) return;
-      if (e.pointerType !== 'mouse') return;
-      // Don't replace a pinned popup with hover
-      if (this.popup.isPinned) return;
-
-      const word = target.dataset.word;
-      if (!word) return;
-
-      this.popup.cancelHide();
-      const isVertical = this.store.get().writingMode === 'vertical';
-      this.popup.scheduleShow(word, target, isVertical);
-    });
+    // Hover: highlight word but don't show popup
+    // (popup is shown only on click, below)
 
     this.container.addEventListener('pointerout', (e) => {
       const target = (e.target as HTMLElement).closest('.word');

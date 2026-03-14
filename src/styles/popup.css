@@ -182,14 +182,16 @@
   margin-bottom: 2px;
 }
 
-/* Word hover styling */
+/* Word hover styling — yellow highlight on hover */
 @media (hover: hover) {
   #reader .word:hover {
-    text-decoration: underline;
-    text-decoration-style: dotted;
-    text-decoration-color: var(--fg-muted);
-    text-underline-offset: 3px;
+    background-color: rgba(250, 204, 21, 0.35);
+    border-radius: 2px;
     cursor: pointer;
+  }
+
+  [data-theme="dark"] #reader .word:hover {
+    background-color: rgba(250, 204, 21, 0.25);
   }
 }
 
@@ -208,18 +210,20 @@
 
 /* Footnote word styling */
 #reader .word.has-footnote {
-  text-decoration: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: #3b82f6;
-  text-underline-offset: 3px;
+  color: #2563eb;
+  background: #dbeafe;
+  border-radius: 3px;
+  padding: 0 2px;
 }
 
 [data-theme="dark"] #reader .word.has-footnote {
-  text-decoration-color: #60a5fa;
+  color: #38bdf8;
+  background: #1e3a5f;
 }
 
 [data-theme="sepia"] #reader .word.has-footnote {
-  text-decoration-color: #2563eb;
+  color: #1d4ed8;
+  background: #dbeafe;
 }
 
 /* Multi-source definition sections */
