@@ -34,6 +34,9 @@ export class Navbar {
           ${gearIcon()}
         </button>
       </div>
+      <div class="navbar-progress">
+        <div class="navbar-progress-bar"></div>
+      </div>
     `;
     document.body.appendChild(this.nav);
 
@@ -67,6 +70,21 @@ export class Navbar {
     // Scroll-aware hide/show
     this.boundScrollHandler = this.onScroll.bind(this);
     this.attachScrollListener();
+
+    // Segmentation progress bar
+    const progressBar = this.nav.querySelector('.navbar-progress-bar') as HTMLElement;
+    const progressContainer = this.nav.querySelector('.navbar-progress') as HTMLElement;
+    document.addEventListener('segmentation-progress', (e) => {
+      const { progress } = (e as CustomEvent).detail;
+      progressBar.style.transform = `scaleX(${progress})`;
+      if (progress >= 1) {
+        setTimeout(() => {
+          progressContainer.classList.add('navbar-progress-done');
+        }, 300);
+      } else {
+        progressContainer.classList.remove('navbar-progress-done');
+      }
+    });
 
     // Re-attach scroll listener on writing mode change + update script & orientation
     document.addEventListener('settings-changed', (e) => {

@@ -105,3 +105,35 @@
 .navbar.navbar-vertical .navbar-btn {
   padding: 8px;
 }
+
+/* Progress bar */
+.navbar-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  overflow: hidden;
+  transition: opacity 0.3s ease;
+}
+
+.navbar-progress-done {
+  opacity: 0;
+}
+
+.navbar-progress-bar {
+  height: 100%;
+  background: var(--fg-muted);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+/* Vertical mode: progress bar on bottom of sidebar */
+.navbar.navbar-vertical .navbar-progress {
+  top: auto;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}

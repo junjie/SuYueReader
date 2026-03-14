@@ -11,6 +11,7 @@ import './styles/themes.css';
 import './styles/navbar.css';
 import './styles/reader.css';
 import './styles/settings.css';
+import './styles/popup.css';
 
 preloadDefaultFont();
 
