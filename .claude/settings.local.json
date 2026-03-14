@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "WebFetch(domain:www.mdbg.net)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:language.moe.gov.tw)",
+      "Bash(npm list:*)",
+      "WebFetch(domain:sourceforge.net)"
+    ]
+  }
+}

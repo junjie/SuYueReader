@@ -59,11 +59,13 @@ Two CSS custom properties are synced because `em` resolves relative to each elem
 - `--reader-max-line-length` (`em`) — used on `#reader` where font-size is the reader's
 - `--reader-max-line-length-px` (`lineLength * fontSize` in `px`) — used on `.navbar-inner` which has a different font-size context
 
-### Navbar Adaptation
+### Navbar & Dropdown Menus
 
 The navbar has a `.navbar-inner` wrapper constrained to the same width as the reader text. The navbar background spans full viewport width; only the button layout aligns with text edges.
 
 In vertical mode, `.navbar-vertical` switches the navbar to a 48px-wide right-edge sidebar. Scroll listeners re-attach: horizontal mode listens to `window`; vertical mode listens to `#reader-container` (horizontal scroll). `scrollLeft` is negative in the RTL container.
+
+**Open and Settings panels** are overlay dropdown menus (not bottom sheets). Each panel is positioned dynamically in JS relative to its trigger button's bounding rect — left-aligned for Open, right-aligned for Settings. In vertical mode, panels appear to the left of the sidebar. The `positionPanel()` method in each sheet class handles viewport clamping: if the button is in the bottom half, the panel anchors its bottom edge to the button and grows upward, with `max-height` set to available space. The navbar remains visible when menus are open.
 
 ### Vertical Mode CSS Coordination
 
@@ -91,4 +93,4 @@ Five highlight colors (Apple Notes palette) via `{color:text}` syntax. CSS class
 
 ## Deployment
 
-`base: '/ChineseReader/'` in `vite.config.ts` — built for GitHub Pages at `/ChineseReader/`.
+`base: '/SuYueReader/'` in `vite.config.ts` — built for GitHub Pages at `/SuYueReader/`. GitHub Actions workflow (`.github/workflows/deploy.yml`) auto-deploys on push to `main`.
