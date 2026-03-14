@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/SuYueReader/',
+  base: '/suyue/',
   server: {
     allowedHosts: ['lins-mbp-14.local'],
   },
