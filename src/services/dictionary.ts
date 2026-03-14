@@ -180,39 +180,22 @@ export function getFootnoteMap(): Map<string, string> | null {
   return footnoteMap;
 }
 
-/** Load dictionary entries directly from a .crdr bundle (skips fetch) */
+/** Load dictionary entries from a .crdr bundle into the text cache for instant display.
+ *  Does NOT replace the full dictionaries — they load normally for drill-down and future texts. */
 export function loadFromBundle(entries: Record<string, RawEntry[]>): void {
-  // Check if entries have source info (new format)
-  const hasSourceInfo = Object.values(entries).some(
-    (arr) => arr.some((e) => e.s !== undefined)
-  );
+  textCache = new Map();
 
-  if (hasSourceInfo) {
-    // Split entries by source
-    const cedictEntries: Record<string, RawEntry[]> = {};
-    const cvdictEntries: Record<string, RawEntry[]> = {};
-
-    for (const [key, rawEntries] of Object.entries(entries)) {
-      for (const e of rawEntries) {
-        const target = e.s === 'cvdict' ? cvdictEntries : cedictEntries;
-        if (!target[key]) target[key] = [];
-        target[key].push(e);
-      }
-    }
-
-    if (Object.keys(cedictEntries).length > 0) {
-      cedictMap = buildEntries(cedictEntries, 'cedict');
-    }
-    if (Object.keys(cvdictEntries).length > 0) {
-      cvdictMap = buildEntries(cvdictEntries, 'cvdict');
-    }
-  } else {
-    // Old format — all entries are cedict
-    cedictMap = buildEntries(entries, 'cedict');
+  for (const [key, rawEntries] of Object.entries(entries)) {
+    textCache.set(
+      key,
+      rawEntries.map((e) => ({
+        traditional: e.t,
+        pinyin: e.p,
+        definitions: e.d,
+        source: (e.s as DictSource) || 'cedict',
+      }))
+    );
   }
-
-  cedictLoadPromise = Promise.resolve();
-  cvdictLoadPromise = Promise.resolve();
 }
 
 /** Export cached dictionary entries (for .crdr export) */
