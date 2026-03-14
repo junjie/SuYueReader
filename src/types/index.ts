@@ -1,6 +1,37 @@
+export type HighlightColor = 'purple' | 'pink' | 'orange' | 'mint' | 'blue';
+
+export interface InlineFormat {
+  start: number;  // code-point offset in clean text
+  end: number;    // exclusive
+  type: 'bold' | 'underline' | 'highlight';
+  color?: HighlightColor;
+}
+
+export interface FootnoteRange {
+  start: number;  // code-point offset in clean text
+  end: number;    // exclusive
+  key: string;    // footnote lookup key
+}
+
 export interface Paragraph {
   index: number;
   text: string;
+  type?: 'heading2' | 'heading3';
+  formatting?: InlineFormat[];
+  footnoteRanges?: FootnoteRange[];
+}
+
+export interface ParseResult {
+  paragraphs: Paragraph[];
+  footnotes: Map<string, string>;
+}
+
+export interface CRDRFile {
+  version: 1;
+  title: string;
+  text: string;
+  segments?: Record<number, { t: string; w: boolean }[][]>;
+  dictionary?: Record<string, { t: string; p: string; d: string[] }[]>;
 }
 
 export type WritingMode = 'horizontal' | 'vertical';

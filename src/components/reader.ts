@@ -1,12 +1,48 @@
-import type { Paragraph } from '../types/index.ts';
+import type { Paragraph, InlineFormat, FootnoteRange, CRDRFile } from '../types/index.ts';
 import type { SettingsStore } from '../state/settings.ts';
 import { getPinyinArray } from '../services/pinyin.ts';
 import { convertScript } from '../services/script-convert.ts';
-import { segmentText } from '../services/segmenter.ts';
+import { segmentText, type Segment } from '../services/segmenter.ts';
 import { DefinitionPopup } from './definition-popup.ts';
-import { preloadWords, clearCache } from '../services/dictionary.ts';
+import { preloadWords, clearCache, hasFootnote, exportCache, loadFromBundle } from '../services/dictionary.ts';
 
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
+
+/**
+ * Segment text with footnote ranges taking priority.
+ * Footnote ranges become single forced word segments;
+ * the gaps between them are segmented normally.
+ */
+function segmentWithFootnotes(text: string, footnoteRanges: FootnoteRange[]): Segment[] {
+  if (footnoteRanges.length === 0) return segmentText(text);
+
+  const codePoints = [...text];
+  // Sort footnote ranges by start position
+  const sorted = [...footnoteRanges].sort((a, b) => a.start - b.start);
+
+  const result: Segment[] = [];
+  let pos = 0; // current code-point position
+
+  for (const fn of sorted) {
+    // Segment the gap before this footnote range
+    if (fn.start > pos) {
+      const gapText = codePoints.slice(pos, fn.start).join('');
+      result.push(...segmentText(gapText));
+    }
+    // Insert the footnote range as a single word segment
+    const fnText = codePoints.slice(fn.start, fn.end).join('');
+    result.push({ text: fnText, isWordLike: true });
+    pos = fn.end;
+  }
+
+  // Segment any remaining text after the last footnote
+  if (pos < codePoints.length) {
+    const tailText = codePoints.slice(pos).join('');
+    result.push(...segmentText(tailText));
+  }
+
+  return result;
+}
 
 export class Reader {
   private container: HTMLElement;
@@ -14,6 +50,12 @@ export class Reader {
   private paragraphs: Paragraph[] = [];
   private popup: DefinitionPopup;
   private renderGeneration = 0;
+  private rawText = '';
+  private textTitle = '';
+  // Stored segmentation for .crdr export
+  private storedSegments: Map<number, Segment[][]> = new Map();
+  // Pre-computed segments from .crdr import (keyed by paragraph index)
+  private precomputedSegments: Map<number, Segment[][]> | null = null;
 
   constructor(container: HTMLElement, store: SettingsStore) {
     this.container = container;
@@ -43,6 +85,8 @@ export class Reader {
       const target = (e.target as HTMLElement).closest('.word') as HTMLElement | null;
       if (!target) return;
       if (e.pointerType !== 'mouse') return;
+      // Don't replace a pinned popup with hover
+      if (this.popup.isPinned) return;
 
       const word = target.dataset.word;
       if (!word) return;
@@ -56,10 +100,11 @@ export class Reader {
       const target = (e.target as HTMLElement).closest('.word');
       if (!target) return;
       if (e.pointerType !== 'mouse') return;
+      if (this.popup.isPinned) return;
       this.popup.scheduleHide();
     });
 
-    // Tap: toggle popup on touch devices
+    // Click: pin popup (desktop) or toggle (touch)
     this.container.addEventListener('click', (e) => {
       const target = (e.target as HTMLElement).closest('.word') as HTMLElement | null;
       if (!target) return;
@@ -68,15 +113,70 @@ export class Reader {
       if (!word) return;
 
       const isVertical = this.store.get().writingMode === 'vertical';
-      this.popup.show(word, target, isVertical);
+      this.popup.show(word, target, isVertical, true);
     });
   }
 
-  setParagraphs(paragraphs: Paragraph[]): void {
+  setParagraphs(paragraphs: Paragraph[], rawText?: string, title?: string): void {
     this.paragraphs = paragraphs;
+    this.rawText = rawText || '';
+    this.textTitle = title || '';
+    this.precomputedSegments = null;
+    this.storedSegments.clear();
     clearCache();
     this.render();
     this.scrollToBeginning();
+  }
+
+  // Footnotes are stored in the dictionary service via setFootnotes()
+  // and matched by position via paragraph.footnoteRanges
+
+  /** Load from a .crdr bundle — sets paragraphs + precomputed data */
+  loadBundle(paragraphs: Paragraph[], bundle: CRDRFile): void {
+    this.paragraphs = paragraphs;
+    this.rawText = bundle.text;
+    this.textTitle = bundle.title;
+
+    // Load pre-computed segments
+    if (bundle.segments) {
+      this.precomputedSegments = new Map();
+      for (const [key, lines] of Object.entries(bundle.segments)) {
+        this.precomputedSegments.set(
+          Number(key),
+          lines.map((line) => line.map((s) => ({ text: s.t, isWordLike: s.w })))
+        );
+      }
+    }
+
+    // Load bundled dictionary entries
+    if (bundle.dictionary) {
+      loadFromBundle(bundle.dictionary);
+    }
+
+    this.storedSegments.clear();
+    clearCache();
+    this.render();
+    this.scrollToBeginning();
+  }
+
+  /** Export current state as .crdr file data */
+  exportCRDR(): CRDRFile {
+    const segments: Record<number, { t: string; w: boolean }[][]> = {};
+    for (const [idx, lines] of this.storedSegments) {
+      segments[idx] = lines.map((line) =>
+        line.map((s) => ({ t: s.text, w: s.isWordLike }))
+      );
+    }
+
+    const dictionary = exportCache();
+
+    return {
+      version: 1,
+      title: this.textTitle,
+      text: this.rawText,
+      segments: Object.keys(segments).length > 0 ? segments : undefined,
+      dictionary: dictionary || undefined,
+    };
   }
 
   private scrollToBeginning(): void {
@@ -152,14 +252,13 @@ export class Reader {
   private renderPlain(scriptVariant: string | null): void {
     const fragments: string[] = [];
     for (const para of this.paragraphs) {
+      const tag = para.type === 'heading2' ? 'h2' : para.type === 'heading3' ? 'h3' : 'p';
       const html = para.text.split('\n').map(line => this.escapeHtml(line)).join('<br>');
-      fragments.push(`<p data-index="${para.index}">${html}</p>`);
+      fragments.push(`<${tag} data-index="${para.index}">${html}</${tag}>`);
     }
     this.container.innerHTML = fragments.join('');
 
-    // Script conversion will be applied during segmentation phase
     if (scriptVariant) {
-      // Dispatch progress event to show we're starting
       document.dispatchEvent(new CustomEvent('segmentation-progress', { detail: { progress: 0 } }));
     }
   }
@@ -167,7 +266,7 @@ export class Reader {
   private async segmentAndRender(generation: number): Promise<Set<string>> {
     const s = this.store.get();
     const uniqueWords = new Set<string>();
-    const paragraphEls = this.container.querySelectorAll('p[data-index]');
+    const paragraphEls = this.container.querySelectorAll('[data-index]');
     const total = this.paragraphs.length;
     const batchSize = 20;
 
@@ -181,23 +280,71 @@ export class Reader {
         if (s.scriptVariant !== 'original') {
           text = await convertScript(text, s.scriptVariant);
         }
-        // Render each line separately, join with <br>
+
+        const formatting = para.formatting || [];
+        const footnoteRanges = para.footnoteRanges || [];
         const lines = text.split('\n');
         const renderedLines: string[] = [];
+        let lineOffset = 0;
+        const paraSegmentLines: Segment[][] = [];
+
         for (const line of lines) {
-          renderedLines.push(await this.renderParagraph(line, s.showPinyin, uniqueWords));
+          const lineLen = [...line].length;
+          const lineEnd = lineOffset + lineLen;
+
+          // Adjust formatting ranges for this line
+          const lineFormatting = formatting
+            .filter((f) => f.start < lineEnd && f.end > lineOffset)
+            .map((f) => ({
+              start: Math.max(f.start - lineOffset, 0),
+              end: Math.min(f.end - lineOffset, lineLen),
+              type: f.type,
+              color: f.color,
+            }));
+
+          // Adjust footnote ranges for this line
+          const lineFootnoteRanges: FootnoteRange[] = footnoteRanges
+            .filter((f) => f.start < lineEnd && f.end > lineOffset)
+            .map((f) => ({
+              start: Math.max(f.start - lineOffset, 0),
+              end: Math.min(f.end - lineOffset, lineLen),
+              key: f.key,
+            }));
+
+          // Use precomputed segments if available, otherwise segment
+          // with footnote ranges forcing whole-phrase segments
+          let lineSegments: Segment[];
+          const precomputed = this.precomputedSegments?.get(para.index);
+          if (precomputed && precomputed[renderedLines.length]) {
+            lineSegments = precomputed[renderedLines.length];
+          } else {
+            lineSegments = segmentWithFootnotes(line, lineFootnoteRanges);
+          }
+
+          paraSegmentLines.push(lineSegments);
+
+          renderedLines.push(
+            await this.renderLine(
+              line, lineSegments, s.showPinyin, uniqueWords,
+              lineFormatting, lineFootnoteRanges
+            )
+          );
+
+          lineOffset = lineEnd + 1;
         }
+
+        // Store segments for .crdr export
+        this.storedSegments.set(para.index, paraSegmentLines);
+
         const el = paragraphEls[j] as HTMLElement | undefined;
         if (el) {
           el.innerHTML = renderedLines.join('<br>');
         }
       }
 
-      // Report progress
       const progress = Math.min(end / total, 1);
       document.dispatchEvent(new CustomEvent('segmentation-progress', { detail: { progress } }));
 
-      // Yield to main thread between batches
       if (end < total) {
         await new Promise((resolve) => setTimeout(resolve, 0));
       }
@@ -206,24 +353,57 @@ export class Reader {
     return uniqueWords;
   }
 
-  private async renderParagraph(text: string, showPinyin: boolean, uniqueWords?: Set<string>): Promise<string> {
-    // Get pinyin for full text first (context-aware polyphone resolution)
+  private async renderLine(
+    text: string,
+    segments: Segment[],
+    showPinyin: boolean,
+    uniqueWords: Set<string> | undefined,
+    formatting: InlineFormat[],
+    footnoteRanges: FootnoteRange[],
+  ): Promise<string> {
     let pinyinArr: string[] | null = null;
     if (showPinyin) {
       pinyinArr = await getPinyinArray(text);
     }
 
-    const segments = segmentText(text);
     let result = '';
-    let pIdx = 0; // tracks position in pinyin array
+    let pIdx = 0;
+    let charPos = 0;
 
     for (const seg of segments) {
       const chars = [...seg.text];
+      const segLen = chars.length;
+      const segEnd = charPos + segLen;
       const hasCjk = chars.some((c) => CJK_RE.test(c));
 
+      // Determine formatting wrappers
+      const fmtOpen: string[] = [];
+      const fmtClose: string[] = [];
+      if (formatting.length > 0) {
+        for (const f of formatting) {
+          if (charPos < f.end && segEnd > f.start) {
+            if (f.type === 'bold') {
+              fmtOpen.push('<strong>');
+              fmtClose.unshift('</strong>');
+            } else if (f.type === 'underline') {
+              fmtOpen.push('<u>');
+              fmtClose.unshift('</u>');
+            } else if (f.type === 'highlight' && f.color) {
+              fmtOpen.push(`<span class="hl-${f.color}">`);
+              fmtClose.unshift('</span>');
+            }
+          }
+        }
+      }
+
+      // Check if this segment overlaps any footnote range (position-based)
+      const matchedFootnote = footnoteRanges.find(
+        (fn) => charPos < fn.end && segEnd > fn.start
+      );
+
       if (seg.isWordLike && hasCjk) {
-        // CJK word — wrap in a .word span
         uniqueWords?.add(seg.text);
+        const hasNote = !!matchedFootnote || hasFootnote(seg.text);
         let inner = '';
         for (const char of chars) {
           if (showPinyin && pinyinArr && CJK_RE.test(char)) {
@@ -234,9 +414,12 @@ export class Reader {
           }
           pIdx++;
         }
-        result += `<span class="word" data-word="${this.escapeAttr(seg.text)}">${inner}</span>`;
+        const fnKeyAttr = matchedFootnote ? ` data-footnote-key="${this.escapeAttr(matchedFootnote.key)}"` : '';
+        result += fmtOpen.join('');
+        result += `<span class="word${hasNote ? ' has-footnote' : ''}" data-word="${this.escapeAttr(seg.text)}"${fnKeyAttr}>${inner}</span>`;
+        result += fmtClose.join('');
       } else {
-        // Non-word: punctuation, whitespace, Latin text
+        result += fmtOpen.join('');
         for (const char of chars) {
           if (showPinyin && pinyinArr && CJK_RE.test(char)) {
             const py = pinyinArr[pIdx] || '';
@@ -246,7 +429,10 @@ export class Reader {
           }
           pIdx++;
         }
+        result += fmtClose.join('');
       }
+
+      charPos = segEnd;
     }
 
     return result;

@@ -2,14 +2,11 @@
   position: fixed;
   z-index: 200;
   max-width: 320px;
-  max-height: 50vh;
-  overflow-y: auto;
   background: var(--settings-bg);
   color: var(--fg);
   border: 1px solid var(--border);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  padding: 12px;
   font-family: system-ui, -apple-system, sans-serif;
   font-size: 14px;
   line-height: 1.5;
@@ -19,12 +16,63 @@
   transform: translateY(4px);
   transition: opacity 0.15s ease, transform 0.15s ease;
   pointer-events: none;
+  /* overflow visible so the ::before hover bridge extends beyond the popup */
+  overflow: visible;
+}
+
+.dict-popup-body {
+  padding: 12px;
+  max-height: 50vh;
+  overflow-y: auto;
 }
 
 .dict-popup.visible {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
+}
+
+/* Invisible hover bridge: extends the popup's hit area outward to cover the gap to the word */
+.dict-popup.visible::before {
+  content: '';
+  position: absolute;
+}
+
+/* Popup is above the word → bridge extends downward from popup bottom */
+.dict-popup.visible.popup-above::before {
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 16px;
+}
+
+/* Popup is below the word → bridge extends upward from popup top */
+.dict-popup.visible.popup-below::before {
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 16px;
+}
+
+/* Popup is left of word → bridge extends rightward from popup right edge */
+.dict-popup.visible.popup-left::before {
+  top: 0;
+  bottom: 0;
+  left: 100%;
+  width: 16px;
+}
+
+/* Popup is right of word → bridge extends leftward from popup left edge */
+.dict-popup.visible.popup-right::before {
+  top: 0;
+  bottom: 0;
+  right: 100%;
+  width: 16px;
+}
+
+/* Pinned popup: no hover bridge needed, stays until click-outside */
+.dict-popup.pinned::before {
+  display: none;
 }
 
 .dict-popup-header {
@@ -156,4 +204,48 @@
 
 [data-theme="dark"] #reader .word.active {
   background-color: rgba(250, 204, 21, 0.25);
+}
+
+/* Footnote word styling */
+#reader .word.has-footnote {
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: #3b82f6;
+  text-underline-offset: 3px;
+}
+
+[data-theme="dark"] #reader .word.has-footnote {
+  text-decoration-color: #60a5fa;
+}
+
+[data-theme="sepia"] #reader .word.has-footnote {
+  text-decoration-color: #2563eb;
+}
+
+/* Multi-source definition sections */
+.dict-popup-source + .dict-popup-source {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border);
+}
+
+.dict-popup-source-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--fg-muted);
+  margin-bottom: 4px;
+}
+
+.dict-popup-footnote-text {
+  line-height: 1.5;
+}
+
+.dict-popup-footnote-text p {
+  margin: 0;
+}
+
+.dict-popup-footnote-text p + p {
+  margin-top: 8px;
 }

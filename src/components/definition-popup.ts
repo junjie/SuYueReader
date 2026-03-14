@@ -1,15 +1,17 @@
-import { lookup, lookupChar, isLoaded, cachedLookup, type DictEntry } from '../services/dictionary.ts';
+import { lookup, lookupChar, isLoaded, cachedLookup, getFootnote, type DictEntry } from '../services/dictionary.ts';
 
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
 
 export class DefinitionPopup {
   private el: HTMLDivElement;
   private currentWord: string | null = null;
+  private currentFootnoteKey: string | null = null;
   private activeAnchor: HTMLElement | null = null;
   private history: string[] = [];
   private hideTimeout: ReturnType<typeof setTimeout> | null = null;
   private showTimeout: ReturnType<typeof setTimeout> | null = null;
   private _justDrilledDown = false;
+  private pinned = false;
 
   constructor() {
     this.el = document.createElement('div');
@@ -21,7 +23,7 @@ export class DefinitionPopup {
       this.cancelHide();
     });
     this.el.addEventListener('pointerleave', () => {
-      this.scheduleHide();
+      if (!this.pinned) this.scheduleHide();
     });
 
     // Handle clicks inside the popup (character drill-down, back button)
@@ -60,14 +62,25 @@ export class DefinitionPopup {
     document.getElementById('reader-container')?.addEventListener('scroll', onScroll, { passive: true });
   }
 
-  async show(word: string, anchor: HTMLElement, isVertical: boolean): Promise<void> {
+  async show(word: string, anchor: HTMLElement, isVertical: boolean, pin = false): Promise<void> {
     this.cancelHide();
     this.cancelShow();
+
+    // If clicking the same word that's already visible, just pin it in place
+    if (pin && this.currentWord === word && this.el.classList.contains('visible')) {
+      this.pinned = true;
+      this.el.classList.add('pinned');
+      return;
+    }
+
     this.clearActive();
     this.currentWord = word;
+    this.currentFootnoteKey = anchor.dataset.footnoteKey || null;
     this.activeAnchor = anchor;
     anchor.classList.add('active');
     this.history = [];
+    this.pinned = pin;
+    this.el.classList.toggle('pinned', pin);
 
     // Try cached lookup first (synchronous)
     const cached = cachedLookup(word);
@@ -80,7 +93,7 @@ export class DefinitionPopup {
 
     // Show loading state if dict isn't loaded yet
     if (!isLoaded()) {
-      this.el.innerHTML = '<div class="dict-popup-loading">Loading dictionary</div>';
+      this.el.innerHTML = '<div class="dict-popup-body"><div class="dict-popup-loading">Loading dictionary</div></div>';
       this.position(anchor, isVertical);
       this.el.classList.add('visible');
     }
@@ -95,38 +108,61 @@ export class DefinitionPopup {
   }
 
   private renderEntries(word: string, entries: DictEntry[] | null): void {
+    let inner = '';
     if (this.history.length > 0) {
-      const backHtml = `<button class="dict-popup-back">\u2190 back</button>`;
-      this.el.innerHTML = backHtml + this.buildEntryHtml(word, entries);
-    } else {
-      this.el.innerHTML = this.buildEntryHtml(word, entries);
+      inner += `<button class="dict-popup-back">\u2190 back</button>`;
     }
+    inner += this.buildContent(word, entries);
+    this.el.innerHTML = `<div class="dict-popup-body">${inner}</div>`;
   }
 
-  private buildEntryHtml(word: string, entries: DictEntry[] | null): string {
-    if (!entries || entries.length === 0) {
-      const chars = [...word].filter((c) => CJK_RE.test(c));
-      let html = `<div class="dict-popup-header"><span class="dict-popup-word">${this.buildWordChars(word, chars)}</span></div>`;
-      html += `<div class="dict-popup-notfound">No definition found</div>`;
-      return html;
+  private buildContent(word: string, entries: DictEntry[] | null): string {
+    const chars = [...word].filter((c) => CJK_RE.test(c));
+    const footnote = getFootnote(this.currentFootnoteKey || word);
+    const hasDict = entries && entries.length > 0;
+    const multiSource = !!footnote && hasDict;
+
+    // Header with word
+    let html = `<div class="dict-popup-header"><span class="dict-popup-word">${this.buildWordChars(word, chars)}</span></div>`;
+
+    // Footnote source
+    if (footnote) {
+      html += `<div class="dict-popup-source">`;
+      if (multiSource) {
+        html += `<div class="dict-popup-source-label">Note</div>`;
+      }
+      html += `<div class="dict-popup-footnote-text">${this.renderFootnote(footnote)}</div>`;
+      html += `</div>`;
     }
 
+    // Dictionary source
+    if (hasDict) {
+      html += `<div class="dict-popup-source">`;
+      if (multiSource) {
+        html += `<div class="dict-popup-source-label">CC-CEDICT</div>`;
+      }
+      html += this.buildDictHtml(word, entries!);
+      html += `</div>`;
+    }
+
+    // Nothing found
+    if (!footnote && !hasDict) {
+      html += `<div class="dict-popup-notfound">No definition found</div>`;
+    }
+
+    return html;
+  }
+
+  private buildDictHtml(word: string, entries: DictEntry[]): string {
+    let html = '';
     const first = entries[0];
     const showTrad = first.traditional !== word;
-    const chars = [...word].filter((c) => CJK_RE.test(c));
 
-    let html = `<div class="dict-popup-header">`;
-    html += `<span class="dict-popup-word">${this.buildWordChars(word, chars)}</span>`;
     if (entries.length === 1) {
       html += `<span class="dict-popup-pinyin">${this.esc(first.pinyin)}</span>`;
-    }
-    if (showTrad) {
-      html += `<span class="dict-popup-trad">${this.esc(first.traditional)}</span>`;
-    }
-    html += `</div>`;
-
-    // Definitions
-    if (entries.length === 1) {
+      if (showTrad) {
+        html += `<span class="dict-popup-trad">${this.esc(first.traditional)}</span>`;
+      }
       html += `<ol class="dict-popup-defs">`;
       for (const d of first.definitions) {
         html += `<li>${this.esc(d)}</li>`;
@@ -175,6 +211,7 @@ export class DefinitionPopup {
       this.history.push(this.currentWord);
     }
     this.currentWord = char;
+    this.currentFootnoteKey = null; // drill-down uses word-based lookup
 
     // Set flag to prevent dismissal from residual touch events
     this._justDrilledDown = true;
@@ -229,22 +266,27 @@ export class DefinitionPopup {
 
     let left: number;
     let top: number;
+    let placement: string;
 
     if (isVertical) {
       // Position to the left of the word
       left = rect.left - popupRect.width - pad;
       top = rect.top;
+      placement = 'popup-left';
       // If not enough space on the left, put it on the right
       if (left < pad) {
         left = rect.right + pad;
+        placement = 'popup-right';
       }
     } else {
       // Position above the word, centered
       left = rect.left + rect.width / 2 - popupRect.width / 2;
       top = rect.top - popupRect.height - pad;
+      placement = 'popup-above';
       // If not enough space above, put it below
       if (top < pad) {
         top = rect.bottom + pad;
+        placement = 'popup-below';
       }
     }
 
@@ -254,6 +296,10 @@ export class DefinitionPopup {
 
     this.el.style.left = `${left}px`;
     this.el.style.top = `${top}px`;
+
+    // Set placement class for hover bridge direction
+    this.el.classList.remove('popup-above', 'popup-below', 'popup-left', 'popup-right');
+    this.el.classList.add(placement);
   }
 
   scheduleHide(): void {
@@ -288,9 +334,11 @@ export class DefinitionPopup {
     this.cancelHide();
     this.cancelShow();
     this.clearActive();
-    this.el.classList.remove('visible');
+    this.el.classList.remove('visible', 'pinned');
     this.currentWord = null;
+    this.currentFootnoteKey = null;
     this.history = [];
+    this.pinned = false;
   }
 
   private clearActive(): void {
@@ -302,6 +350,18 @@ export class DefinitionPopup {
 
   get isVisible(): boolean {
     return this.el.classList.contains('visible');
+  }
+
+  get isPinned(): boolean {
+    return this.pinned;
+  }
+
+  /** Render footnote text: \n\n → paragraph break, \n → line break */
+  private renderFootnote(text: string): string {
+    return text
+      .split('\n\n')
+      .map((para) => `<p>${this.esc(para).replace(/\n/g, '<br>')}</p>`)
+      .join('');
   }
 
   private esc(text: string): string {

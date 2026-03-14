@@ -1,16 +1,20 @@
 import type { TextLoader } from './text-loader.ts';
 
+type ExportCallback = (() => void) | null;
+
 export class OpenSheet {
   private overlay: HTMLElement | null = null;
   private textLoader: TextLoader;
   private fileInput: HTMLInputElement;
+  private onExport: ExportCallback = null;
 
-  constructor(textLoader: TextLoader) {
+  constructor(textLoader: TextLoader, onExport?: () => void) {
     this.textLoader = textLoader;
+    this.onExport = onExport || null;
 
     this.fileInput = document.createElement('input');
     this.fileInput.type = 'file';
-    this.fileInput.accept = '.txt,.text';
+    this.fileInput.accept = '.txt,.text,.crdr';
     this.fileInput.hidden = true;
     document.body.appendChild(this.fileInput);
     this.textLoader.setupFileInput(this.fileInput);
@@ -58,6 +62,12 @@ export class OpenSheet {
           <span class="row-chevron">›</span>
         </button>
       </div>
+      <div class="sheet-group" style="margin-top: 12px">
+        <button class="sheet-group-row" data-action="export">
+          <span>Export as .crdr</span>
+          <span class="row-chevron">↓</span>
+        </button>
+      </div>
     `;
 
     this.overlay.appendChild(panel);
@@ -74,6 +84,10 @@ export class OpenSheet {
     panel.querySelector('[data-action="paste"]')!.addEventListener('click', () => {
       this.close();
       this.showPasteModal();
+    });
+    panel.querySelector('[data-action="export"]')!.addEventListener('click', () => {
+      if (this.onExport) this.onExport();
+      this.close();
     });
 
     panel.getBoundingClientRect();

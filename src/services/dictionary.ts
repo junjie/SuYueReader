@@ -101,3 +101,60 @@ export function cachedLookup(word: string): DictEntry[] | null | undefined {
 export function clearCache(): void {
   textCache = null;
 }
+
+// --- Footnote definitions (custom per-text notes) ---
+
+let footnoteMap: Map<string, string> | null = null;
+
+/** Set footnote definitions for the current text */
+export function setFootnotes(footnotes: Map<string, string>): void {
+  footnoteMap = footnotes.size > 0 ? footnotes : null;
+}
+
+/** Get footnote text for a word, or null */
+export function getFootnote(word: string): string | null {
+  return footnoteMap?.get(word) ?? null;
+}
+
+/** Check if a word has a footnote definition */
+export function hasFootnote(word: string): boolean {
+  return footnoteMap?.has(word) ?? false;
+}
+
+/** Get the footnote map (for .crdr export, script conversion) */
+export function getFootnoteMap(): Map<string, string> | null {
+  return footnoteMap;
+}
+
+/** Load dictionary entries directly from a .crdr bundle (skips fetch) */
+export function loadFromBundle(entries: Record<string, { t: string; p: string; d: string[] }[]>): void {
+  dictMap = new Map();
+  for (const [key, rawEntries] of Object.entries(entries)) {
+    dictMap.set(
+      key,
+      rawEntries.map((e) => ({
+        traditional: e.t,
+        pinyin: e.p,
+        definitions: e.d,
+      }))
+    );
+  }
+  // Also mark as loaded
+  loadPromise = Promise.resolve();
+}
+
+/** Export cached dictionary entries (for .crdr export) */
+export function exportCache(): Record<string, { t: string; p: string; d: string[] }[]> | null {
+  if (!textCache) return null;
+  const result: Record<string, { t: string; p: string; d: string[] }[]> = {};
+  for (const [word, entries] of textCache) {
+    if (entries) {
+      result[word] = entries.map((e) => ({
+        t: e.traditional,
+        p: e.pinyin,
+        d: e.definitions,
+      }));
+    }
+  }
+  return Object.keys(result).length > 0 ? result : null;
+}

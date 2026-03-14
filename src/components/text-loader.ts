@@ -1,4 +1,7 @@
+import type { CRDRFile } from '../types/index.ts';
+
 type TextLoadCallback = (text: string, title?: string) => void;
+type BundleLoadCallback = (bundle: CRDRFile) => void;
 
 interface ManifestEntry {
   id: string;
@@ -7,10 +10,12 @@ interface ManifestEntry {
 
 export class TextLoader {
   private onLoad: TextLoadCallback;
+  private onLoadBundle: BundleLoadCallback | null;
   private manifest: ManifestEntry[] = [];
 
-  constructor(onLoad: TextLoadCallback) {
+  constructor(onLoad: TextLoadCallback, onLoadBundle?: BundleLoadCallback) {
     this.onLoad = onLoad;
+    this.onLoadBundle = onLoadBundle || null;
   }
 
   async loadManifest(): Promise<ManifestEntry[]> {
@@ -44,7 +49,15 @@ export class TextLoader {
       if (!file) return;
       const reader = new FileReader();
       reader.onload = () => {
-        this.onLoad(reader.result as string, file.name.replace(/\.txt$/, ''));
+        const content = reader.result as string;
+        const name = file.name;
+
+        // Detect .crdr files
+        if (name.endsWith('.crdr')) {
+          this.handleCRDR(content, name);
+        } else {
+          this.onLoad(content, name.replace(/\.txt$/, ''));
+        }
       };
       reader.readAsText(file);
       input.value = '';
@@ -53,5 +66,25 @@ export class TextLoader {
 
   loadFromPaste(text: string): void {
     this.onLoad(text, 'Pasted Text');
+  }
+
+  private handleCRDR(content: string, filename: string): void {
+    try {
+      const bundle: CRDRFile = JSON.parse(content);
+      if (bundle.version !== 1 || !bundle.text) {
+        // Invalid format, try loading as plain text
+        this.onLoad(content, filename.replace(/\.crdr$/, ''));
+        return;
+      }
+      if (this.onLoadBundle) {
+        this.onLoadBundle(bundle);
+      } else {
+        // Fallback: load the text content
+        this.onLoad(bundle.text, bundle.title || filename.replace(/\.crdr$/, ''));
+      }
+    } catch {
+      // Not valid JSON, treat as plain text
+      this.onLoad(content, filename.replace(/\.crdr$/, ''));
+    }
   }
 }

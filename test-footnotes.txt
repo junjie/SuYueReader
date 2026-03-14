@@ -1,0 +1,39 @@
+# 小王的一天
+
+## 早上
+
+小王是一个[^年轻人]。他每天早上六点起床，先去公园[^跑步]，然后回家吃早饭。他最喜欢吃[^包子]和喝豆浆。
+
+吃完早饭以后，他骑[^自行车]去上班。他的公司在[^国贸]附近，离家不太远。
+
+## 工作
+
+小王是一个{purple:**程序员**}。他每天写很多代码，也要开很多会议。他的同事们都说他很__认真__，工作效率很高。
+
+今天他的老板让他做一个新的{orange:项目}。这个项目需要用到[^机器学习]的技术。小王虽然以前没做过，但是他觉得这是一个{mint:很好的学习机会}。
+
+## 午饭
+
+中午，小王和同事一起去吃[^火锅]。他们点了很多菜：{pink:牛肉}、{orange:羊肉}、{mint:蔬菜}和{blue:豆腐}。小王最喜欢吃{pink:**麻辣锅底**}，但是他的同事小李不能吃辣，所以他们点了[^鸳鸯锅]。
+
+## 晚上
+
+下班以后，小王去了[^书店]。他买了一本关于{blue:**人工智能**}的书。回到家，他一边看书一边听音乐，度过了一个__愉快__的晚上。
+
+[^年轻人]: A young person; 小王 is 25 years old and just graduated from university two years ago.
+  This is a continuation line (indented with 2 spaces).
+
+  This is a new paragraph within the same footnote.
+[^跑步]: Jogging; he runs 5km every morning around the lake in the park
+[^包子]: Steamed stuffed buns; a traditional Chinese breakfast food
+  with meat or vegetable filling.
+  Also known as 馒头 when without filling.
+[^自行车]: Bicycle; he prefers cycling over driving because it's healthier and better for the environment
+[^国贸]: China World Trade Center (国际贸易中心)
+  A major business district in Beijing's CBD.
+
+  The area is known for its modern skyscrapers and international businesses.
+[^机器学习]: Machine Learning; a branch of AI where computers learn patterns from data
+[^火锅]: Hot pot; a communal cooking method where diners cook raw ingredients in a shared pot of simmering broth
+[^鸳鸯锅]: "Mandarin duck pot" — a hot pot divided into two halves: one spicy (红汤) and one mild (白汤), so everyone is happy
+[^书店]: Bookstore; his favorite bookstore is 三联书店, a famous chain in Beijing

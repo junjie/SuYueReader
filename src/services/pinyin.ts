@@ -10,11 +10,14 @@ async function loadPinyinPro() {
 // CJK Unified Ideographs range
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
 
-export async function annotateWithPinyin(text: string): Promise<string> {
+/** Get pinyin array for full text (context-aware polyphone resolution) */
+export async function getPinyinArray(text: string): Promise<string[]> {
   const mod = await loadPinyinPro();
+  return mod.pinyin(text, { type: 'array' });
+}
 
-  // Get pinyin for the full text, returns space-separated pinyin
-  const pinyinArr = mod.pinyin(text, { type: 'array' });
+export async function annotateWithPinyin(text: string): Promise<string> {
+  const pinyinArr = await getPinyinArray(text);
 
   let result = '';
   let pIdx = 0;
