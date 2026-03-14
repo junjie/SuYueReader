@@ -368,12 +368,15 @@ export class Reader {
       pinyinArr = await getPinyinArray(text);
     }
 
+    // Build a flat list of characters with their formatting applied.
+    // Formatting tags are emitted at character boundaries, so they work
+    // correctly even when a format range starts or ends mid-segment.
+    // Word spans wrap the characters but sit *inside* the formatting spans,
+    // so one highlight can cover multiple word spans seamlessly.
+
     let result = '';
     let pIdx = 0;
     let charPos = 0;
-
-    // Track currently open formatting spans so we can open/close them
-    // at segment boundaries, allowing one span to wrap multiple segments.
     const activeFormats = new Set<InlineFormat>();
 
     for (const seg of segments) {
@@ -382,61 +385,85 @@ export class Reader {
       const segEnd = charPos + segLen;
       const hasCjk = chars.some((c) => CJK_RE.test(c));
 
-      // Close formats that end at or before this segment's start
-      for (const f of activeFormats) {
-        if (f.end <= charPos) {
-          result += this.fmtCloseTag(f);
-          activeFormats.delete(f);
-        }
-      }
-
-      // Open formats that start at or before this segment and end after its start
-      if (formatting.length > 0) {
-        for (const f of formatting) {
-          if (!activeFormats.has(f) && f.start <= charPos && f.end > charPos) {
-            result += this.fmtOpenTag(f);
-            activeFormats.add(f);
-          }
-        }
-        for (const f of formatting) {
-          if (!activeFormats.has(f) && f.start >= charPos && f.start < segEnd) {
-            // Format starts mid-segment — we still open it here since we
-            // don't split segments at formatting boundaries
-            result += this.fmtOpenTag(f);
-            activeFormats.add(f);
-          }
-        }
-      }
-
       // Check if this segment overlaps any footnote range (position-based)
       const matchedFootnote = footnoteRanges.find(
         (fn) => charPos < fn.end && segEnd > fn.start
       );
 
-      if (seg.isWordLike && hasCjk) {
+      // Check if any formatting boundary falls inside this segment (not at edges)
+      const hasMidBoundary = formatting.some((f) =>
+        (f.start > charPos && f.start < segEnd) || (f.end > charPos && f.end < segEnd)
+      );
+
+      if (hasMidBoundary && seg.isWordLike && hasCjk) {
+        // Formatting boundary splits this segment — render char by char,
+        // each character as its own word span (same data-word for dictionary).
         uniqueWords?.add(seg.text);
         const hasNote = !!matchedFootnote || hasFootnote(seg.text);
-        let inner = '';
-        for (const char of chars) {
-          if (showPinyin && pinyinArr && CJK_RE.test(char)) {
-            const py = pinyinArr[pIdx] || '';
-            inner += `<ruby>${this.escapeHtml(char)}<rp>(</rp><rt>${py}</rt><rp>)</rp></ruby>`;
-          } else {
-            inner += this.escapeHtml(char);
-          }
-          pIdx++;
-        }
         const fnKeyAttr = matchedFootnote ? ` data-footnote-key="${this.escapeAttr(matchedFootnote.key)}"` : '';
-        result += `<span class="word${hasNote ? ' has-footnote' : ''}" data-word="${this.escapeAttr(seg.text)}"${fnKeyAttr}>${inner}</span>`;
-      } else {
-        for (const char of chars) {
+
+        for (let ci = 0; ci < chars.length; ci++) {
+          const cPos = charPos + ci;
+          // Close formats that end at this character position
+          for (const f of activeFormats) {
+            if (f.end <= cPos) { result += this.fmtCloseTag(f); activeFormats.delete(f); }
+          }
+          // Open formats that start at this character position
+          for (const f of formatting) {
+            if (!activeFormats.has(f) && f.start <= cPos && f.end > cPos) {
+              result += this.fmtOpenTag(f); activeFormats.add(f);
+            }
+          }
+
+          const char = chars[ci];
+          let charHtml: string;
           if (showPinyin && pinyinArr && CJK_RE.test(char)) {
             const py = pinyinArr[pIdx] || '';
-            result += `<ruby>${this.escapeHtml(char)}<rp>(</rp><rt>${py}</rt><rp>)</rp></ruby>`;
+            charHtml = `<ruby>${this.escapeHtml(char)}<rp>(</rp><rt>${py}</rt><rp>)</rp></ruby>`;
           } else {
-            result += this.escapeHtml(char);
+            charHtml = this.escapeHtml(char);
           }
           pIdx++;
+          result += `<span class="word${hasNote ? ' has-footnote' : ''}" data-word="${this.escapeAttr(seg.text)}"${fnKeyAttr}>${charHtml}</span>`;
+        }
+      } else {
+        // No mid-boundary — emit formatting open/close at segment edges
+        // Close formats that end at or before this segment's start
+        for (const f of activeFormats) {
+          if (f.end <= charPos) { result += this.fmtCloseTag(f); activeFormats.delete(f); }
+        }
+        // Open formats that cover this segment
+        for (const f of formatting) {
+          if (!activeFormats.has(f) && f.start <= charPos && f.end > charPos) {
+            result += this.fmtOpenTag(f); activeFormats.add(f);
+          }
+        }
+
+        if (seg.isWordLike && hasCjk) {
+          uniqueWords?.add(seg.text);
+          const hasNote = !!matchedFootnote || hasFootnote(seg.text);
+          let inner = '';
+          for (const char of chars) {
+            if (showPinyin && pinyinArr && CJK_RE.test(char)) {
+              const py = pinyinArr[pIdx] || '';
+              inner += `<ruby>${this.escapeHtml(char)}<rp>(</rp><rt>${py}</rt><rp>)</rp></ruby>`;
+            } else {
+              inner += this.escapeHtml(char);
+            }
+            pIdx++;
+          }
+          const fnKeyAttr = matchedFootnote ? ` data-footnote-key="${this.escapeAttr(matchedFootnote.key)}"` : '';
+          result += `<span class="word${hasNote ? ' has-footnote' : ''}" data-word="${this.escapeAttr(seg.text)}"${fnKeyAttr}>${inner}</span>`;
+        } else {
+          for (const char of chars) {
+            if (showPinyin && pinyinArr && CJK_RE.test(char)) {
+              const py = pinyinArr[pIdx] || '';
+              result += `<ruby>${this.escapeHtml(char)}<rp>(</rp><rt>${py}</rt><rp>)</rp></ruby>`;
+            } else {
+              result += this.escapeHtml(char);
+            }
+            pIdx++;
+          }
         }
       }
 
