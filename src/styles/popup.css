@@ -1,6 +1,7 @@
 .dict-popup {
   position: fixed;
   z-index: 200;
+  min-width: 180px;
   max-width: 320px;
   background: var(--settings-bg);
   color: var(--fg);
