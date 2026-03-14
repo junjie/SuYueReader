@@ -152,7 +152,8 @@ export class Reader {
   private renderPlain(scriptVariant: string | null): void {
     const fragments: string[] = [];
     for (const para of this.paragraphs) {
-      fragments.push(`<p data-index="${para.index}">${this.escapeHtml(para.text)}</p>`);
+      const html = para.text.split('\n').map(line => this.escapeHtml(line)).join('<br>');
+      fragments.push(`<p data-index="${para.index}">${html}</p>`);
     }
     this.container.innerHTML = fragments.join('');
 
@@ -180,10 +181,15 @@ export class Reader {
         if (s.scriptVariant !== 'original') {
           text = await convertScript(text, s.scriptVariant);
         }
-        const content = await this.renderParagraph(text, s.showPinyin, uniqueWords);
+        // Render each line separately, join with <br>
+        const lines = text.split('\n');
+        const renderedLines: string[] = [];
+        for (const line of lines) {
+          renderedLines.push(await this.renderParagraph(line, s.showPinyin, uniqueWords));
+        }
         const el = paragraphEls[j] as HTMLElement | undefined;
         if (el) {
-          el.innerHTML = content;
+          el.innerHTML = renderedLines.join('<br>');
         }
       }
 

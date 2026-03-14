@@ -4,7 +4,9 @@ export function parseText(raw: string): Paragraph[] {
   const trimmed = raw.trim();
   if (!trimmed) return [];
 
-  // Split by double newlines (paragraphs), fallback to single newlines
+  // Split by double newlines (paragraph breaks).
+  // If no double newlines exist, fall back to treating each single newline as a paragraph break.
+  // When double newlines are present, single newlines within a paragraph are preserved as line breaks.
   let parts = trimmed.split(/\n\n+/);
   if (parts.length === 1) {
     parts = trimmed.split(/\n/);
