@@ -113,7 +113,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>Font</label>
+          <label>字体<span class="sub">Font</span></label>
           <div class="font-size-controls">
             <button class="pinyin-opts-btn" id="s-font-opts" aria-label="Font Options">⋯</button>
             <button class="size-btn" id="s-fontsize-down">A</button>
@@ -123,7 +123,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>Theme</label>
+          <label>主题<span class="sub">Theme</span></label>
           <div class="theme-swatches" id="s-theme-group">
             <button data-theme="light" class="theme-swatch" style="background:#faf8f5;border-color:#ccc" aria-label="Light">
               <span class="swatch-char" style="color:#1a1a1a">文</span>
@@ -138,15 +138,15 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>Layout</label>
+          <label>排版<span class="sub">Layout</span></label>
           <div class="segmented-control" id="s-mode-group">
-            <button data-mode="horizontal" class="seg-btn">Horizontal</button>
-            <button data-mode="vertical" class="seg-btn">Vertical</button>
+            <button data-mode="horizontal" class="seg-btn">横排</button>
+            <button data-mode="vertical" class="seg-btn">竖排</button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static toggle-row">
-          <label>Pinyin</label>
+          <label>拼音<span class="sub">Pinyin</span></label>
           <div class="pinyin-toggle-group">
             <button class="pinyin-opts-btn" id="s-pinyin-opts" aria-label="Pinyin Options">⋯</button>
             <label class="ios-switch">
@@ -157,14 +157,14 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" id="s-dictionaries">
-          <span>Dictionaries</span>
+          <span>词典<span class="row-sub">Dictionaries</span></span>
           <span class="row-chevron">›</span>
         </button>
       </div>
 
       <div class="sheet-group">
         <button class="sheet-group-row" id="s-more">
-          <span>More Options</span>
+          <span>更多选项<span class="row-sub">More Options</span></span>
           <span class="row-chevron">›</span>
         </button>
       </div>
@@ -234,7 +234,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>Line Height</label>
+          <label>行距<span class="sub">Line Height</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-lineheight-down">−</button>
             <span id="s-lineheight-val" class="size-value"></span>
@@ -243,7 +243,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>Paragraph Spacing</label>
+          <label>段间距<span class="sub">Paragraph Spacing</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-paraspacing-down">−</button>
             <span id="s-paraspacing-val" class="size-value"></span>
@@ -252,7 +252,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>Line Length</label>
+          <label>行宽<span class="sub">Line Length</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-linelen-down">−</button>
             <span id="s-linelen-val" class="size-value"></span>
@@ -261,7 +261,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>V Margin</label>
+          <label>垂直边距<span class="sub">Vertical Margin</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-marginv-down">−</button>
             <span id="s-marginv-val" class="size-value"></span>
@@ -272,7 +272,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static toggle-row">
-          <label>Paragraph Numbers</label>
+          <label>段落编号<span class="sub">Paragraph Numbers</span></label>
           <label class="ios-switch">
             <input type="checkbox" id="s-numbering" />
             <span class="ios-switch-track"></span>
@@ -282,7 +282,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <button class="sheet-group-row reset-row" id="s-reset">
-          <span>Reset to Defaults</span>
+          <span>恢复默认<span class="row-sub">Reset to Defaults</span></span>
         </button>
       </div>
     `;
@@ -320,7 +320,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>Font Size</label>
+          <label>字号<span class="sub">Font Size</span></label>
           <div class="font-size-controls">
             <button class="size-btn" id="s-fontsize-down">A</button>
             <span id="s-fontsize-val" class="size-value"></span>
@@ -373,15 +373,15 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>Pinyin Position</label>
+          <label>拼音位置<span class="sub">Pinyin Position</span></label>
           <div class="segmented-control" id="s-pypos-group">
-            <button data-pos="over" class="seg-btn">Above</button>
-            <button data-pos="under" class="seg-btn">Below</button>
+            <button data-pos="over" class="seg-btn">上方</button>
+            <button data-pos="under" class="seg-btn">下方</button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>Pinyin Size</label>
+          <label>拼音大小<span class="sub">Pinyin Size</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-pysize-down">−</button>
             <span id="s-pysize-val" class="size-value"></span>

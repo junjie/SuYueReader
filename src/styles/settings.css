@@ -104,9 +104,19 @@
   color: var(--fg);
 }
 
-.sheet-group-row label span {
+.sheet-group-row label .sub {
+  display: block;
   color: var(--fg-muted);
-  font-size: 14px;
+  font-size: 11px;
+  line-height: 1.2;
+}
+
+/* Subtitle under menu row text */
+.row-sub {
+  display: block;
+  font-size: 11px;
+  color: var(--fg-muted);
+  line-height: 1.2;
 }
 
 .sheet-group-divider {
@@ -121,10 +131,15 @@
   font-weight: 300;
 }
 
-.reset-row span {
+.reset-row > span {
   color: #e53e3e;
   width: 100%;
   text-align: center;
+}
+
+.reset-row .row-sub {
+  color: #e53e3e;
+  opacity: 0.6;
 }
 
 /* Load buttons row */

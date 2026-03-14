@@ -84,23 +84,23 @@ export class OpenSheet {
       </div>
       <div class="sheet-group">
         <button class="sheet-group-row" data-action="builtin">
-          <span>Choose from Library</span>
+          <span>从文库选择<span class="row-sub">Choose from Library</span></span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" data-action="file">
-          <span>Upload File</span>
+          <span>上传文件<span class="row-sub">Upload File</span></span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" data-action="paste">
-          <span>Paste Text</span>
+          <span>粘贴文本<span class="row-sub">Paste Text</span></span>
           <span class="row-chevron">›</span>
         </button>
       </div>
       <div class="sheet-group" style="margin-top: 12px">
         <button class="sheet-group-row" data-action="export">
-          <span>Export as .crdr</span>
+          <span>导出为 .crdr<span class="row-sub">Export as .crdr</span></span>
           <span class="row-chevron">↓</span>
         </button>
       </div>
@@ -131,7 +131,7 @@ export class OpenSheet {
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
       <div class="sheet-group" id="lib-list">
-        <div class="sheet-group-row static" style="justify-content:center;color:var(--fg-muted)">Loading…</div>
+        <div class="sheet-group-row static" style="justify-content:center;color:var(--fg-muted)">加载中…</div>
       </div>
     `;
 
@@ -188,11 +188,11 @@ export class OpenSheet {
     overlay.className = 'modal-overlay';
     overlay.innerHTML = `
       <div class="modal">
-        <h3>Paste Chinese Text</h3>
-        <textarea id="paste-area" rows="12" placeholder="Paste your text here..."></textarea>
+        <h3>粘贴文本<span class="row-sub" style="display:inline; margin-left:6px">Paste Text</span></h3>
+        <textarea id="paste-area" rows="12" placeholder="在此粘贴文本…"></textarea>
         <div class="modal-actions">
-          <button class="sheet-action-btn" id="modal-cancel">Cancel</button>
-          <button class="sheet-action-btn primary" id="modal-load">Load</button>
+          <button class="sheet-action-btn" id="modal-cancel">取消</button>
+          <button class="sheet-action-btn primary" id="modal-load">加载</button>
         </div>
       </div>
     `;
