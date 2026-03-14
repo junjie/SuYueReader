@@ -60,7 +60,7 @@ export class Reader {
   constructor(container: HTMLElement, store: SettingsStore) {
     this.container = container;
     this.store = store;
-    this.popup = new DefinitionPopup();
+    this.popup = new DefinitionPopup(store);
 
     document.addEventListener('settings-changed', (e) => {
       const detail = (e as CustomEvent).detail;

@@ -430,3 +430,56 @@
   color: var(--primary-fg);
   border-color: var(--primary-bg);
 }
+
+/* Dictionary row */
+.dict-row {
+  gap: 10px;
+}
+
+.dict-row-reorder {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dict-reorder-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 18px;
+  border: none;
+  border-radius: 4px;
+  background: var(--btn-bg);
+  color: var(--fg-muted);
+  font-size: 8px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  line-height: 1;
+}
+
+.dict-reorder-btn:active:not(:disabled) {
+  background: var(--btn-hover);
+}
+
+.dict-reorder-btn:disabled {
+  opacity: 0.25;
+  cursor: default;
+}
+
+.dict-row-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dict-row-name {
+  font-size: 16px;
+  color: var(--fg);
+}
+
+.dict-row-desc {
+  font-size: 12px;
+  color: var(--fg-muted);
+}

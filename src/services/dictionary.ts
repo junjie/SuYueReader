@@ -1,40 +1,68 @@
+export type DictSource = 'cedict' | 'cvdict';
+
 export interface DictEntry {
   traditional: string;
   pinyin: string;
   definitions: string[];
+  source: DictSource;
 }
 
 interface RawEntry {
   t: string;
   p: string;
   d: string[];
+  s?: DictSource; // present in .crdr bundles with source info
 }
 
-let dictMap: Map<string, DictEntry[]> | null = null;
-let loadPromise: Promise<void> | null = null;
+let cedictMap: Map<string, DictEntry[]> | null = null;
+let cvdictMap: Map<string, DictEntry[]> | null = null;
+let cedictLoadPromise: Promise<void> | null = null;
+let cvdictLoadPromise: Promise<void> | null = null;
 
-async function loadDict(): Promise<void> {
-  if (dictMap) return;
-  if (loadPromise) return loadPromise;
+function buildEntries(data: Record<string, RawEntry[]>, source: DictSource): Map<string, DictEntry[]> {
+  const map = new Map<string, DictEntry[]>();
+  for (const [key, entries] of Object.entries(data)) {
+    map.set(
+      key,
+      entries.map((e) => ({
+        traditional: e.t,
+        pinyin: e.p,
+        definitions: e.d,
+        source,
+      }))
+    );
+  }
+  return map;
+}
 
-  loadPromise = (async () => {
+async function loadCedict(): Promise<void> {
+  if (cedictMap) return;
+  if (cedictLoadPromise) return cedictLoadPromise;
+
+  cedictLoadPromise = (async () => {
     const base = import.meta.env.BASE_URL;
     const resp = await fetch(`${base}dict/cedict.json`);
     const data: Record<string, RawEntry[]> = await resp.json();
-
-    dictMap = new Map();
-    for (const [key, entries] of Object.entries(data)) {
-      dictMap.set(
-        key,
-        entries.map((e) => ({
-          traditional: e.t,
-          pinyin: e.p,
-          definitions: e.d,
-        }))
-      );
-    }
+    cedictMap = buildEntries(data, 'cedict');
   })();
-  return loadPromise;
+  return cedictLoadPromise;
+}
+
+async function loadCvdict(): Promise<void> {
+  if (cvdictMap) return;
+  if (cvdictLoadPromise) return cvdictLoadPromise;
+
+  cvdictLoadPromise = (async () => {
+    const base = import.meta.env.BASE_URL;
+    const resp = await fetch(`${base}dict/cvdict.json`);
+    const data: Record<string, RawEntry[]> = await resp.json();
+    cvdictMap = buildEntries(data, 'cvdict');
+  })();
+  return cvdictLoadPromise;
+}
+
+async function loadDict(): Promise<void> {
+  await Promise.all([loadCedict(), loadCvdict()]);
 }
 
 let toSimplifiedFn: ((text: string) => string) | null = null;
@@ -46,23 +74,29 @@ async function ensureSimplifiedConverter(): Promise<(text: string) => string> {
   return toSimplifiedFn;
 }
 
-export async function lookup(word: string): Promise<DictEntry[] | null> {
-  await loadDict();
-  if (!dictMap) return null;
-
-  // Try direct lookup
-  const direct = dictMap.get(word);
+function lookupInMap(map: Map<string, DictEntry[]> | null, word: string, simplified: string | null): DictEntry[] {
+  if (!map) return [];
+  const direct = map.get(word);
   if (direct) return direct;
-
-  // Try converting to simplified
-  const toSimplified = await ensureSimplifiedConverter();
-  const simplified = toSimplified(word);
-  if (simplified !== word) {
-    const result = dictMap.get(simplified);
+  if (simplified && simplified !== word) {
+    const result = map.get(simplified);
     if (result) return result;
   }
+  return [];
+}
 
-  return null;
+export async function lookup(word: string): Promise<DictEntry[] | null> {
+  await loadDict();
+
+  // Pre-compute simplified form
+  const toSimplified = await ensureSimplifiedConverter();
+  const simplified = toSimplified(word);
+
+  const cedictResults = lookupInMap(cedictMap, word, simplified);
+  const cvdictResults = lookupInMap(cvdictMap, word, simplified);
+
+  const combined = [...cedictResults, ...cvdictResults];
+  return combined.length > 0 ? combined : null;
 }
 
 export async function lookupChar(char: string): Promise<DictEntry[] | null> {
@@ -76,7 +110,7 @@ export function preload(): void {
 
 /** Check if the dictionary has been loaded */
 export function isLoaded(): boolean {
-  return dictMap !== null;
+  return cedictMap !== null || cvdictMap !== null;
 }
 
 // --- Per-text definition cache ---
@@ -127,32 +161,51 @@ export function getFootnoteMap(): Map<string, string> | null {
 }
 
 /** Load dictionary entries directly from a .crdr bundle (skips fetch) */
-export function loadFromBundle(entries: Record<string, { t: string; p: string; d: string[] }[]>): void {
-  dictMap = new Map();
-  for (const [key, rawEntries] of Object.entries(entries)) {
-    dictMap.set(
-      key,
-      rawEntries.map((e) => ({
-        traditional: e.t,
-        pinyin: e.p,
-        definitions: e.d,
-      }))
-    );
+export function loadFromBundle(entries: Record<string, RawEntry[]>): void {
+  // Check if entries have source info (new format)
+  const hasSourceInfo = Object.values(entries).some(
+    (arr) => arr.some((e) => e.s !== undefined)
+  );
+
+  if (hasSourceInfo) {
+    // Split entries by source
+    const cedictEntries: Record<string, RawEntry[]> = {};
+    const cvdictEntries: Record<string, RawEntry[]> = {};
+
+    for (const [key, rawEntries] of Object.entries(entries)) {
+      for (const e of rawEntries) {
+        const target = e.s === 'cvdict' ? cvdictEntries : cedictEntries;
+        if (!target[key]) target[key] = [];
+        target[key].push(e);
+      }
+    }
+
+    if (Object.keys(cedictEntries).length > 0) {
+      cedictMap = buildEntries(cedictEntries, 'cedict');
+    }
+    if (Object.keys(cvdictEntries).length > 0) {
+      cvdictMap = buildEntries(cvdictEntries, 'cvdict');
+    }
+  } else {
+    // Old format — all entries are cedict
+    cedictMap = buildEntries(entries, 'cedict');
   }
-  // Also mark as loaded
-  loadPromise = Promise.resolve();
+
+  cedictLoadPromise = Promise.resolve();
+  cvdictLoadPromise = Promise.resolve();
 }
 
 /** Export cached dictionary entries (for .crdr export) */
-export function exportCache(): Record<string, { t: string; p: string; d: string[] }[]> | null {
+export function exportCache(): Record<string, RawEntry[]> | null {
   if (!textCache) return null;
-  const result: Record<string, { t: string; p: string; d: string[] }[]> = {};
+  const result: Record<string, RawEntry[]> = {};
   for (const [word, entries] of textCache) {
     if (entries) {
       result[word] = entries.map((e) => ({
         t: e.traditional,
         p: e.pinyin,
         d: e.definitions,
+        s: e.source,
       }));
     }
   }

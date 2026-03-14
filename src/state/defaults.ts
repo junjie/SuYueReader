@@ -17,4 +17,7 @@ export const defaultSettings: Settings = {
   showNumbering: true,
   scriptVariant: 'original',
   lineLength: 35,
+  showCedict: true,
+  showCvdict: true,
+  dictOrder: ['cedict', 'cvdict'],
 };

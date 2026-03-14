@@ -31,7 +31,7 @@ export interface CRDRFile {
   title: string;
   text: string;
   segments?: Record<number, { t: string; w: boolean }[][]>;
-  dictionary?: Record<string, { t: string; p: string; d: string[] }[]>;
+  dictionary?: Record<string, { t: string; p: string; d: string[]; s?: 'cedict' | 'cvdict' }[]>;
 }
 
 export type WritingMode = 'horizontal' | 'vertical';
@@ -56,4 +56,7 @@ export interface Settings {
   showNumbering: boolean;
   scriptVariant: ScriptVariant;
   lineLength: number;
+  showCedict: boolean;
+  showCvdict: boolean;
+  dictOrder: ('cedict' | 'cvdict')[];
 }

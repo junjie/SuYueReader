@@ -77,7 +77,27 @@
 }
 
 .dict-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 8px;
+}
+
+.dict-popup-config {
+  border: none;
+  background: none;
+  color: var(--fg-muted);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.dict-popup-config:hover {
+  color: var(--fg);
+  background: var(--btn-hover);
 }
 
 .dict-popup-word {

@@ -5,7 +5,7 @@ import { displayFonts, previewFontName, loadFontPreview } from '../services/font
 export class SettingsSheet {
   private overlay: HTMLElement | null = null;
   private store: SettingsStore;
-  private view: 'main' | 'advanced' | 'pinyin' | 'font' = 'main';
+  private view: 'main' | 'advanced' | 'pinyin' | 'font' | 'dictionaries' = 'main';
 
   constructor(store: SettingsStore) {
     this.store = store;
@@ -155,6 +155,11 @@ export class SettingsSheet {
             </label>
           </div>
         </div>
+        <div class="sheet-group-divider"></div>
+        <button class="sheet-group-row" id="s-dictionaries">
+          <span>Dictionaries</span>
+          <span class="row-chevron">›</span>
+        </button>
       </div>
 
       <div class="sheet-group">
@@ -203,6 +208,12 @@ export class SettingsSheet {
     // Pinyin options drill-in
     panel.querySelector('#s-pinyin-opts')!.addEventListener('click', () => {
       this.buildPinyinView(panel);
+      this.syncUI(panel);
+    });
+
+    // Dictionaries drill-in
+    panel.querySelector('#s-dictionaries')!.addEventListener('click', () => {
+      this.buildDictionariesView(panel);
       this.syncUI(panel);
     });
 
@@ -395,6 +406,104 @@ export class SettingsSheet {
     this.bindStepper(panel, 's-pysize', 8, 20, 1, 'pinyinSize');
   }
 
+  private static DICT_LABELS: Record<string, { name: string; desc: string }> = {
+    cedict: { name: 'CC-CEDICT', desc: 'English' },
+    cvdict: { name: 'CVDICT', desc: 'Vietnamese' },
+  };
+
+  private buildDictionariesView(panel: HTMLElement): void {
+    this.view = 'dictionaries';
+    const s = this.store.get();
+    const order = s.dictOrder;
+
+    panel.innerHTML = `
+      <div class="sheet-header">
+        <button class="sheet-nav-back" id="s-back">‹</button>
+        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
+      </div>
+
+      <div class="sheet-group" id="s-dict-list">
+        ${order.map((id, i) => this.buildDictRow(id, i, order.length)).join('')}
+      </div>
+    `;
+
+    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
+
+    panel.querySelector('#s-back')!.addEventListener('click', () => {
+      this.buildMainView(panel);
+      this.syncUI(panel);
+    });
+
+    this.bindDictListEvents(panel);
+  }
+
+  private buildDictRow(id: string, index: number, total: number): string {
+    const info = SettingsSheet.DICT_LABELS[id] || { name: id, desc: '' };
+    const settingKey = id === 'cedict' ? 'showCedict' : 'showCvdict';
+    const checked = this.store.get()[settingKey as keyof Settings] ? 'checked' : '';
+
+    let html = '';
+    if (index > 0) html += `<div class="sheet-group-divider"></div>`;
+    html += `<div class="sheet-group-row static dict-row" data-dict="${id}">
+      <div class="dict-row-reorder">
+        <button class="dict-reorder-btn" data-dir="up" ${index === 0 ? 'disabled' : ''} aria-label="Move up">▲</button>
+        <button class="dict-reorder-btn" data-dir="down" ${index === total - 1 ? 'disabled' : ''} aria-label="Move down">▼</button>
+      </div>
+      <div class="dict-row-info">
+        <span class="dict-row-name">${info.name}</span>
+        <span class="dict-row-desc">${info.desc}</span>
+      </div>
+      <label class="ios-switch">
+        <input type="checkbox" data-dict-toggle="${id}" ${checked} />
+        <span class="ios-switch-track"></span>
+      </label>
+    </div>`;
+    return html;
+  }
+
+  private bindDictListEvents(panel: HTMLElement): void {
+    const list = panel.querySelector('#s-dict-list')!;
+
+    // Toggle events
+    list.addEventListener('change', (e) => {
+      const input = e.target as HTMLInputElement;
+      const dictId = input.dataset.dictToggle;
+      if (!dictId) return;
+      if (dictId === 'cedict') this.store.update({ showCedict: input.checked });
+      if (dictId === 'cvdict') this.store.update({ showCvdict: input.checked });
+    });
+
+    // Reorder events
+    list.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest('.dict-reorder-btn') as HTMLElement | null;
+      if (!btn) return;
+      const row = btn.closest('.dict-row') as HTMLElement;
+      const dictId = row.dataset.dict!;
+      const dir = btn.dataset.dir as 'up' | 'down';
+      const order = [...this.store.get().dictOrder];
+      const idx = order.indexOf(dictId as 'cedict' | 'cvdict');
+      if (idx === -1) return;
+      const newIdx = dir === 'up' ? idx - 1 : idx + 1;
+      if (newIdx < 0 || newIdx >= order.length) return;
+      [order[idx], order[newIdx]] = [order[newIdx], order[idx]];
+      this.store.update({ dictOrder: order });
+      // Rebuild the view to reflect new order
+      this.buildDictionariesView(panel);
+      this.syncUI(panel);
+    });
+  }
+
+  openDictionaries(): void {
+    if (!this.overlay) {
+      this.open();
+    }
+    const panel = this.overlay?.querySelector<HTMLElement>('.sheet-panel');
+    if (panel) {
+      this.buildDictionariesView(panel);
+      this.syncUI(panel);
+    }
+  }
+
   private bindStepper(panel: HTMLElement, id: string, min: number, max: number, step: number, key: keyof Settings): void {
     panel.querySelector(`#${id}-down`)!.addEventListener('click', () => {
       const cur = this.store.get()[key] as number;
@@ -442,6 +551,12 @@ export class SettingsSheet {
       panel.querySelectorAll('#s-font-list .font-card').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.font === s.fontFamily);
       });
+    } else if (this.view === 'dictionaries') {
+      const cedictToggle = panel.querySelector<HTMLInputElement>('[data-dict-toggle="cedict"]');
+      if (cedictToggle) cedictToggle.checked = s.showCedict;
+
+      const cvdictToggle = panel.querySelector<HTMLInputElement>('[data-dict-toggle="cvdict"]');
+      if (cvdictToggle) cvdictToggle.checked = s.showCvdict;
     } else if (this.view === 'pinyin') {
       panel.querySelectorAll('#s-pypos-group .seg-btn').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.pos === s.pinyinPosition);

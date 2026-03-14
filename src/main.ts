@@ -55,6 +55,9 @@ const openSheet = new OpenSheet(textLoader, handleExport);
 const settingsSheet = new SettingsSheet(store);
 new Navbar(() => openSheet.toggle(), () => settingsSheet.toggle(), store);
 
+// Allow definition popup to open the dictionaries settings page
+document.addEventListener('open-dict-settings', () => settingsSheet.openDictionaries());
+
 // Load text: URL param or default intro document
 const params = new URLSearchParams(window.location.search);
 const textParam = params.get('text');

@@ -1,9 +1,11 @@
 import { lookup, lookupChar, isLoaded, cachedLookup, getFootnote, type DictEntry } from '../services/dictionary.ts';
+import type { SettingsStore } from '../state/settings.ts';
 
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
 
 export class DefinitionPopup {
   private el: HTMLDivElement;
+  private store: SettingsStore;
   private currentWord: string | null = null;
   private currentFootnoteKey: string | null = null;
   private activeAnchor: HTMLElement | null = null;
@@ -13,7 +15,8 @@ export class DefinitionPopup {
   private _justDrilledDown = false;
   private pinned = false;
 
-  constructor() {
+  constructor(store: SettingsStore) {
+    this.store = store;
     this.el = document.createElement('div');
     this.el.className = 'dict-popup';
     document.body.appendChild(this.el);
@@ -26,7 +29,7 @@ export class DefinitionPopup {
       if (!this.pinned) this.scheduleHide();
     });
 
-    // Handle clicks inside the popup (character drill-down, back button)
+    // Handle clicks inside the popup (character drill-down, back button, dict config)
     this.el.addEventListener('click', (e) => {
       e.stopPropagation();
       const target = e.target as HTMLElement;
@@ -39,6 +42,12 @@ export class DefinitionPopup {
       const backEl = target.closest('.dict-popup-back');
       if (backEl) {
         this.goBack();
+        return;
+      }
+      const configEl = target.closest('.dict-popup-config');
+      if (configEl) {
+        this.hide();
+        document.dispatchEvent(new CustomEvent('open-dict-settings'));
       }
     });
 
@@ -116,37 +125,60 @@ export class DefinitionPopup {
     this.el.innerHTML = `<div class="dict-popup-body">${inner}</div>`;
   }
 
+  private static DICT_LABELS: Record<string, string> = {
+    cedict: 'CC-CEDICT',
+    cvdict: 'CVDICT',
+  };
+
   private buildContent(word: string, entries: DictEntry[] | null): string {
     const chars = [...word].filter((c) => CJK_RE.test(c));
     const footnote = getFootnote(this.currentFootnoteKey || word);
-    const hasDict = entries && entries.length > 0;
-    const multiSource = !!footnote && hasDict;
+    const settings = this.store.get();
 
-    // Header with word
-    let html = `<div class="dict-popup-header"><span class="dict-popup-word">${this.buildWordChars(word, chars)}</span></div>`;
+    // Group entries by source, filtered by enabled setting
+    const bySource: Record<string, DictEntry[]> = {};
+    if (entries) {
+      for (const e of entries) {
+        const enabled = e.source === 'cedict' ? settings.showCedict : settings.showCvdict;
+        if (!enabled) continue;
+        if (!bySource[e.source]) bySource[e.source] = [];
+        bySource[e.source].push(e);
+      }
+    }
+
+    // Render in dictOrder
+    const orderedSources = settings.dictOrder.filter((id) => bySource[id]?.length > 0);
+    const hasAnyDict = orderedSources.length > 0;
+
+    // Count visible sources for labeling
+    const sourceCount = (footnote ? 1 : 0) + orderedSources.length;
+    const showLabels = sourceCount > 1;
+
+    // Header with word + config button
+    let html = `<div class="dict-popup-header"><span class="dict-popup-word">${this.buildWordChars(word, chars)}</span><button class="dict-popup-config" aria-label="Configure dictionaries" title="Configure dictionaries">⚙</button></div>`;
 
     // Footnote source
     if (footnote) {
       html += `<div class="dict-popup-source">`;
-      if (multiSource) {
+      if (showLabels) {
         html += `<div class="dict-popup-source-label">Note</div>`;
       }
       html += `<div class="dict-popup-footnote-text">${this.renderFootnote(footnote)}</div>`;
       html += `</div>`;
     }
 
-    // Dictionary source
-    if (hasDict) {
+    // Dictionary sources in order
+    for (const source of orderedSources) {
       html += `<div class="dict-popup-source">`;
-      if (multiSource) {
-        html += `<div class="dict-popup-source-label">CC-CEDICT</div>`;
+      if (showLabels) {
+        html += `<div class="dict-popup-source-label">${DefinitionPopup.DICT_LABELS[source] || source}</div>`;
       }
-      html += this.buildDictHtml(word, entries!);
+      html += this.buildDictHtml(word, bySource[source]);
       html += `</div>`;
     }
 
     // Nothing found
-    if (!footnote && !hasDict) {
+    if (!footnote && !hasAnyDict) {
       html += `<div class="dict-popup-notfound">No definition found</div>`;
     }
 
