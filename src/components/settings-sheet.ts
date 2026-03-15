@@ -1,6 +1,7 @@
 import type { SettingsStore } from '../state/settings.ts';
 import type { Settings, WritingMode, PinyinPosition, ThemeMode } from '../types/index.ts';
 import { displayFonts, previewFontName, loadFontPreview } from '../services/fonts.ts';
+import { convertScriptSync } from '../services/script-convert.ts';
 
 export class SettingsSheet {
   private overlay: HTMLElement | null = null;
@@ -9,6 +10,11 @@ export class SettingsSheet {
 
   constructor(store: SettingsStore) {
     this.store = store;
+  }
+
+  /** Convert Chinese UI text to match current script variant */
+  private t(html: string): string {
+    return convertScriptSync(html, this.store.get().scriptVariant);
   }
 
   toggle(): void {
@@ -105,7 +111,7 @@ export class SettingsSheet {
 
   private buildMainView(panel: HTMLElement): void {
     this.view = 'main';
-    panel.innerHTML = `
+    panel.innerHTML = this.t(`
       <div class="sheet-header">
         <span class="sheet-nav-back" style="visibility:hidden">‹</span>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
@@ -113,7 +119,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>字体<span class="sub">Font</span></label>
+          <label>字體<span class="sub">Font</span></label>
           <div class="font-size-controls">
             <button class="pinyin-opts-btn" id="s-font-opts" aria-label="Font Options">⋯</button>
             <button class="size-btn" id="s-fontsize-down">A</button>
@@ -123,7 +129,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>主题<span class="sub">Theme</span></label>
+          <label>主題<span class="sub">Theme</span></label>
           <div class="theme-swatches" id="s-theme-group">
             <button data-theme="light" class="theme-swatch" style="background:#faf8f5;border-color:#ccc" aria-label="Light">
               <span class="swatch-char" style="color:#1a1a1a">文</span>
@@ -140,8 +146,8 @@ export class SettingsSheet {
         <div class="sheet-group-row static">
           <label>排版<span class="sub">Layout</span></label>
           <div class="segmented-control" id="s-mode-group">
-            <button data-mode="horizontal" class="seg-btn">横排</button>
-            <button data-mode="vertical" class="seg-btn">竖排</button>
+            <button data-mode="horizontal" class="seg-btn">橫排<span class="seg-sub">Horizontal</span></button>
+            <button data-mode="vertical" class="seg-btn">豎排<span class="seg-sub">Vertical</span></button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
@@ -157,18 +163,18 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" id="s-dictionaries">
-          <span>词典<span class="row-sub">Dictionaries</span></span>
+          <span>詞典<span class="row-sub">Dictionaries</span></span>
           <span class="row-chevron">›</span>
         </button>
       </div>
 
       <div class="sheet-group">
         <button class="sheet-group-row" id="s-more">
-          <span>更多选项<span class="row-sub">More Options</span></span>
+          <span>更多選項<span class="row-sub">More Options</span></span>
           <span class="row-chevron">›</span>
         </button>
       </div>
-    `;
+    `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
 
@@ -226,7 +232,7 @@ export class SettingsSheet {
 
   private buildAdvancedView(panel: HTMLElement): void {
     this.view = 'advanced';
-    panel.innerHTML = `
+    panel.innerHTML = this.t(`
       <div class="sheet-header">
         <button class="sheet-nav-back" id="s-back">‹</button>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
@@ -243,7 +249,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>段间距<span class="sub">Paragraph Spacing</span></label>
+          <label>段間距<span class="sub">Paragraph Spacing</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-paraspacing-down">−</button>
             <span id="s-paraspacing-val" class="size-value"></span>
@@ -252,7 +258,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>行宽<span class="sub">Line Length</span></label>
+          <label>行寬<span class="sub">Line Length</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-linelen-down">−</button>
             <span id="s-linelen-val" class="size-value"></span>
@@ -261,7 +267,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>垂直边距<span class="sub">Vertical Margin</span></label>
+          <label>垂直邊距<span class="sub">Vertical Margin</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-marginv-down">−</button>
             <span id="s-marginv-val" class="size-value"></span>
@@ -272,7 +278,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static toggle-row">
-          <label>段落编号<span class="sub">Paragraph Numbers</span></label>
+          <label>段落編號<span class="sub">Paragraph Numbers</span></label>
           <label class="ios-switch">
             <input type="checkbox" id="s-numbering" />
             <span class="ios-switch-track"></span>
@@ -282,10 +288,10 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <button class="sheet-group-row reset-row" id="s-reset">
-          <span>恢复默认<span class="row-sub">Reset to Defaults</span></span>
+          <span>恢復預設<span class="row-sub">Reset to Defaults</span></span>
         </button>
       </div>
-    `;
+    `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
 
@@ -312,7 +318,7 @@ export class SettingsSheet {
 
   private buildFontView(panel: HTMLElement): void {
     this.view = 'font';
-    panel.innerHTML = `
+    panel.innerHTML = this.t(`
       <div class="sheet-header">
         <button class="sheet-nav-back" id="s-back">‹</button>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
@@ -320,7 +326,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>字号<span class="sub">Font Size</span></label>
+          <label>字號<span class="sub">Font Size</span></label>
           <div class="font-size-controls">
             <button class="size-btn" id="s-fontsize-down">A</button>
             <span id="s-fontsize-val" class="size-value"></span>
@@ -332,7 +338,10 @@ export class SettingsSheet {
       <div class="font-scroll-row" id="s-font-list">
         ${displayFonts.map((f) => `<button class="font-card" data-font="${f}"><span class="font-card-preview" style="font-family:'${previewFontName(f)}',serif">文字</span><span class="font-card-name">${f}</span></button>`).join('')}
       </div>
-    `;
+    `);
+
+    // Force reflow so the panel calculates correct layout for the font row
+    panel.offsetHeight;
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
 
@@ -365,7 +374,7 @@ export class SettingsSheet {
 
   private buildPinyinView(panel: HTMLElement): void {
     this.view = 'pinyin';
-    panel.innerHTML = `
+    panel.innerHTML = this.t(`
       <div class="sheet-header">
         <button class="sheet-nav-back" id="s-back">‹</button>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
@@ -389,7 +398,7 @@ export class SettingsSheet {
           </div>
         </div>
       </div>
-    `;
+    `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
 

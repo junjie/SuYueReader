@@ -7,6 +7,7 @@ import { SettingsSheet } from './components/settings-sheet.ts';
 import { parseText } from './services/text-parser.ts';
 import { setFootnotes } from './services/dictionary.ts';
 import { preloadDefaultFont } from './services/fonts.ts';
+import { convertScriptSync } from './services/script-convert.ts';
 import type { CRDRFile } from './types/index.ts';
 import './styles/main.css';
 import './styles/themes.css';
@@ -22,17 +23,28 @@ const store = new SettingsStore();
 const readerEl = document.getElementById('reader')!;
 const reader = new Reader(readerEl, store);
 
+let currentTextTitle = '';
+
+function setPageTitle(title?: string): void {
+  if (title !== undefined) currentTextTitle = title;
+  const variant = store.get().scriptVariant;
+  const appName = convertScriptSync('素閱', variant);
+  document.title = currentTextTitle
+    ? `${appName}：${convertScriptSync(currentTextTitle, variant)}`
+    : appName;
+}
+
 const textLoader = new TextLoader(
   (text, title) => {
     const { paragraphs, footnotes } = parseText(text);
     setFootnotes(footnotes);
-
+    setPageTitle(title);
     reader.setParagraphs(paragraphs, text, title);
   },
   (bundle: CRDRFile) => {
     const { paragraphs, footnotes } = parseText(bundle.text);
     setFootnotes(footnotes);
-
+    setPageTitle(bundle.title);
     reader.loadBundle(paragraphs, bundle);
   }
 );
@@ -51,12 +63,18 @@ function handleExport(): void {
   URL.revokeObjectURL(url);
 }
 
-const openSheet = new OpenSheet(textLoader, handleExport);
+const openSheet = new OpenSheet(textLoader, store, handleExport);
 const settingsSheet = new SettingsSheet(store);
 new Navbar(() => openSheet.toggle(), () => settingsSheet.toggle(), store);
 
 // Allow definition popup to open the dictionaries settings page
 document.addEventListener('open-dict-settings', () => settingsSheet.openDictionaries());
+
+// Update page title when script variant changes
+document.addEventListener('settings-changed', (e) => {
+  const detail = (e as CustomEvent).detail;
+  if (detail.scriptVariantChanged) setPageTitle();
+});
 
 // Load text: URL param or default intro document
 const params = new URLSearchParams(window.location.search);

@@ -1,4 +1,6 @@
 import type { TextLoader } from './text-loader.ts';
+import type { SettingsStore } from '../state/settings.ts';
+import { convertScriptSync } from '../services/script-convert.ts';
 
 type ExportCallback = (() => void) | null;
 
@@ -7,9 +9,11 @@ export class OpenSheet {
   private textLoader: TextLoader;
   private fileInput: HTMLInputElement;
   private onExport: ExportCallback = null;
+  private store: SettingsStore;
 
-  constructor(textLoader: TextLoader, onExport?: () => void) {
+  constructor(textLoader: TextLoader, store: SettingsStore, onExport?: () => void) {
     this.textLoader = textLoader;
+    this.store = store;
     this.onExport = onExport || null;
 
     this.fileInput = document.createElement('input');
@@ -22,6 +26,11 @@ export class OpenSheet {
     this.fileInput.addEventListener('change', () => {
       if (this.fileInput.files?.length) this.close();
     });
+  }
+
+  /** Convert Chinese UI text to match current script variant */
+  private t(html: string): string {
+    return convertScriptSync(html, this.store.get().scriptVariant);
   }
 
   toggle(): void {
@@ -77,34 +86,34 @@ export class OpenSheet {
   }
 
   private buildMainView(panel: HTMLElement): void {
-    panel.innerHTML = `
+    panel.innerHTML = this.t(`
       <div class="sheet-header">
         <span class="sheet-nav-back" style="visibility:hidden">‹</span>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
       <div class="sheet-group">
         <button class="sheet-group-row" data-action="builtin">
-          <span>从文库选择<span class="row-sub">Choose from Library</span></span>
+          <span>從文庫選擇<span class="row-sub">Choose from Library</span></span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" data-action="file">
-          <span>上传文件<span class="row-sub">Upload File</span></span>
+          <span>上傳檔案<span class="row-sub">Upload File</span></span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" data-action="paste">
-          <span>粘贴文本<span class="row-sub">Paste Text</span></span>
+          <span>貼上文本<span class="row-sub">Paste Text</span></span>
           <span class="row-chevron">›</span>
         </button>
       </div>
       <div class="sheet-group" style="margin-top: 12px">
         <button class="sheet-group-row" data-action="export">
-          <span>导出为 .crdr<span class="row-sub">Export as .crdr</span></span>
+          <span>匯出為 .crdr<span class="row-sub">Export as .crdr</span></span>
           <span class="row-chevron">↓</span>
         </button>
       </div>
-    `;
+    `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
     panel.querySelector('[data-action="builtin"]')!.addEventListener('click', () => {
@@ -125,15 +134,15 @@ export class OpenSheet {
   }
 
   private async buildLibraryView(panel: HTMLElement): Promise<void> {
-    panel.innerHTML = `
+    panel.innerHTML = this.t(`
       <div class="sheet-header">
         <button class="sheet-nav-back" id="lib-back">‹</button>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
       <div class="sheet-group" id="lib-list">
-        <div class="sheet-group-row static" style="justify-content:center;color:var(--fg-muted)">加载中…</div>
+        <div class="sheet-group-row static" style="justify-content:center;color:var(--fg-muted)">載入中…</div>
       </div>
-    `;
+    `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
     panel.querySelector('#lib-back')!.addEventListener('click', () => {
@@ -143,7 +152,7 @@ export class OpenSheet {
     const manifest = await this.textLoader.loadManifest();
     const listEl = panel.querySelector('#lib-list')!;
     listEl.innerHTML = manifest.map((e, i) =>
-      `${i > 0 ? '<div class="sheet-group-divider"></div>' : ''}<button class="sheet-group-row" data-id="${e.id}"><span>${e.title}</span></button>`
+      `${i > 0 ? '<div class="sheet-group-divider"></div>' : ''}<button class="sheet-group-row" data-id="${e.id}"><span>${this.t(e.title)}</span></button>`
     ).join('');
 
     listEl.addEventListener('click', (e) => {
@@ -186,16 +195,16 @@ export class OpenSheet {
   private showPasteModal(): void {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
-    overlay.innerHTML = `
+    overlay.innerHTML = this.t(`
       <div class="modal">
-        <h3>粘贴文本<span class="row-sub" style="display:inline; margin-left:6px">Paste Text</span></h3>
-        <textarea id="paste-area" rows="12" placeholder="在此粘贴文本…"></textarea>
+        <h3>貼上文本<span class="row-sub" style="display:inline; margin-left:6px">Paste Text</span></h3>
+        <textarea id="paste-area" rows="12" placeholder="在此貼上文本…"></textarea>
         <div class="modal-actions">
           <button class="sheet-action-btn" id="modal-cancel">取消</button>
-          <button class="sheet-action-btn primary" id="modal-load">加载</button>
+          <button class="sheet-action-btn primary" id="modal-load">載入</button>
         </div>
       </div>
-    `;
+    `);
     document.body.appendChild(overlay);
 
     const textarea = overlay.querySelector<HTMLTextAreaElement>('#paste-area')!;

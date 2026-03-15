@@ -147,6 +147,7 @@ html:has(.vertical-mode) {
 
 #reader rt {
   font-size: var(--pinyin-size);
+  font-weight: normal;
   font-family: system-ui, sans-serif;
   color: var(--fg-muted);
 }

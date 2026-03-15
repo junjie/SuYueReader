@@ -270,6 +270,13 @@
   color: var(--btn-active-fg);
 }
 
+.seg-sub {
+  display: block;
+  font-size: 9px;
+  opacity: 0.6;
+  line-height: 1.2;
+}
+
 /* iOS toggle switch */
 .ios-switch {
   position: relative;
@@ -373,12 +380,32 @@
   gap: 8px;
   overflow-x: auto;
   padding: 12px 16px;
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) transparent;
   -webkit-overflow-scrolling: touch;
 }
 
 .font-scroll-row::-webkit-scrollbar {
-  display: none;
+  height: 4px;
+}
+
+.font-scroll-row::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+.font-scroll-row::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Hide scrollbar on touch devices */
+@media (pointer: coarse) {
+  .font-scroll-row {
+    scrollbar-width: none;
+  }
+  .font-scroll-row::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 .font-card {

@@ -33,6 +33,17 @@ function convertPunctuation(text: string, mappings: [string, string][]): string 
   return text;
 }
 
+/** Sync conversion — returns text unchanged if converters haven't loaded yet. */
+export function convertScriptSync(text: string, variant: ScriptVariant): string {
+  if (variant === 'simplified' && toSimplified) {
+    return convertPunctuation(toSimplified(text), PUNCT_TO_SIMPLIFIED);
+  }
+  if (variant === 'traditional' && toTraditional) {
+    return convertPunctuation(toTraditional(text), PUNCT_TO_TRADITIONAL);
+  }
+  return text;
+}
+
 export async function convertScript(text: string, variant: ScriptVariant): Promise<string> {
   if (variant === 'original') return text;
   await ensureConverters();
