@@ -267,6 +267,15 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
+          <label>懸掛縮排<span class="sub">Hanging Indent</span></label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-hanging-down">−</button>
+            <span id="s-hanging-val" class="size-value"></span>
+            <button class="size-btn" id="s-hanging-up">+</button>
+          </div>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static">
           <label>垂直邊距<span class="sub">Vertical Margin</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-marginv-down">−</button>
@@ -304,6 +313,7 @@ export class SettingsSheet {
     this.bindStepper(panel, 's-lineheight', 1.2, 3.5, 0.1, 'lineHeight');
     this.bindStepper(panel, 's-paraspacing', 0, 4, 0.25, isVertical ? 'verticalParagraphSpacing' : 'paragraphSpacing');
     this.bindStepper(panel, 's-linelen', 20, 60, 5, 'lineLength');
+    this.bindStepper(panel, 's-hanging', 0, 5, 1, 'hangingIndent');
     this.bindStepper(panel, 's-marginv', 0, 100, 4, isVertical ? 'verticalMarginV' : 'marginV');
 
     panel.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
@@ -564,6 +574,7 @@ export class SettingsSheet {
       this.setStepperVal(panel, 's-lineheight', `${s.lineHeight}`);
       this.setStepperVal(panel, 's-paraspacing', `${isVertical ? s.verticalParagraphSpacing : s.paragraphSpacing}em`);
       this.setStepperVal(panel, 's-linelen', `${s.lineLength}字`);
+      this.setStepperVal(panel, 's-hanging', `${s.hangingIndent}字`);
       this.setStepperVal(panel, 's-marginv', `${isVertical ? s.verticalMarginV : s.marginV}px`);
 
       const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');

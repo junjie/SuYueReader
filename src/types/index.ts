@@ -63,4 +63,5 @@ export interface Settings {
   showMoedict: boolean;
   dictOrder: DictSource[];
   popupFontSize: number;
+  hangingIndent: number;
 }

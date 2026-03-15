@@ -102,6 +102,7 @@ export class SettingsStore {
     root.setProperty('--reader-max-line-length-px', `${s.lineLength * s.fontSize}px`);
     root.setProperty('--pinyin-size', `${s.pinyinSize}px`);
     root.setProperty('--popup-font-size', `${s.popupFontSize}px`);
+    root.setProperty('--reader-hanging-indent', `${s.hangingIndent}em`);
   }
 
   private static themeColors: Record<string, string> = {

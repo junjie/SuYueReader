@@ -57,6 +57,11 @@ html:has(.vertical-mode) {
   margin-block-start: 0;
 }
 
+#reader p {
+  padding-inline-start: var(--reader-hanging-indent);
+  text-indent: calc(-1 * var(--reader-hanging-indent));
+}
+
 #reader p:last-child,
 #reader h2:last-child,
 #reader h3:last-child {

@@ -22,4 +22,5 @@ export const defaultSettings: Settings = {
   showMoedict: false,
   dictOrder: ['cedict', 'cvdict', 'moedict'],
   popupFontSize: 14,
+  hangingIndent: 0,
 };
