@@ -1,6 +1,6 @@
 import type { SettingsStore } from '../state/settings.ts';
 import type { Settings, WritingMode, PinyinPosition, ThemeMode } from '../types/index.ts';
-import { displayFonts, previewFontName, loadFontPreview } from '../services/fonts.ts';
+import { displayFonts, getAvailableSystemFonts, previewFontName, loadFontPreview } from '../services/fonts.ts';
 import { convertScriptSync, uiVariant } from '../services/script-convert.ts';
 
 export class SettingsSheet {
@@ -348,6 +348,8 @@ export class SettingsSheet {
       <div class="font-scroll-row" id="s-font-list">
         ${displayFonts.map((f) => `<button class="font-card" data-font="${f}"><span class="font-card-preview" style="font-family:'${previewFontName(f)}',serif">文字</span><span class="font-card-name">${f}</span></button>`).join('')}
       </div>
+
+      <div id="s-sysfont-section"></div>
     `);
 
     // Force reflow so the panel calculates correct layout for the font row
@@ -369,16 +371,27 @@ export class SettingsSheet {
       this.store.update({ fontSize: Math.min(48, s.fontSize + 2) });
     });
 
-    panel.querySelector('#s-font-list')!.addEventListener('click', (e) => {
+    const fontClickHandler = (e: Event) => {
       const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-font]');
       if (btn) {
-        const font = btn.dataset.font!;
-        // Font loading happens in syncCSS via resolveFont
-        this.store.update({ fontFamily: font });
+        this.store.update({ fontFamily: btn.dataset.font! });
       }
-    });
+    };
+    panel.querySelector('#s-font-list')!.addEventListener('click', fontClickHandler);
 
-    // Load lightweight previews (only a few glyphs each)
+    // Show system fonts that are actually installed on this device
+    const available = getAvailableSystemFonts();
+    const sysSection = panel.querySelector('#s-sysfont-section')!;
+    if (available.length > 0) {
+      sysSection.innerHTML = `
+        <div class="font-section-label">${this.t('系統字體')} System</div>
+        <div class="font-scroll-row" id="s-sysfont-list">
+          ${available.map((sf) => `<button class="font-card" data-font="${sf.display}"><span class="font-card-preview" style="font-family:'${sf.sc}','${sf.tc}',${sf.family}">文字</span><span class="font-card-name">${sf.display}</span></button>`).join('')}
+        </div>`;
+      panel.querySelector('#s-sysfont-list')!.addEventListener('click', fontClickHandler);
+    }
+
+    // Load lightweight previews for web fonts only
     displayFonts.forEach((f) => loadFontPreview(f));
   }
 
@@ -583,7 +596,7 @@ export class SettingsSheet {
       const fsVal = panel.querySelector('#s-fontsize-val');
       if (fsVal) fsVal.textContent = `${s.fontSize}px`;
 
-      panel.querySelectorAll('#s-font-list .font-card').forEach((btn) => {
+      panel.querySelectorAll('.font-card[data-font]').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.font === s.fontFamily);
       });
     } else if (this.view === 'dictionaries') {

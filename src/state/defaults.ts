@@ -3,7 +3,7 @@ import type { Settings } from '../types/index.ts';
 export const defaultSettings: Settings = {
   fontFamily: 'Noto Serif',
   fontSize: 22,
-  lineHeight: 1.5,
+  lineHeight: 1.6,
   paragraphSpacing: 1,
   verticalParagraphSpacing: 0.5,
   marginH: 32,

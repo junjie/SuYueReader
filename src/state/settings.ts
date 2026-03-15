@@ -1,6 +1,6 @@
 import type { Settings } from '../types/index.ts';
 import { defaultSettings } from './defaults.ts';
-import { resolveFont, loadFont } from '../services/fonts.ts';
+import { resolveFont, loadFont, fontGenericFamily } from '../services/fonts.ts';
 
 const STORAGE_KEY = 'chinese-reader-settings';
 
@@ -87,7 +87,7 @@ export class SettingsStore {
     const root = document.documentElement.style;
     const effectiveFont = resolveFont(s.fontFamily, s.scriptVariant);
     loadFont(effectiveFont);
-    root.setProperty('--reader-font-family', `"${effectiveFont}", serif`);
+    root.setProperty('--reader-font-family', `"${effectiveFont}", ${fontGenericFamily(s.fontFamily)}`);
     root.setProperty('--reader-font-size', `${s.fontSize}px`);
     root.setProperty('--reader-line-height', `${s.lineHeight}`);
     const isVertical = s.writingMode === 'vertical';

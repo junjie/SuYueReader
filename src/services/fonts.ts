@@ -21,6 +21,20 @@ export const displayFonts = [
   'Ma Shan Zheng',
 ];
 
+/** System fonts available on macOS/iOS and Windows */
+export const systemFonts = [
+  // macOS / iOS
+  { display: 'PingFang',    sc: 'PingFang SC',      tc: 'PingFang TC',         family: 'sans-serif' as const },
+  { display: 'Songti',      sc: 'Songti SC',         tc: 'Songti TC',           family: 'serif' as const },
+  { display: 'Kaiti',       sc: 'Kaiti SC',           tc: 'Kaiti TC',            family: 'serif' as const },
+  { display: 'STFangsong',  sc: 'STFangsong',         tc: 'STFangsong',          family: 'serif' as const },
+  // Windows
+  { display: 'Microsoft YaHei',  sc: 'Microsoft YaHei',    tc: 'Microsoft JhengHei',  family: 'sans-serif' as const },
+  { display: 'SimSun',           sc: 'SimSun',              tc: 'MingLiU',              family: 'serif' as const },
+  { display: 'KaiTi',            sc: 'KaiTi',               tc: 'DFKai-SB',             family: 'serif' as const },
+  { display: 'FangSong',         sc: 'FangSong',             tc: 'FangSong',              family: 'serif' as const },
+];
+
 /** Maps display font → { sc, tc } actual font names */
 const FONT_VARIANTS: Record<string, { sc: string; tc: string }> = {
   'Noto Serif':    { sc: 'Noto Serif SC',   tc: 'Noto Serif TC' },
@@ -28,6 +42,62 @@ const FONT_VARIANTS: Record<string, { sc: string; tc: string }> = {
   'LXGW WenKai':  { sc: 'LXGW WenKai TC',  tc: 'LXGW WenKai TC' },  // TC covers both
   'Ma Shan Zheng': { sc: 'Ma Shan Zheng',   tc: 'Ma Shan Zheng' },   // no TC variant
 };
+
+// Register system fonts into FONT_VARIANTS
+for (const sf of systemFonts) {
+  FONT_VARIANTS[sf.display] = { sc: sf.sc, tc: sf.tc };
+}
+
+const SYSTEM_FONT_SET = new Set(systemFonts.map(sf => sf.display));
+const SYSTEM_FONT_FAMILY = new Map(systemFonts.map(sf => [sf.display, sf.family]));
+
+/** Check if a display font name is a system font */
+export function isSystemFont(displayFont: string): boolean {
+  return SYSTEM_FONT_SET.has(displayFont);
+}
+
+/**
+ * Detect if a font is installed by comparing canvas text width
+ * against known fallback fonts. If the measured width differs
+ * from both serif and sans-serif baselines, the font is present.
+ */
+const _detectCache = new Map<string, boolean>();
+function isFontInstalled(fontName: string): boolean {
+  const cached = _detectCache.get(fontName);
+  if (cached !== undefined) return cached;
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d')!;
+  const testStr = '測試文字ABCDwxyz';
+  const size = '72px';
+
+  ctx.font = `${size} serif`;
+  const serifW = ctx.measureText(testStr).width;
+  ctx.font = `${size} sans-serif`;
+  const sansW = ctx.measureText(testStr).width;
+
+  ctx.font = `${size} "${fontName}", serif`;
+  const testW1 = ctx.measureText(testStr).width;
+  ctx.font = `${size} "${fontName}", sans-serif`;
+  const testW2 = ctx.measureText(testStr).width;
+
+  // Font is installed if it differs from at least one baseline
+  const installed = testW1 !== serifW || testW2 !== sansW;
+  _detectCache.set(fontName, installed);
+  return installed;
+}
+
+/** Return only system fonts that are actually installed on this device */
+export function getAvailableSystemFonts(): typeof systemFonts {
+  return systemFonts.filter(sf =>
+    isFontInstalled(sf.sc) || isFontInstalled(sf.tc)
+  );
+}
+
+/** Get the generic CSS family for a font ('serif' or 'sans-serif') */
+export function fontGenericFamily(displayFont: string): string {
+  return SYSTEM_FONT_FAMILY.get(displayFont) || 'serif';
+}
 
 /**
  * Resolve a display font + script variant to the actual font name to load/use.
