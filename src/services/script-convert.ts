@@ -33,6 +33,11 @@ function convertPunctuation(text: string, mappings: [string, string][]): string 
   return text;
 }
 
+/** Map script variant for UI: "original" defaults to simplified. */
+export function uiVariant(variant: ScriptVariant): ScriptVariant {
+  return variant === 'original' ? 'simplified' : variant;
+}
+
 /** Sync conversion — returns text unchanged if converters haven't loaded yet. */
 export function convertScriptSync(text: string, variant: ScriptVariant): string {
   if (variant === 'simplified' && toSimplified) {

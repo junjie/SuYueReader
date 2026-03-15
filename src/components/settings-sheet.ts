@@ -1,7 +1,7 @@
 import type { SettingsStore } from '../state/settings.ts';
 import type { Settings, WritingMode, PinyinPosition, ThemeMode } from '../types/index.ts';
 import { displayFonts, previewFontName, loadFontPreview } from '../services/fonts.ts';
-import { convertScriptSync } from '../services/script-convert.ts';
+import { convertScriptSync, uiVariant } from '../services/script-convert.ts';
 
 export class SettingsSheet {
   private overlay: HTMLElement | null = null;
@@ -14,7 +14,7 @@ export class SettingsSheet {
 
   /** Convert Chinese UI text to match current script variant */
   private t(html: string): string {
-    return convertScriptSync(html, this.store.get().scriptVariant);
+    return convertScriptSync(html, uiVariant(this.store.get().scriptVariant));
   }
 
   toggle(): void {

@@ -7,7 +7,7 @@ import { SettingsSheet } from './components/settings-sheet.ts';
 import { parseText } from './services/text-parser.ts';
 import { setFootnotes } from './services/dictionary.ts';
 import { preloadDefaultFont } from './services/fonts.ts';
-import { convertScriptSync } from './services/script-convert.ts';
+import { convertScriptSync, uiVariant } from './services/script-convert.ts';
 import type { CRDRFile } from './types/index.ts';
 import './styles/main.css';
 import './styles/themes.css';
@@ -27,7 +27,7 @@ let currentTextTitle = '';
 
 function setPageTitle(title?: string): void {
   if (title !== undefined) currentTextTitle = title;
-  const variant = store.get().scriptVariant;
+  const variant = uiVariant(store.get().scriptVariant);
   const appName = convertScriptSync('素閱', variant);
   document.title = currentTextTitle
     ? `${appName}：${convertScriptSync(currentTextTitle, variant)}`

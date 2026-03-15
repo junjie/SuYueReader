@@ -1,6 +1,6 @@
 import type { TextLoader } from './text-loader.ts';
 import type { SettingsStore } from '../state/settings.ts';
-import { convertScriptSync } from '../services/script-convert.ts';
+import { convertScriptSync, uiVariant } from '../services/script-convert.ts';
 
 type ExportCallback = (() => void) | null;
 
@@ -30,7 +30,7 @@ export class OpenSheet {
 
   /** Convert Chinese UI text to match current script variant */
   private t(html: string): string {
-    return convertScriptSync(html, this.store.get().scriptVariant);
+    return convertScriptSync(html, uiVariant(this.store.get().scriptVariant));
   }
 
   toggle(): void {
