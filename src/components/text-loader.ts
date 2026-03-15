@@ -65,7 +65,10 @@ export class TextLoader {
   }
 
   loadFromPaste(text: string): void {
-    this.onLoad(text, 'Pasted Text');
+    // Build title from first non-empty line, strip markdown heading prefix
+    const firstLine = text.split('\n').find((l) => l.trim())?.trim() || '';
+    const title = firstLine.replace(/^#+\s*/, '').slice(0, 30) || '粘贴文本';
+    this.onLoad(text, title);
   }
 
   private handleCRDR(content: string, filename: string): void {
