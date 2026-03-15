@@ -43,6 +43,10 @@ html:has(.vertical-mode) {
   padding-top: calc(var(--reader-margin-v) + env(safe-area-inset-top, 0px));
   padding-right: calc(var(--reader-margin-h) + var(--navbar-offset, 48px));
   padding-bottom: calc(var(--reader-margin-v) + env(safe-area-inset-bottom, 0px));
+  max-inline-size: min(
+    var(--reader-max-line-length),
+    calc(100dvh - 2 * var(--reader-margin-v) - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px))
+  );
   height: auto;
   min-height: auto;
   direction: ltr; /* restore text direction inside the reader */
