@@ -31,8 +31,10 @@ export interface CRDRFile {
   title: string;
   text: string;
   segments?: Record<number, { t: string; w: boolean }[][]>;
-  dictionary?: Record<string, { t: string; p: string; d: string[]; s?: 'cedict' | 'cvdict' }[]>;
+  dictionary?: Record<string, { t: string; p: string; d: string[]; s?: DictSource; b?: string; rd?: string }[]>;
 }
+
+export type DictSource = 'cedict' | 'cvdict' | 'moedict';
 
 export type WritingMode = 'horizontal' | 'vertical';
 export type PinyinPosition = 'over' | 'under';
@@ -58,5 +60,7 @@ export interface Settings {
   lineLength: number;
   showCedict: boolean;
   showCvdict: boolean;
-  dictOrder: ('cedict' | 'cvdict')[];
+  showMoedict: boolean;
+  dictOrder: DictSource[];
+  popupFontSize: number;
 }

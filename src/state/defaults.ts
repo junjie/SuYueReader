@@ -19,5 +19,7 @@ export const defaultSettings: Settings = {
   lineLength: 35,
   showCedict: true,
   showCvdict: true,
-  dictOrder: ['cedict', 'cvdict'],
+  showMoedict: false,
+  dictOrder: ['cedict', 'cvdict', 'moedict'],
+  popupFontSize: 14,
 };

@@ -32,6 +32,10 @@ export class SettingsStore {
         if (parsed.fontFamily && SettingsStore.FONT_MIGRATION[parsed.fontFamily]) {
           parsed.fontFamily = SettingsStore.FONT_MIGRATION[parsed.fontFamily];
         }
+        // Migrate dictOrder to include moedict if missing
+        if (parsed.dictOrder && !parsed.dictOrder.includes('moedict')) {
+          parsed.dictOrder = [...parsed.dictOrder, 'moedict'];
+        }
         return { ...defaultSettings, ...parsed };
       }
     } catch {
@@ -61,10 +65,15 @@ export class SettingsStore {
       partial.writingMode !== undefined && partial.writingMode !== prev.writingMode;
     const scriptVariantChanged =
       partial.scriptVariant !== undefined && partial.scriptVariant !== prev.scriptVariant;
+    const dictChanged =
+      partial.showCedict !== undefined && partial.showCedict !== prev.showCedict ||
+      partial.showCvdict !== undefined && partial.showCvdict !== prev.showCvdict ||
+      partial.showMoedict !== undefined && partial.showMoedict !== prev.showMoedict ||
+      partial.dictOrder !== undefined && JSON.stringify(partial.dictOrder) !== JSON.stringify(prev.dictOrder);
 
     document.dispatchEvent(
       new CustomEvent('settings-changed', {
-        detail: { settings: this.get(), pinyinChanged, writingModeChanged, scriptVariantChanged, prevWritingMode: prev.writingMode },
+        detail: { settings: this.get(), pinyinChanged, writingModeChanged, scriptVariantChanged, dictChanged, prevWritingMode: prev.writingMode },
       })
     );
   }
@@ -92,6 +101,7 @@ export class SettingsStore {
     root.setProperty('--reader-max-line-length', `${s.lineLength}em`);
     root.setProperty('--reader-max-line-length-px', `${s.lineLength * s.fontSize}px`);
     root.setProperty('--pinyin-size', `${s.pinyinSize}px`);
+    root.setProperty('--popup-font-size', `${s.popupFontSize}px`);
   }
 
   private static themeColors: Record<string, string> = {

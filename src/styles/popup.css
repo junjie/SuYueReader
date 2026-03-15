@@ -9,7 +9,7 @@
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   font-family: system-ui, -apple-system, sans-serif;
-  font-size: 14px;
+  font-size: var(--popup-font-size, 14px);
   line-height: 1.5;
   writing-mode: horizontal-tb;
   direction: ltr;
@@ -81,6 +81,34 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 8px;
+}
+
+.dict-popup-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.dict-popup-size-btn {
+  border: none;
+  background: none;
+  color: var(--fg-muted);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 4px;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.dict-popup-size-btn.dict-popup-size-up {
+  font-size: 15px;
+}
+
+.dict-popup-size-btn:hover {
+  color: var(--fg);
+  background: var(--btn-hover);
 }
 
 .dict-popup-config {
@@ -274,4 +302,71 @@
 
 .dict-popup-footnote-text p + p {
   margin-top: 8px;
+}
+
+/* MOE Dictionary styles */
+.dict-popup-bopomofo {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-left: 6px;
+}
+
+.moe-pronunciation {
+  margin-bottom: 4px;
+}
+
+.moe-entry + .moe-entry {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.moe-entry-sep {
+  display: none;
+}
+
+.moe-pos {
+  font-weight: bold;
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin: 4px 0 2px;
+}
+
+.moe-senses {
+  margin: 0;
+  padding-left: 1.5em;
+}
+
+.moe-senses li {
+  margin-bottom: 2px;
+  word-break: break-word;
+}
+
+.moe-senses li:last-child {
+  margin-bottom: 0;
+}
+
+.moe-plain {
+  word-break: break-word;
+}
+
+.moe-example {
+  opacity: 0.7;
+}
+
+.moe-quote {
+  opacity: 0.7;
+  font-size: 0.92em;
+}
+
+.moe-crossref {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 4px;
+}
+
+.moe-synonym, .moe-antonym {
+  font-size: 0.85em;
+  opacity: 0.7;
+  margin-top: 2px;
 }

@@ -418,6 +418,7 @@ export class SettingsSheet {
   private static DICT_LABELS: Record<string, { name: string; desc: string }> = {
     cedict: { name: 'CC-CEDICT', desc: 'English' },
     cvdict: { name: 'CVDICT', desc: 'Vietnamese' },
+    moedict: { name: '國語辭典', desc: 'Chinese (Traditional)' },
   };
 
   private buildDictionariesView(panel: HTMLElement): void {
@@ -425,7 +426,7 @@ export class SettingsSheet {
     const s = this.store.get();
     const order = s.dictOrder;
 
-    panel.innerHTML = `
+    panel.innerHTML = this.t(`
       <div class="sheet-header">
         <button class="sheet-nav-back" id="s-back">‹</button>
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
@@ -434,7 +435,18 @@ export class SettingsSheet {
       <div class="sheet-group" id="s-dict-list">
         ${order.map((id, i) => this.buildDictRow(id, i, order.length)).join('')}
       </div>
-    `;
+
+      <div class="sheet-group">
+        <div class="sheet-group-row static">
+          <label>字號<span class="sub">Text Size</span></label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-popupsize-down">−</button>
+            <span id="s-popupsize-val" class="size-value"></span>
+            <button class="size-btn" id="s-popupsize-up">+</button>
+          </div>
+        </div>
+      </div>
+    `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
 
@@ -443,13 +455,15 @@ export class SettingsSheet {
       this.syncUI(panel);
     });
 
+    this.bindStepper(panel, 's-popupsize', 10, 24, 1, 'popupFontSize');
     this.bindDictListEvents(panel);
   }
 
   private buildDictRow(id: string, index: number, total: number): string {
     const info = SettingsSheet.DICT_LABELS[id] || { name: id, desc: '' };
-    const settingKey = id === 'cedict' ? 'showCedict' : 'showCvdict';
-    const checked = this.store.get()[settingKey as keyof Settings] ? 'checked' : '';
+    const settingKeyMap: Record<string, keyof Settings> = { cedict: 'showCedict', cvdict: 'showCvdict', moedict: 'showMoedict' };
+    const settingKey = settingKeyMap[id] || 'showCedict';
+    const checked = this.store.get()[settingKey] ? 'checked' : '';
 
     let html = '';
     if (index > 0) html += `<div class="sheet-group-divider"></div>`;
@@ -478,8 +492,9 @@ export class SettingsSheet {
       const input = e.target as HTMLInputElement;
       const dictId = input.dataset.dictToggle;
       if (!dictId) return;
-      if (dictId === 'cedict') this.store.update({ showCedict: input.checked });
-      if (dictId === 'cvdict') this.store.update({ showCvdict: input.checked });
+      const toggleMap: Record<string, string> = { cedict: 'showCedict', cvdict: 'showCvdict', moedict: 'showMoedict' };
+      const key = toggleMap[dictId];
+      if (key) this.store.update({ [key]: input.checked });
     });
 
     // Reorder events
@@ -490,7 +505,7 @@ export class SettingsSheet {
       const dictId = row.dataset.dict!;
       const dir = btn.dataset.dir as 'up' | 'down';
       const order = [...this.store.get().dictOrder];
-      const idx = order.indexOf(dictId as 'cedict' | 'cvdict');
+      const idx = order.indexOf(dictId as 'cedict' | 'cvdict' | 'moedict');
       if (idx === -1) return;
       const newIdx = dir === 'up' ? idx - 1 : idx + 1;
       if (newIdx < 0 || newIdx >= order.length) return;
@@ -561,11 +576,12 @@ export class SettingsSheet {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.font === s.fontFamily);
       });
     } else if (this.view === 'dictionaries') {
-      const cedictToggle = panel.querySelector<HTMLInputElement>('[data-dict-toggle="cedict"]');
-      if (cedictToggle) cedictToggle.checked = s.showCedict;
-
-      const cvdictToggle = panel.querySelector<HTMLInputElement>('[data-dict-toggle="cvdict"]');
-      if (cvdictToggle) cvdictToggle.checked = s.showCvdict;
+      const toggleMap: Record<string, keyof Settings> = { cedict: 'showCedict', cvdict: 'showCvdict', moedict: 'showMoedict' };
+      for (const [dictId, key] of Object.entries(toggleMap)) {
+        const toggle = panel.querySelector<HTMLInputElement>(`[data-dict-toggle="${dictId}"]`);
+        if (toggle) toggle.checked = s[key] as boolean;
+      }
+      this.setStepperVal(panel, 's-popupsize', `${s.popupFontSize}px`);
     } else if (this.view === 'pinyin') {
       panel.querySelectorAll('#s-pypos-group .seg-btn').forEach((btn) => {
         btn.classList.toggle('active', (btn as HTMLElement).dataset.pos === s.pinyinPosition);

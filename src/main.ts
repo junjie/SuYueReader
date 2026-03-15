@@ -5,7 +5,7 @@ import { Navbar } from './components/navbar.ts';
 import { OpenSheet } from './components/open-sheet.ts';
 import { SettingsSheet } from './components/settings-sheet.ts';
 import { parseText } from './services/text-parser.ts';
-import { setFootnotes } from './services/dictionary.ts';
+import { setFootnotes, setMoedictEnabled } from './services/dictionary.ts';
 import { preloadDefaultFont } from './services/fonts.ts';
 import { convertScriptSync, uiVariant } from './services/script-convert.ts';
 import type { CRDRFile } from './types/index.ts';
@@ -19,6 +19,7 @@ import './styles/popup.css';
 preloadDefaultFont();
 
 const store = new SettingsStore();
+setMoedictEnabled(store.get().showMoedict);
 
 const readerEl = document.getElementById('reader')!;
 const reader = new Reader(readerEl, store);
@@ -70,10 +71,11 @@ new Navbar(() => openSheet.toggle(), () => settingsSheet.toggle(), store);
 // Allow definition popup to open the dictionaries settings page
 document.addEventListener('open-dict-settings', () => settingsSheet.openDictionaries());
 
-// Update page title when script variant changes
+// Update page title when script variant changes; sync moedict toggle
 document.addEventListener('settings-changed', (e) => {
   const detail = (e as CustomEvent).detail;
   if (detail.scriptVariantChanged) setPageTitle();
+  setMoedictEnabled(detail.settings.showMoedict);
 });
 
 // Load text: URL param or default intro document

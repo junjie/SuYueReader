@@ -44,6 +44,13 @@ export class DefinitionPopup {
         this.goBack();
         return;
       }
+      const sizeBtn = target.closest('.dict-popup-size-btn') as HTMLElement | null;
+      if (sizeBtn) {
+        const s = this.store.get();
+        const delta = sizeBtn.dataset.dir === 'up' ? 1 : -1;
+        this.store.update({ popupFontSize: Math.max(10, Math.min(24, s.popupFontSize + delta)) });
+        return;
+      }
       const configEl = target.closest('.dict-popup-config');
       if (configEl) {
         this.hide();
@@ -63,12 +70,36 @@ export class DefinitionPopup {
       this.hide();
     });
 
-    // Dismiss on scroll
+    // Dismiss on scroll (only unpinned popups)
     const onScroll = () => {
-      if (this.el.classList.contains('visible')) this.hide();
+      if (this.el.classList.contains('visible') && !this.pinned) this.hide();
     };
     window.addEventListener('scroll', onScroll, { passive: true });
     document.getElementById('reader-container')?.addEventListener('scroll', onScroll, { passive: true });
+
+    // Re-render visible popup when dictionary settings change
+    document.addEventListener('settings-changed', (e) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail.dictChanged && this.el.classList.contains('visible') && this.currentWord) {
+        this.refresh();
+      }
+    });
+  }
+
+  /** Re-lookup and re-render the current word (e.g. after dict toggle/order change) */
+  private async refresh(): Promise<void> {
+    const word = this.currentWord;
+    if (!word) return;
+
+    const cached = cachedLookup(word);
+    if (cached !== undefined) {
+      this.renderEntries(word, cached);
+      return;
+    }
+
+    const entries = await lookup(word);
+    if (this.currentWord !== word) return;
+    this.renderEntries(word, entries);
   }
 
   async show(word: string, anchor: HTMLElement, isVertical: boolean, pin = false): Promise<void> {
@@ -128,6 +159,7 @@ export class DefinitionPopup {
   private static DICT_LABELS: Record<string, string> = {
     cedict: 'CC-CEDICT',
     cvdict: 'CVDICT',
+    moedict: '國語辭典',
   };
 
   private buildContent(word: string, entries: DictEntry[] | null): string {
@@ -136,11 +168,16 @@ export class DefinitionPopup {
     const settings = this.store.get();
 
     // Group entries by source, filtered by enabled setting
+    const enabledMap: Record<string, keyof typeof settings> = {
+      cedict: 'showCedict',
+      cvdict: 'showCvdict',
+      moedict: 'showMoedict',
+    };
     const bySource: Record<string, DictEntry[]> = {};
     if (entries) {
       for (const e of entries) {
-        const enabled = e.source === 'cedict' ? settings.showCedict : settings.showCvdict;
-        if (!enabled) continue;
+        const key = enabledMap[e.source];
+        if (!key || !settings[key]) continue;
         if (!bySource[e.source]) bySource[e.source] = [];
         bySource[e.source].push(e);
       }
@@ -154,8 +191,8 @@ export class DefinitionPopup {
     const sourceCount = (footnote ? 1 : 0) + orderedSources.length;
     const showLabels = sourceCount > 1;
 
-    // Header with word + config button
-    let html = `<div class="dict-popup-header"><span class="dict-popup-word">${this.buildWordChars(word, chars)}</span><button class="dict-popup-config" aria-label="Configure dictionaries" title="Configure dictionaries">⚙</button></div>`;
+    // Header with word + size controls + config button
+    let html = `<div class="dict-popup-header"><span class="dict-popup-word">${this.buildWordChars(word, chars)}</span><div class="dict-popup-toolbar"><button class="dict-popup-size-btn" data-dir="down" aria-label="Smaller text">小</button><button class="dict-popup-size-btn dict-popup-size-up" data-dir="up" aria-label="Larger text">大</button><button class="dict-popup-config" aria-label="Configure dictionaries" title="Configure dictionaries">⚙</button></div></div>`;
 
     // Footnote source
     if (footnote) {
@@ -173,7 +210,11 @@ export class DefinitionPopup {
       if (showLabels) {
         html += `<div class="dict-popup-source-label">${DefinitionPopup.DICT_LABELS[source] || source}</div>`;
       }
-      html += this.buildDictHtml(word, bySource[source]);
+      if (source === 'moedict') {
+        html += this.buildMoedictHtml(word, bySource[source]);
+      } else {
+        html += this.buildDictHtml(word, bySource[source]);
+      }
       html += `</div>`;
     }
 
@@ -216,6 +257,129 @@ export class DefinitionPopup {
         html += `</ol></div>`;
       }
     }
+
+    return html;
+  }
+
+  private buildMoedictHtml(_word: string, entries: DictEntry[]): string {
+    let html = '';
+    for (let i = 0; i < entries.length; i++) {
+      const entry = entries[i];
+      if (i > 0) html += `<div class="moe-entry-sep"></div>`;
+      html += `<div class="moe-entry">`;
+
+      // Pinyin + Bopomofo line
+      if (entry.pinyin || entry.bopomofo) {
+        html += `<div class="moe-pronunciation">`;
+        if (entry.pinyin) html += `<span class="dict-popup-pinyin">${this.esc(entry.pinyin)}</span>`;
+        if (entry.bopomofo) html += `<span class="dict-popup-bopomofo">${this.esc(entry.bopomofo)}</span>`;
+        html += `</div>`;
+      }
+
+      // Parse and render rich definition
+      if (entry.richDefinition) {
+        html += this.parseMoedictDefinition(entry.richDefinition);
+      }
+
+      // Cross-reference
+      if (entry.crossRef) {
+        html += `<div class="moe-crossref">${this.esc(entry.crossRef)}</div>`;
+      }
+
+      // Synonyms / Antonyms
+      if (entry.synonyms) {
+        html += `<div class="moe-synonym">近：${this.esc(entry.synonyms)}</div>`;
+      }
+      if (entry.antonyms) {
+        html += `<div class="moe-antonym">反：${this.esc(entry.antonyms)}</div>`;
+      }
+
+      html += `</div>`;
+    }
+    return html;
+  }
+
+  /**
+   * Parse MOE dictionary definition text into structured HTML.
+   * Format: [POS] tags delimit parts of speech, numbered items are senses.
+   */
+  private parseMoedictDefinition(text: string): string {
+    let html = '';
+    // Collect all POS tag matches upfront to avoid global regex lastIndex issues
+    const posPattern = /\[([^\]]+)\]/g;
+    const matches: { pos: string; index: number; end: number }[] = [];
+    let m;
+    while ((m = posPattern.exec(text)) !== null) {
+      matches.push({ pos: m[1], index: m.index, end: m.index + m[0].length });
+    }
+
+    const parts: { pos?: string; text: string }[] = [];
+
+    if (matches.length === 0) {
+      // No POS tags — treat entire text as content
+      if (text.trim()) parts.push({ text: text.trim() });
+    } else {
+      // Text before first POS tag
+      if (matches[0].index > 0) {
+        const before = text.slice(0, matches[0].index).trim();
+        if (before) parts.push({ text: before });
+      }
+      // Each POS tag + content until next tag
+      for (let i = 0; i < matches.length; i++) {
+        const contentEnd = i + 1 < matches.length ? matches[i + 1].index : text.length;
+        const content = text.slice(matches[i].end, contentEnd).trim();
+        parts.push({ pos: matches[i].pos, text: content });
+      }
+    }
+
+    for (const part of parts) {
+      if (part.pos) {
+        html += `<div class="moe-pos">[${this.esc(part.pos)}]</div>`;
+      }
+      if (part.text) {
+        html += this.renderMoeSenses(part.text);
+      }
+    }
+
+    return html;
+  }
+
+  /** Render numbered senses, or plain text if no numbering */
+  private renderMoeSenses(text: string): string {
+    // Split on numbered items: "1.xxx 2.xxx" or multiline "1.\nxxx\n2.\nxxx"
+    const sensePattern = /(?:^|\n)\s*(\d+)\.\s*/;
+    const senseParts = text.split(sensePattern);
+
+    // If no numbered items, render as plain
+    if (senseParts.length <= 1) {
+      return `<div class="moe-plain">${this.renderMoeText(text)}</div>`;
+    }
+
+    let html = '<ol class="moe-senses">';
+    // senseParts: [before, num1, text1, num2, text2, ...]
+    for (let i = 1; i < senseParts.length; i += 2) {
+      const senseText = (senseParts[i + 1] || '').trim();
+      if (senseText) {
+        html += `<li>${this.renderMoeText(senseText)}</li>`;
+      }
+    }
+    html += '</ol>';
+    return html;
+  }
+
+  /** Render MOE text with examples and quotes styled distinctly */
+  private renderMoeText(text: string): string {
+    // Escape first, then apply styling to specific patterns
+    let html = this.esc(text);
+
+    // Style examples: 如：「...」
+    html = html.replace(/如：(「[^」]*」(?:、「[^」]*」)*)/g, '<span class="moe-example">如：$1</span>');
+
+    // Style literary quotes: 《book》content「quote」
+    html = html.replace(/(《[^》]+》[^「]*「[^」]*」)/g, '<span class="moe-quote">$1</span>');
+
+    // Line breaks within a sense
+    html = html.replace(/\n/g, '<br>');
 
     return html;
   }

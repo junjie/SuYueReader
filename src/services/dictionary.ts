@@ -1,10 +1,15 @@
-export type DictSource = 'cedict' | 'cvdict';
+import type { DictSource } from '../types/index.ts';
 
 export interface DictEntry {
   traditional: string;
   pinyin: string;
   definitions: string[];
   source: DictSource;
+  bopomofo?: string;
+  richDefinition?: string;
+  synonyms?: string;
+  antonyms?: string;
+  crossRef?: string;
 }
 
 interface RawEntry {
@@ -12,6 +17,8 @@ interface RawEntry {
   p: string;
   d: string[];
   s?: DictSource; // present in .crdr bundles with source info
+  b?: string;     // bopomofo (moedict)
+  rd?: string;    // rich definition text (moedict)
 }
 
 let cedictMap: Map<string, DictEntry[]> | null = null;
@@ -29,6 +36,8 @@ function buildEntries(data: Record<string, RawEntry[]>, source: DictSource): Map
         pinyin: e.p,
         definitions: e.d,
         source,
+        ...(e.b ? { bopomofo: e.b } : {}),
+        ...(e.rd ? { richDefinition: e.rd } : {}),
       }))
     );
   }
@@ -85,6 +94,125 @@ function lookupInMap(map: Map<string, DictEntry[]> | null, word: string, simplif
   return [];
 }
 
+// --- MOE Dictionary (chunked lazy-loading) ---
+
+const NUM_MOEDICT_CHUNKS = 20;
+const moedictChunks: Map<number, Map<string, DictEntry[] | string>> = new Map();
+const moedictChunkPromises: Map<number, Promise<void>> = new Map();
+
+interface MoedictRawEntry {
+  p: string;  // pinyin
+  b: string;  // bopomofo
+  d?: string; // definition
+  y?: string; // synonyms
+  a?: string; // antonyms
+  x?: string; // cross-ref
+}
+
+function moedictChunkId(word: string): number {
+  return word.codePointAt(0)! % NUM_MOEDICT_CHUNKS;
+}
+
+async function loadMoedictChunk(chunkId: number): Promise<void> {
+  if (moedictChunks.has(chunkId)) return;
+  if (moedictChunkPromises.has(chunkId)) return moedictChunkPromises.get(chunkId)!;
+
+  const promise = (async () => {
+    const base = import.meta.env.BASE_URL;
+    const filename = `moedict-${String(chunkId).padStart(2, '0')}.json`;
+    const resp = await fetch(`${base}dict/${filename}`);
+    if (!resp.ok) {
+      moedictChunks.set(chunkId, new Map());
+      return;
+    }
+    const data: Record<string, MoedictRawEntry[] | string> = await resp.json();
+    const map = new Map<string, DictEntry[] | string>();
+
+    for (const [key, value] of Object.entries(data)) {
+      if (typeof value === 'string') {
+        // Alias: "→traditionalKey"
+        map.set(key, value);
+      } else {
+        map.set(
+          key,
+          value.map((e) => ({
+            traditional: key,
+            pinyin: e.p || '',
+            definitions: [], // definitions are in richDefinition
+            source: 'moedict' as DictSource,
+            bopomofo: e.b || '',
+            richDefinition: e.d || '',
+            synonyms: e.y || undefined,
+            antonyms: e.a || undefined,
+            crossRef: e.x || undefined,
+          }))
+        );
+      }
+    }
+
+    moedictChunks.set(chunkId, map);
+  })();
+
+  moedictChunkPromises.set(chunkId, promise);
+  return promise;
+}
+
+async function resolveFromChunk(chunkMap: Map<string, DictEntry[] | string>, key: string): Promise<DictEntry[] | null> {
+  const value = chunkMap.get(key);
+  if (!value) return null;
+  if (typeof value === 'string') {
+    // It's an alias like "→繁體key" — resolve the traditional key
+    const tradKey = value.slice(1); // remove "→"
+    const tradChunkId = moedictChunkId(tradKey);
+    // Load the target chunk if needed (may be different from source chunk)
+    await loadMoedictChunk(tradChunkId);
+    const tradChunk = moedictChunks.get(tradChunkId);
+    if (!tradChunk) return null;
+    const tradValue = tradChunk.get(tradKey);
+    if (!tradValue || typeof tradValue === 'string') return null;
+    return tradValue;
+  }
+  return value;
+}
+
+async function lookupInMoedict(word: string, simplified: string | null): Promise<DictEntry[]> {
+  // Load chunks for both word forms
+  const cid1 = moedictChunkId(word);
+  const promises = [loadMoedictChunk(cid1)];
+
+  if (simplified && simplified !== word) {
+    const cid2 = moedictChunkId(simplified);
+    if (cid2 !== cid1) promises.push(loadMoedictChunk(cid2));
+  }
+
+  await Promise.all(promises);
+
+  // Try word directly
+  const chunk1 = moedictChunks.get(cid1);
+  if (chunk1) {
+    const result = await resolveFromChunk(chunk1, word);
+    if (result) return result;
+  }
+
+  // Try simplified form
+  if (simplified && simplified !== word) {
+    const cid2 = moedictChunkId(simplified);
+    const chunk2 = moedictChunks.get(cid2);
+    if (chunk2) {
+      const result = await resolveFromChunk(chunk2, simplified);
+      if (result) return result;
+    }
+  }
+
+  return [];
+}
+
+// We need settings access for moedict toggle — pass via lookup
+let _showMoedict = false;
+export function setMoedictEnabled(enabled: boolean): void {
+  _showMoedict = enabled;
+}
+
 export async function lookup(word: string): Promise<DictEntry[] | null> {
   await loadDict();
 
@@ -94,8 +222,9 @@ export async function lookup(word: string): Promise<DictEntry[] | null> {
 
   const cedictResults = lookupInMap(cedictMap, word, simplified);
   const cvdictResults = lookupInMap(cvdictMap, word, simplified);
+  const moedictResults = _showMoedict ? await lookupInMoedict(word, simplified) : [];
 
-  const combined = [...cedictResults, ...cvdictResults];
+  const combined = [...cedictResults, ...cvdictResults, ...moedictResults];
   return combined.length > 0 ? combined : null;
 }
 
@@ -119,7 +248,8 @@ export async function ensureReady(): Promise<void> {
   await ensureSimplifiedConverter();
 }
 
-/** Sync check whether a word has a dictionary entry. Requires ensureReady() called first. */
+/** Sync check whether a word has a dictionary entry. Requires ensureReady() called first.
+ *  Note: does not check MoeDict (lazy-loaded chunks can't be checked synchronously). */
 export function hasEntry(word: string): boolean {
   const simplified = toSimplifiedFn ? toSimplifiedFn(word) : null;
   if (cedictMap) {
@@ -193,6 +323,8 @@ export function loadFromBundle(entries: Record<string, RawEntry[]>): void {
         pinyin: e.p,
         definitions: e.d,
         source: (e.s as DictSource) || 'cedict',
+        ...(e.b ? { bopomofo: e.b } : {}),
+        ...(e.rd ? { richDefinition: e.rd } : {}),
       }))
     );
   }
@@ -209,6 +341,8 @@ export function exportCache(): Record<string, RawEntry[]> | null {
         p: e.pinyin,
         d: e.definitions,
         s: e.source,
+        ...(e.bopomofo ? { b: e.bopomofo } : {}),
+        ...(e.richDefinition ? { rd: e.richDefinition } : {}),
       }));
     }
   }

@@ -7,11 +7,13 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "build:dict": "node scripts/build-cedict.mjs"
+    "build:dict": "node scripts/build-cedict.mjs",
+    "build:moedict": "node scripts/build-moedict.mjs"
   },
   "devDependencies": {
     "typescript": "~5.7.0",
-    "vite": "^6.0.0"
+    "vite": "^6.0.0",
+    "xlsx": "^0.18.5"
   },
   "dependencies": {
     "opencc-js": "^1.0.5",
