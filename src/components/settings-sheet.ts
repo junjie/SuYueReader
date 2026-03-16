@@ -164,9 +164,9 @@ export class SettingsSheet {
         <div class="sheet-group-row static">
           <label>字號<span class="sub">Font Size</span></label>
           <div class="font-size-controls">
-            <button class="size-btn" id="s-fontsize-down">A</button>
+            <button class="size-btn" id="s-fontsize-down">小</button>
             <span id="s-fontsize-val" class="size-value"></span>
-            <button class="size-btn size-btn-large" id="s-fontsize-up">A</button>
+            <button class="size-btn size-btn-large" id="s-fontsize-up">大</button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
