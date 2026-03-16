@@ -531,3 +531,28 @@
   font-size: 12px;
   color: var(--fg-muted);
 }
+
+.dict-info-btn {
+  border: none;
+  background: none;
+  color: var(--fg-muted);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.license-modal-body p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.license-modal-body a {
+  color: var(--primary-bg);
+  text-decoration: none;
+}
+
+.license-modal-body a:hover {
+  text-decoration: underline;
+}

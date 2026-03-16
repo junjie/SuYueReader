@@ -439,10 +439,31 @@ export class SettingsSheet {
     this.bindStepper(panel, 's-pysize', 8, 20, 1, 'pinyinSize');
   }
 
-  private static DICT_LABELS: Record<string, { name: string; desc: string }> = {
-    cedict: { name: 'CC-CEDICT', desc: 'English' },
-    cvdict: { name: 'CVDICT', desc: 'Vietnamese' },
-    moedict: { name: '國語辭典', desc: 'Chinese (Traditional)' },
+  private static DICT_LABELS: Record<string, { name: string; desc: string; license: string; licenseUrl: string; attribution: string; url: string }> = {
+    cedict: {
+      name: 'CC-CEDICT',
+      desc: 'English',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      attribution: 'CC-CEDICT by MDBG',
+      url: 'https://cc-cedict.org/wiki/',
+    },
+    cvdict: {
+      name: 'CVDICT',
+      desc: 'Vietnamese',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0/',
+      attribution: 'CVDICT by Phong Phan, based on CC-CEDICT',
+      url: 'https://github.com/ph0ngp/CVDICT',
+    },
+    moedict: {
+      name: '國語辭典',
+      desc: 'Chinese (Traditional)',
+      license: 'CC BY-ND 3.0 TW',
+      licenseUrl: 'https://creativecommons.org/licenses/by-nd/3.0/tw/',
+      attribution: '教育部《重編國語辭典修訂本》',
+      url: 'https://dict.revised.moe.edu.tw/',
+    },
   };
 
   private buildDictionariesView(panel: HTMLElement): void {
@@ -500,6 +521,7 @@ export class SettingsSheet {
         <span class="dict-row-name">${info.name}</span>
         <span class="dict-row-desc">${info.desc}</span>
       </div>
+      <button class="dict-info-btn" data-dict-info="${id}" aria-label="License info">ⓘ</button>
       <label class="ios-switch">
         <input type="checkbox" data-dict-toggle="${id}" ${checked} />
         <span class="ios-switch-track"></span>
@@ -521,8 +543,14 @@ export class SettingsSheet {
       if (key) this.store.update({ [key]: input.checked });
     });
 
-    // Reorder events
+    // Reorder and info events
     list.addEventListener('click', (e) => {
+      const infoBtn = (e.target as HTMLElement).closest('.dict-info-btn') as HTMLElement | null;
+      if (infoBtn) {
+        const dictId = infoBtn.dataset.dictInfo!;
+        this.showLicenseModal(dictId);
+        return;
+      }
       const btn = (e.target as HTMLElement).closest('.dict-reorder-btn') as HTMLElement | null;
       if (!btn) return;
       const row = btn.closest('.dict-row') as HTMLElement;
@@ -539,6 +567,40 @@ export class SettingsSheet {
       this.buildDictionariesView(panel);
       this.syncUI(panel);
     });
+  }
+
+  private showLicenseModal(dictId: string): void {
+    const info = SettingsSheet.DICT_LABELS[dictId];
+    if (!info) return;
+
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = `
+      <div class="modal" style="width: min(90vw, 400px);">
+        <h3>${info.name}</h3>
+        <div class="license-modal-body">
+          <p>License: <a href="${info.licenseUrl}" target="_blank" rel="noopener noreferrer">${info.license}</a></p>
+          <p>${info.attribution}<br><a href="${info.url}" target="_blank" rel="noopener noreferrer">${info.url}</a></p>
+        </div>
+        <div class="modal-actions">
+          <button class="sheet-action-btn" id="license-modal-close">Close</button>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const close = () => overlay.remove();
+
+    overlay.querySelector('#license-modal-close')!.addEventListener('click', close);
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+    overlay.addEventListener('touchstart', (e) => {
+      if (e.target === overlay) {
+        e.preventDefault();
+        close();
+      }
+    }, { passive: false });
   }
 
   openDictionaries(): void {
