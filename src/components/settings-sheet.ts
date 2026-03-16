@@ -6,7 +6,7 @@ import { convertScriptSync, uiVariant } from '../services/script-convert.ts';
 export class SettingsSheet {
   private overlay: HTMLElement | null = null;
   private store: SettingsStore;
-  private view: 'main' | 'advanced' | 'pinyin' | 'font' | 'dictionaries' = 'main';
+  private activeTab: 'appearance' | 'typography' | 'dictionaries' = 'appearance';
 
   constructor(store: SettingsStore) {
     this.store = store;
@@ -29,7 +29,6 @@ export class SettingsSheet {
     if (this.overlay) return;
     document.dispatchEvent(new CustomEvent('sheet-opening', { detail: 'settings' }));
 
-    this.view = 'main';
     this.overlay = document.createElement('div');
     this.overlay.className = 'sheet-overlay';
 
@@ -39,7 +38,7 @@ export class SettingsSheet {
     this.overlay.appendChild(panel);
     document.body.appendChild(this.overlay);
 
-    this.buildMainView(panel);
+    this.buildTabs(panel);
     this.syncUI(panel);
 
     panel.getBoundingClientRect();
@@ -89,19 +88,15 @@ export class SettingsSheet {
       const rect = btn.getBoundingClientRect();
       const margin = 8;
       if (isVertical) {
-        // Place to the left of the sidebar
         panel.style.right = `${window.innerWidth - rect.left + margin}px`;
-        // Prefer aligning top with button, but clamp so panel stays in viewport
         panel.style.top = `${rect.top}px`;
         panel.style.maxHeight = `${window.innerHeight - rect.top - margin}px`;
-        // If button is in bottom half, anchor to bottom instead so panel grows upward
         if (rect.top > window.innerHeight / 2) {
           panel.style.top = '';
           panel.style.bottom = `${window.innerHeight - rect.bottom}px`;
           panel.style.maxHeight = `${rect.bottom - margin}px`;
         }
       } else {
-        // Place below navbar, right edge aligned with button's right edge
         panel.style.top = `${rect.bottom + margin}px`;
         panel.style.right = `${window.innerWidth - rect.right}px`;
         panel.style.maxHeight = `${window.innerHeight - rect.bottom - margin * 2}px`;
@@ -109,25 +104,53 @@ export class SettingsSheet {
     }
   }
 
-  private buildMainView(panel: HTMLElement): void {
-    this.view = 'main';
+  private buildTabs(panel: HTMLElement): void {
     panel.innerHTML = this.t(`
-      <div class="sheet-header">
-        <span class="sheet-nav-back" style="visibility:hidden">‹</span>
+      <div class="sheet-header" style="justify-content: flex-end">
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
+      <div class="settings-tabs" id="s-tabs">
+        <button class="settings-tab" data-tab="appearance">外觀</button>
+        <button class="settings-tab" data-tab="typography">排版</button>
+        <button class="settings-tab" data-tab="dictionaries">詞典</button>
+      </div>
+      <div class="settings-tab-content" id="tab-appearance"></div>
+      <div class="settings-tab-content hidden" id="tab-typography"></div>
+      <div class="settings-tab-content hidden" id="tab-dictionaries"></div>
+    `);
 
+    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
+
+    // Tab switching
+    panel.querySelector('#s-tabs')!.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('.settings-tab');
+      if (btn && btn.dataset.tab) {
+        this.switchTab(panel, btn.dataset.tab as typeof this.activeTab);
+      }
+    });
+
+    // Build all three tabs
+    this.buildAppearanceTab(panel.querySelector('#tab-appearance')!);
+    this.buildTypographyTab(panel.querySelector('#tab-typography')!);
+    this.buildDictionariesTab(panel.querySelector('#tab-dictionaries')!);
+
+    // Activate initial tab
+    this.switchTab(panel, this.activeTab);
+  }
+
+  private switchTab(panel: HTMLElement, tab: typeof this.activeTab): void {
+    this.activeTab = tab;
+    panel.querySelectorAll('.settings-tab').forEach((btn) => {
+      btn.classList.toggle('active', (btn as HTMLElement).dataset.tab === tab);
+    });
+    panel.querySelectorAll('.settings-tab-content').forEach((el) => {
+      el.classList.toggle('hidden', el.id !== `tab-${tab}`);
+    });
+  }
+
+  private buildAppearanceTab(container: HTMLElement): void {
+    container.innerHTML = this.t(`
       <div class="sheet-group">
-        <div class="sheet-group-row static">
-          <label>字體<span class="sub">Font</span></label>
-          <div class="font-size-controls">
-            <button class="pinyin-opts-btn" id="s-font-opts" aria-label="Font Options">⋯</button>
-            <button class="size-btn" id="s-fontsize-down">A</button>
-            <span id="s-fontsize-val" class="size-value"></span>
-            <button class="size-btn size-btn-large" id="s-fontsize-up">A</button>
-          </div>
-        </div>
-        <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
           <label>主題<span class="sub">Theme</span></label>
           <div class="theme-swatches" id="s-theme-group">
@@ -142,6 +165,23 @@ export class SettingsSheet {
             </button>
           </div>
         </div>
+      </div>
+
+      <div class="font-scroll-row" id="s-font-list">
+        ${displayFonts.map((f) => `<button class="font-card" data-font="${f}"><span class="font-card-preview" style="font-family:'${previewFontName(f)}',serif">文字</span><span class="font-card-name">${f}</span></button>`).join('')}
+      </div>
+
+      <div id="s-sysfont-section"></div>
+
+      <div class="sheet-group">
+        <div class="sheet-group-row static">
+          <label>字號<span class="sub">Font Size</span></label>
+          <div class="font-size-controls">
+            <button class="size-btn" id="s-fontsize-down">A</button>
+            <span id="s-fontsize-val" class="size-value"></span>
+            <button class="size-btn size-btn-large" id="s-fontsize-up">A</button>
+          </div>
+        </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
           <label>排版<span class="sub">Layout</span></label>
@@ -153,91 +193,97 @@ export class SettingsSheet {
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static toggle-row">
           <label>拼音<span class="sub">Pinyin</span></label>
-          <div class="pinyin-toggle-group">
-            <button class="pinyin-opts-btn" id="s-pinyin-opts" aria-label="Pinyin Options">⋯</button>
-            <label class="ios-switch">
-              <input type="checkbox" id="s-pinyin" />
-              <span class="ios-switch-track"></span>
-            </label>
+          <label class="ios-switch">
+            <input type="checkbox" id="s-pinyin" />
+            <span class="ios-switch-track"></span>
+          </label>
+        </div>
+      </div>
+
+      <div id="s-pinyin-extras" class="sheet-group" style="display:none">
+        <div class="sheet-group-row static">
+          <label>拼音位置<span class="sub">Position</span></label>
+          <div class="segmented-control" id="s-pypos-group">
+            <button data-pos="over" class="seg-btn">上方</button>
+            <button data-pos="under" class="seg-btn">下方</button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
-        <button class="sheet-group-row" id="s-dictionaries">
-          <span>詞典<span class="row-sub">Dictionaries</span></span>
-          <span class="row-chevron">›</span>
-        </button>
-      </div>
-
-      <div class="sheet-group">
-        <button class="sheet-group-row" id="s-more">
-          <span>更多選項<span class="row-sub">More Options</span></span>
-          <span class="row-chevron">›</span>
-        </button>
+        <div class="sheet-group-row static">
+          <label>拼音大小<span class="sub">Size</span></label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-pysize-down">−</button>
+            <span id="s-pysize-val" class="size-value"></span>
+            <button class="size-btn" id="s-pysize-up">+</button>
+          </div>
+        </div>
       </div>
     `);
 
-    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
-
-    // Font size
-    panel.querySelector('#s-fontsize-down')!.addEventListener('click', () => {
-      const s = this.store.get();
-      this.store.update({ fontSize: Math.max(14, s.fontSize - 2) });
-    });
-    panel.querySelector('#s-fontsize-up')!.addEventListener('click', () => {
-      const s = this.store.get();
-      this.store.update({ fontSize: Math.min(48, s.fontSize + 2) });
-    });
-
-    // Font options drill-in
-    panel.querySelector('#s-font-opts')!.addEventListener('click', () => {
-      this.buildFontView(panel);
-      this.syncUI(panel);
-    });
+    // Force reflow for font row layout
+    container.offsetHeight;
 
     // Theme
-    panel.querySelector('#s-theme-group')!.addEventListener('click', (e) => {
+    container.querySelector('#s-theme-group')!.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-theme]');
       if (btn) this.store.update({ theme: btn.dataset.theme as ThemeMode });
     });
 
+    // Font selection
+    const fontClickHandler = (e: Event) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-font]');
+      if (btn) this.store.update({ fontFamily: btn.dataset.font! });
+    };
+    container.querySelector('#s-font-list')!.addEventListener('click', fontClickHandler);
+
+    // System fonts
+    const available = getAvailableSystemFonts();
+    const sysSection = container.querySelector('#s-sysfont-section')!;
+    if (available.length > 0) {
+      sysSection.innerHTML = `
+        <div class="font-section-label">${this.t('系統字體')} System</div>
+        <div class="font-scroll-row" id="s-sysfont-list">
+          ${available.map((sf) => `<button class="font-card" data-font="${sf.display}"><span class="font-card-preview" style="font-family:'${sf.sc}','${sf.tc}',${sf.family}">文字</span><span class="font-card-name">${sf.display}</span></button>`).join('')}
+        </div>`;
+      container.querySelector('#s-sysfont-list')!.addEventListener('click', fontClickHandler);
+    }
+
+    // Load font previews
+    displayFonts.forEach((f) => loadFontPreview(f));
+
+    // Font size
+    container.querySelector('#s-fontsize-down')!.addEventListener('click', () => {
+      const s = this.store.get();
+      this.store.update({ fontSize: Math.max(14, s.fontSize - 2) });
+    });
+    container.querySelector('#s-fontsize-up')!.addEventListener('click', () => {
+      const s = this.store.get();
+      this.store.update({ fontSize: Math.min(48, s.fontSize + 2) });
+    });
+
     // Writing mode
-    panel.querySelector('#s-mode-group')!.addEventListener('click', (e) => {
+    container.querySelector('#s-mode-group')!.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-mode]');
       if (btn) this.store.update({ writingMode: btn.dataset.mode as WritingMode });
     });
 
     // Pinyin toggle
-    panel.querySelector<HTMLInputElement>('#s-pinyin')!.addEventListener('change', (e) => {
+    container.querySelector<HTMLInputElement>('#s-pinyin')!.addEventListener('change', (e) => {
       this.store.update({ showPinyin: (e.target as HTMLInputElement).checked });
     });
 
-    // Pinyin options drill-in
-    panel.querySelector('#s-pinyin-opts')!.addEventListener('click', () => {
-      this.buildPinyinView(panel);
-      this.syncUI(panel);
+    // Pinyin position
+    container.querySelector('#s-pypos-group')!.addEventListener('click', (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-pos]');
+      if (btn) this.store.update({ pinyinPosition: btn.dataset.pos as PinyinPosition });
     });
 
-    // Dictionaries drill-in
-    panel.querySelector('#s-dictionaries')!.addEventListener('click', () => {
-      this.buildDictionariesView(panel);
-      this.syncUI(panel);
-    });
-
-    // More options
-    panel.querySelector('#s-more')!.addEventListener('click', () => {
-      this.buildAdvancedView(panel);
-      this.syncUI(panel);
-    });
+    // Pinyin size
+    this.bindStepper(container, 's-pysize', 8, 20, 1, 'pinyinSize');
   }
 
-  private buildAdvancedView(panel: HTMLElement): void {
-    this.view = 'advanced';
-    panel.innerHTML = this.t(`
-      <div class="sheet-header">
-        <button class="sheet-nav-back" id="s-back">‹</button>
-        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
-      </div>
-
+  private buildTypographyTab(container: HTMLElement): void {
+    container.innerHTML = this.t(`
       <div class="sheet-group">
         <div class="sheet-group-row static">
           <label>行距<span class="sub">Line Height</span></label>
@@ -249,20 +295,20 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>段間距<span class="sub">Paragraph Spacing</span></label>
-          <div class="stepper-controls">
-            <button class="size-btn" id="s-paraspacing-down">−</button>
-            <span id="s-paraspacing-val" class="size-value"></span>
-            <button class="size-btn" id="s-paraspacing-up">+</button>
-          </div>
-        </div>
-        <div class="sheet-group-divider"></div>
-        <div class="sheet-group-row static">
           <label>行寬<span class="sub">Line Length</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-linelen-down">−</button>
             <span id="s-linelen-val" class="size-value"></span>
             <button class="size-btn" id="s-linelen-up">+</button>
+          </div>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static">
+          <label>段間距<span class="sub">Paragraph Spacing</span></label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-paraspacing-down">−</button>
+            <span id="s-paraspacing-val" class="size-value"></span>
+            <button class="size-btn" id="s-paraspacing-up">+</button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
@@ -294,149 +340,18 @@ export class SettingsSheet {
           </label>
         </div>
       </div>
-
-      <div class="sheet-group">
-        <button class="sheet-group-row reset-row" id="s-reset">
-          <span>恢復預設<span class="row-sub">Reset to Defaults</span></span>
-        </button>
-      </div>
     `);
-
-    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
-
-    panel.querySelector('#s-back')!.addEventListener('click', () => {
-      this.buildMainView(panel);
-      this.syncUI(panel);
-    });
 
     const isVertical = this.store.get().writingMode === 'vertical';
-    this.bindStepper(panel, 's-lineheight', 1.2, 3.5, 0.1, 'lineHeight');
-    this.bindStepper(panel, 's-paraspacing', 0, 4, 0.25, isVertical ? 'verticalParagraphSpacing' : 'paragraphSpacing');
-    this.bindStepper(panel, 's-linelen', 20, 60, 5, 'lineLength');
-    this.bindStepper(panel, 's-hanging', 0, 5, 1, 'hangingIndent');
-    this.bindStepper(panel, 's-marginv', 0, 100, 4, isVertical ? 'verticalMarginV' : 'marginV');
+    this.bindStepper(container, 's-lineheight', 1.2, 3.5, 0.1, 'lineHeight');
+    this.bindStepper(container, 's-linelen', 20, 60, 5, 'lineLength');
+    this.bindStepper(container, 's-paraspacing', 0, 4, 0.25, isVertical ? 'verticalParagraphSpacing' : 'paragraphSpacing');
+    this.bindStepper(container, 's-hanging', 0, 5, 1, 'hangingIndent');
+    this.bindStepper(container, 's-marginv', 0, 100, 4, isVertical ? 'verticalMarginV' : 'marginV');
 
-    panel.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
+    container.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
       this.store.update({ showNumbering: (e.target as HTMLInputElement).checked });
     });
-
-    panel.querySelector('#s-reset')!.addEventListener('click', () => {
-      this.store.reset();
-      this.buildAdvancedView(panel);
-      this.syncUI(panel);
-    });
-  }
-
-  private buildFontView(panel: HTMLElement): void {
-    this.view = 'font';
-    panel.innerHTML = this.t(`
-      <div class="sheet-header">
-        <button class="sheet-nav-back" id="s-back">‹</button>
-        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
-      </div>
-
-      <div class="sheet-group">
-        <div class="sheet-group-row static">
-          <label>字號<span class="sub">Font Size</span></label>
-          <div class="font-size-controls">
-            <button class="size-btn" id="s-fontsize-down">A</button>
-            <span id="s-fontsize-val" class="size-value"></span>
-            <button class="size-btn size-btn-large" id="s-fontsize-up">A</button>
-          </div>
-        </div>
-      </div>
-
-      <div class="font-scroll-row" id="s-font-list">
-        ${displayFonts.map((f) => `<button class="font-card" data-font="${f}"><span class="font-card-preview" style="font-family:'${previewFontName(f)}',serif">文字</span><span class="font-card-name">${f}</span></button>`).join('')}
-      </div>
-
-      <div id="s-sysfont-section"></div>
-    `);
-
-    // Force reflow so the panel calculates correct layout for the font row
-    panel.offsetHeight;
-
-    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
-
-    panel.querySelector('#s-back')!.addEventListener('click', () => {
-      this.buildMainView(panel);
-      this.syncUI(panel);
-    });
-
-    panel.querySelector('#s-fontsize-down')!.addEventListener('click', () => {
-      const s = this.store.get();
-      this.store.update({ fontSize: Math.max(14, s.fontSize - 2) });
-    });
-    panel.querySelector('#s-fontsize-up')!.addEventListener('click', () => {
-      const s = this.store.get();
-      this.store.update({ fontSize: Math.min(48, s.fontSize + 2) });
-    });
-
-    const fontClickHandler = (e: Event) => {
-      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-font]');
-      if (btn) {
-        this.store.update({ fontFamily: btn.dataset.font! });
-      }
-    };
-    panel.querySelector('#s-font-list')!.addEventListener('click', fontClickHandler);
-
-    // Show system fonts that are actually installed on this device
-    const available = getAvailableSystemFonts();
-    const sysSection = panel.querySelector('#s-sysfont-section')!;
-    if (available.length > 0) {
-      sysSection.innerHTML = `
-        <div class="font-section-label">${this.t('系統字體')} System</div>
-        <div class="font-scroll-row" id="s-sysfont-list">
-          ${available.map((sf) => `<button class="font-card" data-font="${sf.display}"><span class="font-card-preview" style="font-family:'${sf.sc}','${sf.tc}',${sf.family}">文字</span><span class="font-card-name">${sf.display}</span></button>`).join('')}
-        </div>`;
-      panel.querySelector('#s-sysfont-list')!.addEventListener('click', fontClickHandler);
-    }
-
-    // Load lightweight previews for web fonts only
-    displayFonts.forEach((f) => loadFontPreview(f));
-  }
-
-  private buildPinyinView(panel: HTMLElement): void {
-    this.view = 'pinyin';
-    panel.innerHTML = this.t(`
-      <div class="sheet-header">
-        <button class="sheet-nav-back" id="s-back">‹</button>
-        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
-      </div>
-
-      <div class="sheet-group">
-        <div class="sheet-group-row static">
-          <label>拼音位置<span class="sub">Pinyin Position</span></label>
-          <div class="segmented-control" id="s-pypos-group">
-            <button data-pos="over" class="seg-btn">上方</button>
-            <button data-pos="under" class="seg-btn">下方</button>
-          </div>
-        </div>
-        <div class="sheet-group-divider"></div>
-        <div class="sheet-group-row static">
-          <label>拼音大小<span class="sub">Pinyin Size</span></label>
-          <div class="stepper-controls">
-            <button class="size-btn" id="s-pysize-down">−</button>
-            <span id="s-pysize-val" class="size-value"></span>
-            <button class="size-btn" id="s-pysize-up">+</button>
-          </div>
-        </div>
-      </div>
-    `);
-
-    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
-
-    panel.querySelector('#s-back')!.addEventListener('click', () => {
-      this.buildMainView(panel);
-      this.syncUI(panel);
-    });
-
-    panel.querySelector('#s-pypos-group')!.addEventListener('click', (e) => {
-      const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-pos]');
-      if (btn) this.store.update({ pinyinPosition: btn.dataset.pos as PinyinPosition });
-    });
-
-    this.bindStepper(panel, 's-pysize', 8, 20, 1, 'pinyinSize');
   }
 
   private static DICT_LABELS: Record<string, { name: string; desc: string; license: string; licenseUrl: string; attribution: string; url: string }> = {
@@ -466,17 +381,11 @@ export class SettingsSheet {
     },
   };
 
-  private buildDictionariesView(panel: HTMLElement): void {
-    this.view = 'dictionaries';
+  private buildDictionariesTab(container: HTMLElement): void {
     const s = this.store.get();
     const order = s.dictOrder;
 
-    panel.innerHTML = this.t(`
-      <div class="sheet-header">
-        <button class="sheet-nav-back" id="s-back">‹</button>
-        <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
-      </div>
-
+    container.innerHTML = this.t(`
       <div class="sheet-group" id="s-dict-list">
         ${order.map((id, i) => this.buildDictRow(id, i, order.length)).join('')}
       </div>
@@ -491,17 +400,25 @@ export class SettingsSheet {
           </div>
         </div>
       </div>
+
+      <div class="sheet-group">
+        <button class="sheet-group-row reset-row" id="s-reset">
+          <span>恢復預設<span class="row-sub">Reset to Defaults</span></span>
+        </button>
+      </div>
     `);
 
-    panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
+    this.bindStepper(container, 's-popupsize', 10, 24, 1, 'popupFontSize');
+    this.bindDictListEvents(container);
 
-    panel.querySelector('#s-back')!.addEventListener('click', () => {
-      this.buildMainView(panel);
-      this.syncUI(panel);
+    container.querySelector('#s-reset')!.addEventListener('click', () => {
+      this.store.reset();
+      const panel = this.overlay?.querySelector<HTMLElement>('.sheet-panel');
+      if (panel) {
+        this.buildTabs(panel);
+        this.syncUI(panel);
+      }
     });
-
-    this.bindStepper(panel, 's-popupsize', 10, 24, 1, 'popupFontSize');
-    this.bindDictListEvents(panel);
   }
 
   private buildDictRow(id: string, index: number, total: number): string {
@@ -530,8 +447,8 @@ export class SettingsSheet {
     return html;
   }
 
-  private bindDictListEvents(panel: HTMLElement): void {
-    const list = panel.querySelector('#s-dict-list')!;
+  private bindDictListEvents(container: HTMLElement): void {
+    const list = container.querySelector('#s-dict-list')!;
 
     // Toggle events
     list.addEventListener('change', (e) => {
@@ -563,9 +480,9 @@ export class SettingsSheet {
       if (newIdx < 0 || newIdx >= order.length) return;
       [order[idx], order[newIdx]] = [order[newIdx], order[idx]];
       this.store.update({ dictOrder: order });
-      // Rebuild the view to reflect new order
-      this.buildDictionariesView(panel);
-      this.syncUI(panel);
+      // Rebuild only the dict list
+      const newOrder = this.store.get().dictOrder;
+      list.innerHTML = this.t(newOrder.map((id, i) => this.buildDictRow(id, i, newOrder.length)).join(''));
     });
   }
 
@@ -605,21 +522,22 @@ export class SettingsSheet {
 
   openDictionaries(): void {
     if (!this.overlay) {
+      this.activeTab = 'dictionaries';
       this.open();
+      return;
     }
-    const panel = this.overlay?.querySelector<HTMLElement>('.sheet-panel');
+    const panel = this.overlay.querySelector<HTMLElement>('.sheet-panel');
     if (panel) {
-      this.buildDictionariesView(panel);
-      this.syncUI(panel);
+      this.switchTab(panel, 'dictionaries');
     }
   }
 
-  private bindStepper(panel: HTMLElement, id: string, min: number, max: number, step: number, key: keyof Settings): void {
-    panel.querySelector(`#${id}-down`)!.addEventListener('click', () => {
+  private bindStepper(container: HTMLElement, id: string, min: number, max: number, step: number, key: keyof Settings): void {
+    container.querySelector(`#${id}-down`)!.addEventListener('click', () => {
       const cur = this.store.get()[key] as number;
       this.store.update({ [key]: Math.max(min, Math.round((cur - step) * 100) / 100) });
     });
-    panel.querySelector(`#${id}-up`)!.addEventListener('click', () => {
+    container.querySelector(`#${id}-up`)!.addEventListener('click', () => {
       const cur = this.store.get()[key] as number;
       this.store.update({ [key]: Math.min(max, Math.round((cur + step) * 100) / 100) });
     });
@@ -627,55 +545,53 @@ export class SettingsSheet {
 
   private syncUI(panel: HTMLElement): void {
     const s: Settings = this.store.get();
+    const isVertical = s.writingMode === 'vertical';
 
-    if (this.view === 'main') {
-      const fsVal = panel.querySelector('#s-fontsize-val');
-      if (fsVal) fsVal.textContent = `${s.fontSize}px`;
+    // Appearance tab
+    const fsVal = panel.querySelector('#s-fontsize-val');
+    if (fsVal) fsVal.textContent = `${s.fontSize}px`;
 
-      panel.querySelectorAll('#s-theme-group .theme-swatch').forEach((btn) => {
-        btn.classList.toggle('active', (btn as HTMLElement).dataset.theme === s.theme);
-      });
+    panel.querySelectorAll('#s-theme-group .theme-swatch').forEach((btn) => {
+      btn.classList.toggle('active', (btn as HTMLElement).dataset.theme === s.theme);
+    });
 
-      panel.querySelectorAll('#s-mode-group .seg-btn').forEach((btn) => {
-        btn.classList.toggle('active', (btn as HTMLElement).dataset.mode === s.writingMode);
-      });
+    panel.querySelectorAll('.font-card[data-font]').forEach((btn) => {
+      btn.classList.toggle('active', (btn as HTMLElement).dataset.font === s.fontFamily);
+    });
 
-      const pyCheck = panel.querySelector<HTMLInputElement>('#s-pinyin');
-      if (pyCheck) pyCheck.checked = s.showPinyin;
+    panel.querySelectorAll('#s-mode-group .seg-btn').forEach((btn) => {
+      btn.classList.toggle('active', (btn as HTMLElement).dataset.mode === s.writingMode);
+    });
 
-      const pyOptsBtn = panel.querySelector<HTMLElement>('#s-pinyin-opts');
-      if (pyOptsBtn) pyOptsBtn.style.display = s.showPinyin ? '' : 'none';
-    } else if (this.view === 'advanced') {
-      const isVertical = s.writingMode === 'vertical';
-      this.setStepperVal(panel, 's-lineheight', `${s.lineHeight}`);
-      this.setStepperVal(panel, 's-paraspacing', `${isVertical ? s.verticalParagraphSpacing : s.paragraphSpacing}em`);
-      this.setStepperVal(panel, 's-linelen', `${s.lineLength}字`);
-      this.setStepperVal(panel, 's-hanging', `${s.hangingIndent}字`);
-      this.setStepperVal(panel, 's-marginv', `${isVertical ? s.verticalMarginV : s.marginV}px`);
+    const pyCheck = panel.querySelector<HTMLInputElement>('#s-pinyin');
+    if (pyCheck) pyCheck.checked = s.showPinyin;
 
-      const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');
-      if (numCheck) numCheck.checked = s.showNumbering;
-    } else if (this.view === 'font') {
-      const fsVal = panel.querySelector('#s-fontsize-val');
-      if (fsVal) fsVal.textContent = `${s.fontSize}px`;
+    const pyExtras = panel.querySelector<HTMLElement>('#s-pinyin-extras');
+    if (pyExtras) pyExtras.style.display = s.showPinyin ? '' : 'none';
 
-      panel.querySelectorAll('.font-card[data-font]').forEach((btn) => {
-        btn.classList.toggle('active', (btn as HTMLElement).dataset.font === s.fontFamily);
-      });
-    } else if (this.view === 'dictionaries') {
-      const toggleMap: Record<string, keyof Settings> = { cedict: 'showCedict', cvdict: 'showCvdict', moedict: 'showMoedict' };
-      for (const [dictId, key] of Object.entries(toggleMap)) {
-        const toggle = panel.querySelector<HTMLInputElement>(`[data-dict-toggle="${dictId}"]`);
-        if (toggle) toggle.checked = s[key] as boolean;
-      }
-      this.setStepperVal(panel, 's-popupsize', `${s.popupFontSize}px`);
-    } else if (this.view === 'pinyin') {
-      panel.querySelectorAll('#s-pypos-group .seg-btn').forEach((btn) => {
-        btn.classList.toggle('active', (btn as HTMLElement).dataset.pos === s.pinyinPosition);
-      });
+    panel.querySelectorAll('#s-pypos-group .seg-btn').forEach((btn) => {
+      btn.classList.toggle('active', (btn as HTMLElement).dataset.pos === s.pinyinPosition);
+    });
 
-      this.setStepperVal(panel, 's-pysize', `${s.pinyinSize}px`);
+    this.setStepperVal(panel, 's-pysize', `${s.pinyinSize}px`);
+
+    // Typography tab
+    this.setStepperVal(panel, 's-lineheight', `${s.lineHeight}`);
+    this.setStepperVal(panel, 's-linelen', `${s.lineLength}字`);
+    this.setStepperVal(panel, 's-paraspacing', `${isVertical ? s.verticalParagraphSpacing : s.paragraphSpacing}em`);
+    this.setStepperVal(panel, 's-hanging', `${s.hangingIndent}字`);
+    this.setStepperVal(panel, 's-marginv', `${isVertical ? s.verticalMarginV : s.marginV}px`);
+
+    const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');
+    if (numCheck) numCheck.checked = s.showNumbering;
+
+    // Dictionaries tab
+    const toggleMap: Record<string, keyof Settings> = { cedict: 'showCedict', cvdict: 'showCvdict', moedict: 'showMoedict' };
+    for (const [dictId, key] of Object.entries(toggleMap)) {
+      const toggle = panel.querySelector<HTMLInputElement>(`[data-dict-toggle="${dictId}"]`);
+      if (toggle) toggle.checked = s[key] as boolean;
     }
+    this.setStepperVal(panel, 's-popupsize', `${s.popupFontSize}px`);
   }
 
   private setStepperVal(panel: HTMLElement, id: string, display: string): void {

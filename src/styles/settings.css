@@ -38,8 +38,7 @@
   padding: 16px;
   z-index: 101;
   max-height: 85vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  overflow-y: hidden;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -348,6 +347,48 @@
 
 .sheet-nav-back:active {
   opacity: 0.5;
+}
+
+/* Tab bar */
+.settings-tabs {
+  display: flex;
+  background: var(--btn-bg);
+  border-radius: 8px;
+  padding: 2px;
+  flex-shrink: 0;
+}
+
+.settings-tab {
+  flex: 1;
+  padding: 6px 0;
+  border: none;
+  background: transparent;
+  color: var(--fg-muted);
+  font-size: 13px;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: background 0.15s, color 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.settings-tab.active {
+  background: var(--btn-active-bg);
+  color: var(--btn-active-fg);
+}
+
+/* Tab content — per-tab scrolling */
+.settings-tab-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  flex: 1;
+  min-height: 0;
+}
+
+.settings-tab-content.hidden {
+  display: none;
 }
 
 /* Pinyin toggle group */
