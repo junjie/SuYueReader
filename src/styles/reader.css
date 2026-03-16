@@ -1,6 +1,7 @@
 #reader {
   font-family: var(--reader-font-family);
   font-size: var(--reader-font-size);
+  font-weight: var(--reader-font-weight);
   line-height: var(--reader-line-height);
   color: var(--fg);
   background: var(--bg);
@@ -98,13 +99,13 @@ html:has(.vertical-mode) {
 /* Headings */
 #reader h2 {
   font-size: 1.2em;
-  font-weight: 700;
+  font-weight: var(--reader-heading-font-weight);
   line-height: 1.3;
 }
 
 #reader h3 {
   font-size: 1.1em;
-  font-weight: 700;
+  font-weight: var(--reader-heading-font-weight);
   line-height: 1.3;
 }
 

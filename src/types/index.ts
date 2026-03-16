@@ -64,4 +64,5 @@ export interface Settings {
   dictOrder: DictSource[];
   popupFontSize: number;
   hangingIndent: number;
+  boldText: boolean;
 }

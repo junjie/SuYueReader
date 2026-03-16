@@ -107,6 +107,8 @@ export class SettingsStore {
     root.setProperty('--pinyin-size', `${s.pinyinSize}px`);
     root.setProperty('--popup-font-size', `${s.popupFontSize}px`);
     root.setProperty('--reader-hanging-indent', `${s.hangingIndent}em`);
+    root.setProperty('--reader-font-weight', s.boldText ? '600' : '400');
+    root.setProperty('--reader-heading-font-weight', s.boldText ? '800' : '700');
   }
 
   private static themeColors: Record<string, string> = {

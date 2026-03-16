@@ -5,11 +5,11 @@ const loadedPreviews = new Set<string>();
 
 /** Google Fonts spec for each loadable font */
 const FONT_SPEC: Record<string, string> = {
-  'Noto Serif SC': 'Noto+Serif+SC:wght@400;700',
-  'Noto Serif TC': 'Noto+Serif+TC:wght@400;700',
-  'Noto Sans SC': 'Noto+Sans+SC:wght@400;700',
-  'Noto Sans TC': 'Noto+Sans+TC:wght@400;700',
-  'LXGW WenKai TC': 'LXGW+WenKai+TC:wght@400;700',
+  'Noto Serif SC': 'Noto+Serif+SC:wght@400;600;700;800',
+  'Noto Serif TC': 'Noto+Serif+TC:wght@400;600;700;800',
+  'Noto Sans SC': 'Noto+Sans+SC:wght@400;600;700;800',
+  'Noto Sans TC': 'Noto+Sans+TC:wght@400;600;700;800',
+  'LXGW WenKai TC': 'LXGW+WenKai+TC:wght@400;600;700',
 
   'Huninn': 'Huninn',
   'Iansui': 'Iansui',

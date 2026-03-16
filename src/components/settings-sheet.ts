@@ -304,6 +304,14 @@ export class SettingsSheet {
   private buildTypographyTab(container: HTMLElement): void {
     container.innerHTML = this.t(`
       <div class="sheet-group">
+        <div class="sheet-group-row static toggle-row">
+          <label>粗體<span class="sub">Bold Text</span></label>
+          <label class="ios-switch">
+            <input type="checkbox" id="s-boldtext" />
+            <span class="ios-switch-track"></span>
+          </label>
+        </div>
+        <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
           <label>行距<span class="sub">Line Height</span></label>
           <div class="stepper-controls">
@@ -348,9 +356,7 @@ export class SettingsSheet {
             <button class="size-btn" id="s-marginv-up">+</button>
           </div>
         </div>
-      </div>
-
-      <div class="sheet-group">
+        <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static toggle-row">
           <label>段落編號<span class="sub">Paragraph Numbers</span></label>
           <label class="ios-switch">
@@ -371,6 +377,10 @@ export class SettingsSheet {
 
     container.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
       this.store.update({ showNumbering: (e.target as HTMLInputElement).checked });
+    });
+
+    container.querySelector<HTMLInputElement>('#s-boldtext')!.addEventListener('change', (e) => {
+      this.store.update({ boldText: (e.target as HTMLInputElement).checked });
     });
 
     this.bindResetLink(container);
@@ -646,6 +656,9 @@ export class SettingsSheet {
 
     const numCheck = panel.querySelector<HTMLInputElement>('#s-numbering');
     if (numCheck) numCheck.checked = s.showNumbering;
+
+    const boldCheck = panel.querySelector<HTMLInputElement>('#s-boldtext');
+    if (boldCheck) boldCheck.checked = s.boldText;
 
     // Dictionaries tab
     const toggleMap: Record<string, keyof Settings> = { cedict: 'showCedict', cvdict: 'showCvdict', moedict: 'showMoedict' };
