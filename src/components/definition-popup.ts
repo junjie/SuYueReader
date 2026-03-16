@@ -1,4 +1,4 @@
-import { lookup, lookupChar, isLoaded, cachedLookup, getFootnote, type DictEntry } from '../services/dictionary.ts';
+import { lookup, lookupChar, isLoaded, cachedLookup, setMoedictEnabled, getFootnote, type DictEntry } from '../services/dictionary.ts';
 import type { SettingsStore } from '../state/settings.ts';
 
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
@@ -91,12 +91,11 @@ export class DefinitionPopup {
     const word = this.currentWord;
     if (!word) return;
 
-    const cached = cachedLookup(word);
-    if (cached !== undefined) {
-      this.renderEntries(word, cached);
-      return;
-    }
+    // Sync moedict flag before lookup so it reflects the new setting
+    // (the main.ts listener may not have fired yet)
+    setMoedictEnabled(this.store.get().showMoedict);
 
+    // Bypass cache — dict settings changed so cached results are stale
     const entries = await lookup(word);
     if (this.currentWord !== word) return;
     this.renderEntries(word, entries);

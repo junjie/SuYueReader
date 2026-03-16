@@ -322,7 +322,8 @@ export class SettingsSheet {
 
     panel.querySelector('#s-reset')!.addEventListener('click', () => {
       this.store.reset();
-      // Font will be loaded via syncCSS on reset
+      this.buildAdvancedView(panel);
+      this.syncUI(panel);
     });
   }
 

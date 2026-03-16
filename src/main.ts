@@ -5,7 +5,7 @@ import { Navbar } from './components/navbar.ts';
 import { OpenSheet } from './components/open-sheet.ts';
 import { SettingsSheet } from './components/settings-sheet.ts';
 import { parseText } from './services/text-parser.ts';
-import { setFootnotes, setMoedictEnabled } from './services/dictionary.ts';
+import { setFootnotes, setMoedictEnabled, clearCache } from './services/dictionary.ts';
 import { preloadDefaultFont } from './services/fonts.ts';
 import { convertScriptSync, uiVariant } from './services/script-convert.ts';
 import type { CRDRFile } from './types/index.ts';
@@ -76,6 +76,7 @@ document.addEventListener('settings-changed', (e) => {
   const detail = (e as CustomEvent).detail;
   if (detail.scriptVariantChanged) setPageTitle();
   setMoedictEnabled(detail.settings.showMoedict);
+  if (detail.dictChanged) clearCache();
 });
 
 // Load text: URL param or default intro document
