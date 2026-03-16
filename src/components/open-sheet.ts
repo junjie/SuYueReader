@@ -103,6 +103,7 @@ export class OpenSheet {
           <span class="row-chevron">›</span>
         </button>
       </div>
+      <div class="open-sheet-footer">素閱 ${__BUILD_DATE__}<br><a href="https://mastodon.social/@junjielin" target="_blank" rel="noopener noreferrer">林雋傑</a></div>
     `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
