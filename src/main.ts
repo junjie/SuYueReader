@@ -18,6 +18,10 @@ import './styles/popup.css';
 
 preloadDefaultFont();
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`);
+}
+
 const store = new SettingsStore();
 setMoedictEnabled(store.get().showMoedict);
 

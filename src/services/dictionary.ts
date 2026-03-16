@@ -1,5 +1,9 @@
 import type { DictSource } from '../types/index.ts';
 
+const DICT_BASE_URL = import.meta.env.PROD
+  ? 'https://cdn.jsdelivr.net/gh/junjie/SuYueReader@main/public/dict/'
+  : `${import.meta.env.BASE_URL}dict/`;
+
 export interface DictEntry {
   traditional: string;
   pinyin: string;
@@ -49,8 +53,7 @@ async function loadCedict(): Promise<void> {
   if (cedictLoadPromise) return cedictLoadPromise;
 
   cedictLoadPromise = (async () => {
-    const base = import.meta.env.BASE_URL;
-    const resp = await fetch(`${base}dict/cedict.json`);
+    const resp = await fetch(`${DICT_BASE_URL}cedict.json`);
     const data: Record<string, RawEntry[]> = await resp.json();
     cedictMap = buildEntries(data, 'cedict');
   })();
@@ -62,8 +65,7 @@ async function loadCvdict(): Promise<void> {
   if (cvdictLoadPromise) return cvdictLoadPromise;
 
   cvdictLoadPromise = (async () => {
-    const base = import.meta.env.BASE_URL;
-    const resp = await fetch(`${base}dict/cvdict.json`);
+    const resp = await fetch(`${DICT_BASE_URL}cvdict.json`);
     const data: Record<string, RawEntry[]> = await resp.json();
     cvdictMap = buildEntries(data, 'cvdict');
   })();
@@ -118,9 +120,8 @@ async function loadMoedictChunk(chunkId: number): Promise<void> {
   if (moedictChunkPromises.has(chunkId)) return moedictChunkPromises.get(chunkId)!;
 
   const promise = (async () => {
-    const base = import.meta.env.BASE_URL;
     const filename = `moedict-${String(chunkId).padStart(2, '0')}.json`;
-    const resp = await fetch(`${base}dict/${filename}`);
+    const resp = await fetch(`${DICT_BASE_URL}${filename}`);
     if (!resp.ok) {
       moedictChunks.set(chunkId, new Map());
       return;
