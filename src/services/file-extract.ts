@@ -3,6 +3,7 @@ type PDFLib = typeof import('pdfjs-dist');
 let mammothModule: { extractRawText: (opts: { arrayBuffer: ArrayBuffer }) => Promise<{ value: string }> } | null = null;
 let pdfjsModule: PDFLib | null = null;
 
+
 async function ensureMammoth() {
   if (!mammothModule) {
     mammothModule = await import('mammoth');
@@ -12,9 +13,11 @@ async function ensureMammoth() {
 
 async function ensurePdfjs() {
   if (!pdfjsModule) {
-    const pdfjs = await import('pdfjs-dist');
+    // Legacy build for broader browser compat (iOS Safari lacks ReadableStream in standard build)
+    const pdfjs: PDFLib = await import('pdfjs-dist/legacy/build/pdf.mjs');
+    const version = pdfjs.version;
     pdfjs.GlobalWorkerOptions.workerSrc =
-      'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.10.38/build/pdf.worker.min.mjs';
+      `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/legacy/build/pdf.worker.min.mjs`;
     pdfjsModule = pdfjs;
   }
   return pdfjsModule;
@@ -55,7 +58,7 @@ async function extractPdf(buffer: ArrayBuffer): Promise<string> {
 
   const text = pages.join('\n').trim();
   if (text.length < 10) {
-    throw new Error('This PDF appears to be scanned or image-based — no extractable text was found.');
+    throw new Error('此 PDF 似乎是扫描件或图片，无法提取文字。\n\nThis PDF appears to be scanned or image-based — no extractable text was found.');
   }
   return text;
 }

@@ -57,13 +57,13 @@ export class TextLoader {
         try {
           const text = await extractText(file);
           if (!text || !text.trim()) {
-            alert('No extractable text found in this file.');
+            alert('未能从文件中提取文字。\n\nNo extractable text found in this file.');
             return;
           }
           const title = name.replace(/\.(docx|pdf)$/i, '');
           this.onLoad(text, title);
         } catch (err) {
-          alert(err instanceof Error ? err.message : 'Failed to extract text from file.');
+          alert(err instanceof Error ? err.message : '无法读取此文件。\n\nFailed to extract text from file.');
         }
         return;
       }
