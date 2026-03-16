@@ -20,9 +20,8 @@ export const displayFonts = [
   'Noto Serif',
   'Noto Sans',
   'LXGW WenKai',
-
-  'Huninn',
   'Iansui',
+  'Huninn',
 ];
 
 /** System fonts available on macOS/iOS and Windows */

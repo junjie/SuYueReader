@@ -176,7 +176,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>排版<span class="sub">Layout</span></label>
+          <label>方向<span class="sub">Direction</span></label>
           <div class="segmented-control" id="s-mode-group">
             <button data-mode="horizontal" class="seg-btn">橫排<span class="seg-sub">Horizontal</span></button>
             <button data-mode="vertical" class="seg-btn">豎排<span class="seg-sub">Vertical</span></button>
