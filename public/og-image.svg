@@ -1,0 +1,409 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#faf8f5"/>
+
+  <!-- Subtle top accent line -->
+  <rect x="0" y="0" width="1200" height="4" fill="#2563eb" opacity="0.6"/>
+
+  <!-- Background text (faint, no pinyin) -->
+  <g opacity="0.09">
+    <text x="1164" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">大</text>
+    <text x="1164" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">學</text>
+    <text x="1164" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">之</text>
+    <text x="1164" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">道</text>
+    <text x="1164" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="1164" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">在</text>
+    <text x="1164" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="1164" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">在</text>
+    <text x="1164" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="1112" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">在</text>
+    <text x="1112" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="1112" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="1112" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">止</text>
+    <text x="1112" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="1112" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="1112" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">有</text>
+    <text x="1112" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">定</text>
+    <text x="1112" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="1112" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">定</text>
+    <text x="1060" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="1060" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="1060" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">能</text>
+    <text x="1060" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">靜</text>
+    <text x="1060" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="1060" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">靜</text>
+    <text x="1060" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="1060" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="1060" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">能</text>
+    <text x="1060" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">安</text>
+    <text x="1060" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="1060" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">安</text>
+    <text x="1060" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="1060" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="1008" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">能</text>
+    <text x="1008" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">慮</text>
+    <text x="1008" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="1008" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">慮</text>
+    <text x="1008" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="1008" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="1008" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">能</text>
+    <text x="1008" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">得</text>
+    <text x="1008" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="1008" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">物</text>
+    <text x="1008" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">有</text>
+    <text x="1008" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">本</text>
+    <text x="1008" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">末</text>
+    <text x="1008" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="956" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">事</text>
+    <text x="956" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">有</text>
+    <text x="956" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">終</text>
+    <text x="956" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">始</text>
+    <text x="956" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="956" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="956" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">所</text>
+    <text x="956" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="956" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="956" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="956" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">則</text>
+    <text x="956" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">近</text>
+    <text x="956" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">道</text>
+    <text x="956" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">矣</text>
+    <text x="904" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="904" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">古</text>
+    <text x="904" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">之</text>
+    <text x="904" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">欲</text>
+    <text x="904" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">於</text>
+    <text x="904" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">天</text>
+    <text x="904" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">下</text>
+    <text x="904" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="904" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="904" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="904" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">治</text>
+    <text x="852" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="852" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">國</text>
+    <text x="852" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">；</text>
+    <text x="852" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">欲</text>
+    <text x="852" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">治</text>
+    <text x="852" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="852" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">國</text>
+    <text x="852" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="852" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="852" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="852" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">齊</text>
+    <text x="852" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="852" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">家</text>
+    <text x="852" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">；</text>
+    <text x="800" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">欲</text>
+    <text x="800" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">齊</text>
+    <text x="800" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="800" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">家</text>
+    <text x="800" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="800" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="800" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="800" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">脩</text>
+    <text x="800" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="800" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">身</text>
+    <text x="800" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">；</text>
+    <text x="800" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">欲</text>
+    <text x="800" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">脩</text>
+    <text x="800" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="748" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">身</text>
+    <text x="748" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="748" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="748" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="748" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">正</text>
+    <text x="748" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="748" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">心</text>
+    <text x="748" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">；</text>
+    <text x="748" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">欲</text>
+    <text x="748" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">正</text>
+    <text x="748" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="748" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">心</text>
+    <text x="748" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="748" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="696" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="696" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">誠</text>
+    <text x="696" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="696" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">意</text>
+    <text x="696" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">；</text>
+    <text x="696" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">欲</text>
+    <text x="696" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">誠</text>
+    <text x="696" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="696" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">意</text>
+    <text x="696" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="696" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="696" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="696" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">致</text>
+    <text x="696" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="644" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="644" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="644" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">致</text>
+    <text x="644" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="644" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">在</text>
+    <text x="644" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">格</text>
+    <text x="644" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">物</text>
+    <text x="644" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="644" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">物</text>
+    <text x="644" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">格</text>
+    <text x="644" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="644" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="644" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="644" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">至</text>
+    <text x="592" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="592" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="592" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">至</text>
+    <text x="592" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="592" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="592" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">意</text>
+    <text x="592" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">誠</text>
+    <text x="592" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="592" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">意</text>
+    <text x="592" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">誠</text>
+    <text x="592" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="592" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="592" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">心</text>
+    <text x="592" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">正</text>
+    <text x="540" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="540" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">心</text>
+    <text x="540" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">正</text>
+    <text x="540" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="540" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="540" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">身</text>
+    <text x="540" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">脩</text>
+    <text x="540" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="540" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">身</text>
+    <text x="540" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">脩</text>
+    <text x="540" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="540" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="540" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">家</text>
+    <text x="540" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">齊</text>
+    <text x="488" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="488" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">家</text>
+    <text x="488" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">齊</text>
+    <text x="488" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="488" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="488" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">國</text>
+    <text x="488" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">治</text>
+    <text x="488" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="488" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">國</text>
+    <text x="488" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">治</text>
+    <text x="488" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="488" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="488" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">天</text>
+    <text x="488" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">下</text>
+    <text x="436" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">平</text>
+    <text x="436" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="436" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">自</text>
+    <text x="436" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">天</text>
+    <text x="436" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">子</text>
+    <text x="436" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">以</text>
+    <text x="436" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">至</text>
+    <text x="436" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">於</text>
+    <text x="436" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">庶</text>
+    <text x="436" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">人</text>
+    <text x="436" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="436" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">壹</text>
+    <text x="436" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">是</text>
+    <text x="436" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">皆</text>
+    <text x="384" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">以</text>
+    <text x="384" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">脩</text>
+    <text x="384" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">身</text>
+    <text x="384" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">爲</text>
+    <text x="384" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">本</text>
+    <text x="384" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="384" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="384" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">本</text>
+    <text x="384" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">亂</text>
+    <text x="384" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="384" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">末</text>
+    <text x="384" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">治</text>
+    <text x="384" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="384" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">否</text>
+    <text x="332" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">矣</text>
+    <text x="332" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="332" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="332" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">所</text>
+    <text x="332" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">厚</text>
+    <text x="332" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="332" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">薄</text>
+    <text x="332" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="332" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="332" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="332" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">所</text>
+    <text x="332" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">薄</text>
+    <text x="332" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="332" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">厚</text>
+    <text x="280" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="280" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">未</text>
+    <text x="280" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">之</text>
+    <text x="280" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">有</text>
+    <text x="280" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">也</text>
+    <text x="280" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">！</text>
+    <text x="280" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">此</text>
+    <text x="280" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">謂</text>
+    <text x="280" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="280" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">本</text>
+    <text x="280" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="280" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">此</text>
+    <text x="280" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">謂</text>
+    <text x="280" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="228" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">之</text>
+    <text x="228" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">至</text>
+    <text x="228" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">也</text>
+    <text x="228" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="228" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">大</text>
+    <text x="228" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">學</text>
+    <text x="228" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">之</text>
+    <text x="228" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">道</text>
+    <text x="228" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="228" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">在</text>
+    <text x="228" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="176" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">在</text>
+    <text x="176" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="176" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">在</text>
+    <text x="176" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="176" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="176" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">止</text>
+    <text x="176" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="176" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="124" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">有</text>
+    <text x="124" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">定</text>
+    <text x="124" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="124" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">定</text>
+    <text x="124" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="124" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="124" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">能</text>
+    <text x="124" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">靜</text>
+    <text x="124" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="124" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">靜</text>
+    <text x="124" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="124" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="124" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">能</text>
+    <text x="124" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">安</text>
+    <text x="72" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="72" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">安</text>
+    <text x="72" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="72" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="72" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">能</text>
+    <text x="72" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">慮</text>
+    <text x="72" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="72" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">慮</text>
+    <text x="72" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">而</text>
+    <text x="72" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="72" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">能</text>
+    <text x="72" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">得</text>
+    <text x="72" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="72" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">物</text>
+    <text x="20" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">有</text>
+    <text x="20" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">本</text>
+    <text x="20" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">末</text>
+    <text x="20" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="20" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">事</text>
+    <text x="20" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">有</text>
+    <text x="20" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">終</text>
+    <text x="20" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">始</text>
+    <text x="20" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="20" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">知</text>
+    <text x="20" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">所</text>
+    <text x="20" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="20" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">後</text>
+    <text x="20" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="-32" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">則</text>
+    <text x="-32" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">近</text>
+    <text x="-32" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">道</text>
+    <text x="-32" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">矣</text>
+    <text x="-32" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">。</text>
+    <text x="-32" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">古</text>
+    <text x="-32" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">之</text>
+    <text x="-32" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">欲</text>
+    <text x="-32" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">於</text>
+    <text x="-32" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">天</text>
+    <text x="-32" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">下</text>
+    <text x="-84" y="28" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="-84" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="-84" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+    <text x="-84" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">治</text>
+    <text x="-84" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="-84" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">國</text>
+    <text x="-84" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">；</text>
+    <text x="-84" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">欲</text>
+    <text x="-84" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">治</text>
+    <text x="-84" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">其</text>
+    <text x="-84" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">國</text>
+    <text x="-84" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">者</text>
+    <text x="-84" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">，</text>
+    <text x="-84" y="652" font-family="'Noto Serif TC', serif" font-size="38" fill="#1a1a1a" text-anchor="middle">先</text>
+  </g>
+
+  <!-- Highlighted words (spread across edges) -->
+  <g opacity="0.4">
+    <rect x="1143" y="282" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="1164" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">明</text>
+    <rect x="1143" y="330" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="1164" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">明</text>
+    <rect x="1143" y="378" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="1164" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">德</text>
+    <rect x="1143" y="522" width="42" height="44" rx="3" fill="#ccfbf1"/>
+    <text x="1164" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#0d9488" text-anchor="middle">親</text>
+    <rect x="1143" y="570" width="42" height="44" rx="3" fill="#ccfbf1"/>
+    <text x="1164" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#0d9488" text-anchor="middle">民</text>
+    <rect x="1091" y="42" width="42" height="44" rx="3" fill="#ffedd5"/>
+    <text x="1112" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#ea580c" text-anchor="middle">止</text>
+    <rect x="1091" y="90" width="42" height="44" rx="3" fill="#ffedd5"/>
+    <text x="1112" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#ea580c" text-anchor="middle">於</text>
+    <rect x="1091" y="138" width="42" height="44" rx="3" fill="#ffedd5"/>
+    <text x="1112" y="172" font-family="'Noto Serif TC', serif" font-size="38" fill="#ea580c" text-anchor="middle">至</text>
+    <rect x="1091" y="186" width="42" height="44" rx="3" fill="#ffedd5"/>
+    <text x="1112" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#ea580c" text-anchor="middle">善</text>
+    <rect x="883" y="186" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="904" y="220" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">明</text>
+    <rect x="883" y="234" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="904" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">明</text>
+    <rect x="883" y="282" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="904" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">德</text>
+    <rect x="207" y="474" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="228" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">明</text>
+    <rect x="207" y="522" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="228" y="556" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">明</text>
+    <rect x="207" y="570" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="228" y="604" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">德</text>
+    <rect x="155" y="42" width="42" height="44" rx="3" fill="#ccfbf1"/>
+    <text x="176" y="76" font-family="'Noto Serif TC', serif" font-size="38" fill="#0d9488" text-anchor="middle">親</text>
+    <rect x="155" y="90" width="42" height="44" rx="3" fill="#ccfbf1"/>
+    <text x="176" y="124" font-family="'Noto Serif TC', serif" font-size="38" fill="#0d9488" text-anchor="middle">民</text>
+    <rect x="155" y="234" width="42" height="44" rx="3" fill="#ffedd5"/>
+    <text x="176" y="268" font-family="'Noto Serif TC', serif" font-size="38" fill="#ea580c" text-anchor="middle">止</text>
+    <rect x="155" y="282" width="42" height="44" rx="3" fill="#ffedd5"/>
+    <text x="176" y="316" font-family="'Noto Serif TC', serif" font-size="38" fill="#ea580c" text-anchor="middle">於</text>
+    <rect x="155" y="330" width="42" height="44" rx="3" fill="#ffedd5"/>
+    <text x="176" y="364" font-family="'Noto Serif TC', serif" font-size="38" fill="#ea580c" text-anchor="middle">至</text>
+    <rect x="155" y="378" width="42" height="44" rx="3" fill="#ffedd5"/>
+    <text x="176" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#ea580c" text-anchor="middle">善</text>
+    <rect x="-53" y="378" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="-32" y="412" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">明</text>
+    <rect x="-53" y="426" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="-32" y="460" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">明</text>
+    <rect x="-53" y="474" width="42" height="44" rx="3" fill="#ede9fe"/>
+    <text x="-32" y="508" font-family="'Noto Serif TC', serif" font-size="38" fill="#8b5cf6" text-anchor="middle">德</text>
+  </g>
+
+  <!-- Pinyin above title (ruby-style) -->
+  <text x="524" y="166" font-family="system-ui, sans-serif" font-size="28" fill="#777" text-anchor="middle">sù</text>
+  <text x="676" y="166" font-family="system-ui, sans-serif" font-size="28" fill="#777" text-anchor="middle">yuè</text>
+
+  <!-- App name -->
+  <text x="600" y="300" font-family="'Noto Serif SC', serif" font-weight="700" font-size="128" fill="#1a1a1a" text-anchor="middle" letter-spacing="0.12em">素阅</text>
+
+  <!-- Tagline Chinese -->
+  <text x="600" y="370" font-family="'Noto Serif SC', serif" font-size="38" fill="#555" text-anchor="middle">静心读中文</text>
+
+  <!-- Tagline English -->
+  <text x="600" y="412" font-family="system-ui, sans-serif" font-size="24" fill="#999" text-anchor="middle">A better way to read Chinese.</text>
+
+  <!-- Bottom border accent (5 colors) -->
+  <rect x="0" y="622" width="240" height="8" fill="#8b5cf6"/>
+  <rect x="240" y="622" width="240" height="8" fill="#ec4899"/>
+  <rect x="480" y="622" width="240" height="8" fill="#ea580c"/>
+  <rect x="720" y="622" width="240" height="8" fill="#0d9488"/>
+  <rect x="960" y="622" width="240" height="8" fill="#2563eb"/>
+</svg>

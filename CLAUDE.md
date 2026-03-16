@@ -7,6 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - **`npm run dev`** — Start Vite dev server (use `npx vite --host` for LAN access)
 - **`npm run build`** — TypeScript type-check + Vite production build
 - **`npm run preview`** — Preview production build locally
+- **`npm run build:dict`** — Rebuild CC-CEDICT JSON from source (`scripts/build-cedict.mjs`)
+- **`npm run build:moedict`** — Rebuild MOEDict JSON from source (`scripts/build-moedict.mjs`)
 - No test runner configured
 
 ## Architecture
@@ -37,15 +39,15 @@ Each paragraph carries optional `formatting` (character offset ranges) and `foot
 
 ### Dictionary & Definition Popup
 
-`services/dictionary.ts` lazy-loads CC-CEDICT (`dict/cedict.json`) on first lookup. Per-text cache (`preloadWords` / `cachedLookup`) populated after segmentation for instant popup display.
+`services/dictionary.ts` lazy-loads CC-CEDICT (`dict/cedict.json`) on first lookup. Per-text cache (`preloadWords` / `cachedLookup`) populated after segmentation for instant popup display. Three dictionary sources: **CC-CEDICT** (single JSON, always loaded), **CVDICT** (Cantonese readings, single JSON), and **MOEDict** (Taiwan Ministry of Education dictionary, split into 20 sharded files `moedict-00.json`–`moedict-19.json`, loaded on-demand). MOEDict is disabled by default and enabled in settings.
 
-**Multi-source definitions**: The popup shows footnote notes (from `[^word]: ...` in the text file) above CC-CEDICT entries, with source labels when both exist. Footnote lookup uses `data-footnote-key` attributes on word spans (position-based matching, not word-text matching) so phrases split by the segmenter still resolve correctly.
+**Multi-source definitions**: The popup shows footnote notes (from `[^word]: ...` in the text file) above dictionary entries, with source labels when multiple exist. Footnote lookup uses `data-footnote-key` attributes on word spans (position-based matching, not word-text matching) so phrases split by the segmenter still resolve correctly.
 
 **Popup interaction**: Desktop hover shows popup with 50ms debounce; click pins it open. Pinned popups stay until click-outside or scroll. Touch devices toggle on tap. Character drill-down on multi-char words, with back navigation.
 
 ### Progressive 3-Phase Render
 
-Reader `render()` runs: (1) plain text render (instant), (2) batched segmentation with word spans (20 paragraphs/batch, `setTimeout(0)` yielding), (3) definition preload. `renderGeneration` counter cancels stale renders. Progress bar in navbar tracks phase 2.
+Reader `render()` runs: (1) plain text render (instant), (2) batched segmentation with word spans (20 paragraphs/batch, `setTimeout(0)` yielding), (3) definition preload. `renderGeneration` counter cancels stale renders. Progress bar in navbar tracks phase 2. Segmentation uses `Intl.Segmenter('zh', { granularity: 'word' })` with a per-character CJK fallback when the API is unavailable.
 
 ### Self-Contained Format (.sy)
 
@@ -90,6 +92,8 @@ Five highlight colors (Apple Notes palette) via `{color:text}` syntax. CSS class
 - **Fonts** are loaded on-demand from Google Fonts CDN by injecting `<link>` tags (`services/fonts.ts`); font names are display names (e.g. "Noto Serif") resolved to SC/TC variants based on `scriptVariant`
 - **Pinyin-pro** (~300KB) is code-split by Vite and only loaded when the user enables pinyin
 - **Built-in texts** live in `public/texts/` with a `manifest.json` mapping IDs to titles; URL param `?text=001` deep-links to a specific text
+- **Service worker** (`public/sw.js`) provides offline caching, registered in `main.ts`
+- **Build scripts** in `scripts/` contain dictionary build utilities (`build-cedict.mjs`, `build-moedict.mjs`, `build-cvdict.mjs`)
 
 ## Deployment
 
