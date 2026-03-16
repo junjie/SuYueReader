@@ -10,7 +10,9 @@ const FONT_SPEC: Record<string, string> = {
   'Noto Sans SC': 'Noto+Sans+SC:wght@400;700',
   'Noto Sans TC': 'Noto+Sans+TC:wght@400;700',
   'LXGW WenKai TC': 'LXGW+WenKai+TC:wght@400;700',
-  'Ma Shan Zheng': 'Ma+Shan+Zheng',
+
+  'Huninn': 'Huninn',
+  'Iansui': 'Iansui',
 };
 
 /** Display fonts the user picks from (script-neutral) */
@@ -18,7 +20,9 @@ export const displayFonts = [
   'Noto Serif',
   'Noto Sans',
   'LXGW WenKai',
-  'Ma Shan Zheng',
+
+  'Huninn',
+  'Iansui',
 ];
 
 /** System fonts available on macOS/iOS and Windows */
@@ -40,7 +44,9 @@ const FONT_VARIANTS: Record<string, { sc: string; tc: string }> = {
   'Noto Serif':    { sc: 'Noto Serif SC',   tc: 'Noto Serif TC' },
   'Noto Sans':     { sc: 'Noto Sans SC',    tc: 'Noto Sans TC' },
   'LXGW WenKai':  { sc: 'LXGW WenKai TC',  tc: 'LXGW WenKai TC' },  // TC covers both
-  'Ma Shan Zheng': { sc: 'Ma Shan Zheng',   tc: 'Ma Shan Zheng' },   // no TC variant
+
+  'Huninn':        { sc: 'Huninn',          tc: 'Huninn' },          // TC only
+  'Iansui':        { sc: 'Iansui',          tc: 'Iansui' },          // TC only
 };
 
 // Register system fonts into FONT_VARIANTS
