@@ -403,6 +403,10 @@
   min-height: 0;
 }
 
+.settings-tab-content > * {
+  flex-shrink: 0;
+}
+
 .settings-tab-content.hidden {
   display: none;
 }

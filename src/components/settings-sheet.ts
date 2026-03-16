@@ -89,13 +89,8 @@ export class SettingsSheet {
       const margin = 8;
       if (isVertical) {
         panel.style.right = `${window.innerWidth - rect.left + margin}px`;
-        panel.style.top = `${rect.top}px`;
-        panel.style.maxHeight = `${window.innerHeight - rect.top - margin}px`;
-        if (rect.top > window.innerHeight / 2) {
-          panel.style.top = '';
-          panel.style.bottom = `${window.innerHeight - rect.bottom}px`;
-          panel.style.maxHeight = `${rect.bottom - margin}px`;
-        }
+        panel.style.top = `${margin}px`;
+        panel.style.maxHeight = `${window.innerHeight - margin * 2}px`;
       } else {
         panel.style.top = `${rect.bottom + margin}px`;
         panel.style.right = `${window.innerWidth - rect.right}px`;

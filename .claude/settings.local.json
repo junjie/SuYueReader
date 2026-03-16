@@ -6,7 +6,8 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:language.moe.gov.tw)",
       "Bash(npm list:*)",
-      "WebFetch(domain:sourceforge.net)"
+      "WebFetch(domain:sourceforge.net)",
+      "Bash(git log:*)"
     ]
   }
 }
