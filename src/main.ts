@@ -40,11 +40,11 @@ function setPageTitle(title?: string): void {
 }
 
 const textLoader = new TextLoader(
-  (text, title) => {
+  (text, title, builtInId) => {
     const { paragraphs, footnotes } = parseText(text);
     setFootnotes(footnotes);
     setPageTitle(title);
-    reader.setParagraphs(paragraphs, text, title);
+    reader.setParagraphs(paragraphs, text, title, builtInId);
   },
   (bundle: SYFile) => {
     const { paragraphs, footnotes } = parseText(bundle.text);

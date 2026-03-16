@@ -1,6 +1,6 @@
 import type { SYFile } from '../types/index.ts';
 
-type TextLoadCallback = (text: string, title?: string) => void;
+type TextLoadCallback = (text: string, title?: string, builtInId?: string) => void;
 type BundleLoadCallback = (bundle: SYFile) => void;
 
 interface ManifestEntry {
@@ -40,7 +40,7 @@ export class TextLoader {
     const base = import.meta.env.BASE_URL;
     const res = await fetch(`${base}texts/${id}-${entry.title}.txt`);
     const text = await res.text();
-    this.onLoad(text, entry.title);
+    this.onLoad(text, entry.title, id);
   }
 
   setupFileInput(input: HTMLInputElement): void {

@@ -215,3 +215,51 @@ html:has(.vertical-mode) {
 [data-theme="sepia"] #reader .hl-orange { color: #c2410c; background: #ffedd5; }
 [data-theme="sepia"] #reader .hl-mint   { color: #0f766e; background: #ccfbf1; }
 [data-theme="sepia"] #reader .hl-blue   { color: #1d4ed8; background: #dbeafe; }
+
+/* ── Share link ── */
+
+.share-link {
+  padding-block: 1.5em;
+  text-align: center;
+}
+
+.vertical-mode .share-link {
+  text-align: start;
+}
+
+.share-link-btn {
+  color: var(--fg-muted);
+  cursor: pointer;
+  user-select: none;
+  font-size: 12px;
+  font-family: system-ui, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.vertical-mode .share-link-btn svg {
+  transform: scaleX(-1);
+}
+
+.share-link-btn:hover {
+  color: var(--fg);
+}
+
+.share-link-btn.copied {
+  cursor: default;
+}
+
+.share-toast {
+  position: fixed;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--fg);
+  color: var(--bg);
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  white-space: nowrap;
+  z-index: 9999;
+  pointer-events: none;
+}

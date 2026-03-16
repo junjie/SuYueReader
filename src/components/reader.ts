@@ -56,6 +56,7 @@ export class Reader {
   private storedSegments: Map<number, Segment[][]> = new Map();
   // Pre-computed segments from .sy import (keyed by paragraph index)
   private precomputedSegments: Map<number, Segment[][]> | null = null;
+  private builtInId: string | null = null;
 
   constructor(container: HTMLElement, store: SettingsStore) {
     this.container = container;
@@ -104,10 +105,11 @@ export class Reader {
     });
   }
 
-  setParagraphs(paragraphs: Paragraph[], rawText?: string, title?: string): void {
+  setParagraphs(paragraphs: Paragraph[], rawText?: string, title?: string, builtInId?: string): void {
     this.paragraphs = paragraphs;
     this.rawText = rawText || '';
     this.textTitle = title || '';
+    this.builtInId = builtInId || null;
     this.precomputedSegments = null;
     this.storedSegments.clear();
     clearCache();
@@ -123,6 +125,7 @@ export class Reader {
     this.paragraphs = paragraphs;
     this.rawText = bundle.text;
     this.textTitle = bundle.title;
+    this.builtInId = null;
 
     // Load pre-computed segments
     if (bundle.segments) {
@@ -230,10 +233,52 @@ export class Reader {
     const uniqueWords = await this.segmentAndRender(generation);
     if (this.renderGeneration !== generation) return;
 
+    // Append share link for built-in texts
+    this.appendShareLink();
+
     // Phase 3: Preload definitions for all unique words
     if (uniqueWords.size > 0) {
       await preloadWords([...uniqueWords]);
     }
+  }
+
+  private appendShareLink(): void {
+    if (!this.builtInId) return;
+    const textId = this.builtInId;
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'share-link';
+    wrapper.innerHTML = `<span class="share-link-btn"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2L22 12 12 22v-6c-5.5 0-9.5 1.5-12 6 1-6 4.5-12 12-14V2z"/></svg></span>`;
+
+    const btn = wrapper.querySelector('.share-link-btn')!;
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const url = `${window.location.origin}${import.meta.env.BASE_URL}?text=${textId}`;
+      const showToast = () => {
+        let toast = document.querySelector('.share-toast');
+        if (toast) toast.remove();
+        toast = document.createElement('div');
+        toast.className = 'share-toast';
+        toast.textContent = '已複製連結 Copied Link';
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1500);
+      };
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(url).then(showToast, showToast);
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = url;
+        ta.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0;width:1px;height:1px';
+        document.body.appendChild(ta);
+        ta.focus({ preventScroll: true });
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+        showToast();
+      }
+    });
+    this.container.appendChild(wrapper);
   }
 
   private renderPlain(scriptVariant: string | null): void {
