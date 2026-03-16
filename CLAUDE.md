@@ -26,7 +26,7 @@ Components listen to this event. Most setting changes are **CSS-only** — no DO
 
 ### Text Pipeline
 
-`TextLoader` handles three input methods (built-in texts via manifest, file upload, paste) plus `.crdr` bundle import. Raw text goes through `parseText()` which returns `ParseResult { paragraphs, footnotes }`. The parser handles:
+`TextLoader` handles three input methods (built-in texts via manifest, file upload, paste) plus `.sy` bundle import. Raw text goes through `parseText()` which returns `ParseResult { paragraphs, footnotes }`. The parser handles:
 
 1. **Footnote extraction** — `[^key]: definition` lines (with multi-line support via 2-space indentation)
 2. **Paragraph splitting** — `\n\n+` splits paragraphs; single `\n` preserved as `<br>`
@@ -47,7 +47,7 @@ Each paragraph carries optional `formatting` (character offset ranges) and `foot
 
 Reader `render()` runs: (1) plain text render (instant), (2) batched segmentation with word spans (20 paragraphs/batch, `setTimeout(0)` yielding), (3) definition preload. `renderGeneration` counter cancels stale renders. Progress bar in navbar tracks phase 2.
 
-### Self-Contained Format (.crdr)
+### Self-Contained Format (.sy)
 
 JSON-based bundle: `{ version, title, text, segments?, dictionary? }`. Export from Open Sheet packages raw text + pre-computed segmentation + dictionary cache. Import skips segmenter and dictionary fetch entirely. Text is re-parsed on import so markdown/footnotes are always processed fresh.
 

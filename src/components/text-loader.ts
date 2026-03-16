@@ -1,7 +1,7 @@
-import type { CRDRFile } from '../types/index.ts';
+import type { SYFile } from '../types/index.ts';
 
 type TextLoadCallback = (text: string, title?: string) => void;
-type BundleLoadCallback = (bundle: CRDRFile) => void;
+type BundleLoadCallback = (bundle: SYFile) => void;
 
 interface ManifestEntry {
   id: string;
@@ -52,9 +52,9 @@ export class TextLoader {
         const content = reader.result as string;
         const name = file.name;
 
-        // Detect .crdr files
-        if (name.endsWith('.crdr')) {
-          this.handleCRDR(content, name);
+        // Detect .sy files
+        if (name.endsWith('.sy')) {
+          this.handleSY(content, name);
         } else {
           this.onLoad(content, name.replace(/\.txt$/, ''));
         }
@@ -71,23 +71,23 @@ export class TextLoader {
     this.onLoad(text, title);
   }
 
-  private handleCRDR(content: string, filename: string): void {
+  private handleSY(content: string, filename: string): void {
     try {
-      const bundle: CRDRFile = JSON.parse(content);
+      const bundle: SYFile = JSON.parse(content);
       if (bundle.version !== 1 || !bundle.text) {
         // Invalid format, try loading as plain text
-        this.onLoad(content, filename.replace(/\.crdr$/, ''));
+        this.onLoad(content, filename.replace(/\.sy$/, ''));
         return;
       }
       if (this.onLoadBundle) {
         this.onLoadBundle(bundle);
       } else {
         // Fallback: load the text content
-        this.onLoad(bundle.text, bundle.title || filename.replace(/\.crdr$/, ''));
+        this.onLoad(bundle.text, bundle.title || filename.replace(/\.sy$/, ''));
       }
     } catch {
       // Not valid JSON, treat as plain text
-      this.onLoad(content, filename.replace(/\.crdr$/, ''));
+      this.onLoad(content, filename.replace(/\.sy$/, ''));
     }
   }
 }

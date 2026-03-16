@@ -2,23 +2,19 @@ import type { TextLoader } from './text-loader.ts';
 import type { SettingsStore } from '../state/settings.ts';
 import { convertScriptSync, uiVariant } from '../services/script-convert.ts';
 
-type ExportCallback = (() => void) | null;
-
 export class OpenSheet {
   private overlay: HTMLElement | null = null;
   private textLoader: TextLoader;
   private fileInput: HTMLInputElement;
-  private onExport: ExportCallback = null;
   private store: SettingsStore;
 
-  constructor(textLoader: TextLoader, store: SettingsStore, onExport?: () => void) {
+  constructor(textLoader: TextLoader, store: SettingsStore) {
     this.textLoader = textLoader;
     this.store = store;
-    this.onExport = onExport || null;
 
     this.fileInput = document.createElement('input');
     this.fileInput.type = 'file';
-    this.fileInput.accept = '.txt,.text,.crdr';
+    this.fileInput.accept = '.txt,.text,.sy';
     this.fileInput.hidden = true;
     document.body.appendChild(this.fileInput);
     this.textLoader.setupFileInput(this.fileInput);
@@ -107,12 +103,6 @@ export class OpenSheet {
           <span class="row-chevron">›</span>
         </button>
       </div>
-      <div class="sheet-group" style="margin-top: 12px">
-        <button class="sheet-group-row" data-action="export">
-          <span>匯出為 .crdr<span class="row-sub">Export as .crdr</span></span>
-          <span class="row-chevron">↓</span>
-        </button>
-      </div>
     `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
@@ -126,10 +116,6 @@ export class OpenSheet {
     panel.querySelector('[data-action="paste"]')!.addEventListener('click', () => {
       this.close();
       this.showPasteModal();
-    });
-    panel.querySelector('[data-action="export"]')!.addEventListener('click', () => {
-      if (this.onExport) this.onExport();
-      this.close();
     });
   }
 

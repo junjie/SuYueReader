@@ -26,7 +26,7 @@ export interface ParseResult {
   footnotes: Map<string, string>;
 }
 
-export interface CRDRFile {
+export interface SYFile {
   version: 1;
   title: string;
   text: string;

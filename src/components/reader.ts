@@ -1,4 +1,4 @@
-import type { Paragraph, InlineFormat, FootnoteRange, CRDRFile } from '../types/index.ts';
+import type { Paragraph, InlineFormat, FootnoteRange, SYFile } from '../types/index.ts';
 import type { SettingsStore } from '../state/settings.ts';
 import { getPinyinArray } from '../services/pinyin.ts';
 import { convertScript } from '../services/script-convert.ts';
@@ -52,9 +52,9 @@ export class Reader {
   private renderGeneration = 0;
   private rawText = '';
   private textTitle = '';
-  // Stored segmentation for .crdr export
+  // Stored segmentation for .sy export
   private storedSegments: Map<number, Segment[][]> = new Map();
-  // Pre-computed segments from .crdr import (keyed by paragraph index)
+  // Pre-computed segments from .sy import (keyed by paragraph index)
   private precomputedSegments: Map<number, Segment[][]> | null = null;
 
   constructor(container: HTMLElement, store: SettingsStore) {
@@ -118,8 +118,8 @@ export class Reader {
   // Footnotes are stored in the dictionary service via setFootnotes()
   // and matched by position via paragraph.footnoteRanges
 
-  /** Load from a .crdr bundle — sets paragraphs + precomputed data */
-  loadBundle(paragraphs: Paragraph[], bundle: CRDRFile): void {
+  /** Load from a .sy bundle — sets paragraphs + precomputed data */
+  loadBundle(paragraphs: Paragraph[], bundle: SYFile): void {
     this.paragraphs = paragraphs;
     this.rawText = bundle.text;
     this.textTitle = bundle.title;
@@ -146,8 +146,8 @@ export class Reader {
     this.scrollToBeginning();
   }
 
-  /** Export current state as .crdr file data */
-  exportCRDR(): CRDRFile {
+  /** Export current state as .sy file data */
+  exportSY(): SYFile {
     const segments: Record<number, { t: string; w: boolean }[][]> = {};
     for (const [idx, lines] of this.storedSegments) {
       segments[idx] = lines.map((line) =>
@@ -342,7 +342,7 @@ export class Reader {
           lineOffset = lineEnd + 1;
         }
 
-        // Store segments for .crdr export
+        // Store segments for .sy export
         this.storedSegments.set(para.index, paraSegmentLines);
 
         const el = paragraphEls[j] as HTMLElement | undefined;

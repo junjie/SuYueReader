@@ -8,7 +8,7 @@ import { parseText } from './services/text-parser.ts';
 import { setFootnotes, setMoedictEnabled, clearCache } from './services/dictionary.ts';
 import { preloadDefaultFont } from './services/fonts.ts';
 import { convertScriptSync, uiVariant } from './services/script-convert.ts';
-import type { CRDRFile } from './types/index.ts';
+import type { SYFile } from './types/index.ts';
 import './styles/main.css';
 import './styles/themes.css';
 import './styles/navbar.css';
@@ -46,7 +46,7 @@ const textLoader = new TextLoader(
     setPageTitle(title);
     reader.setParagraphs(paragraphs, text, title);
   },
-  (bundle: CRDRFile) => {
+  (bundle: SYFile) => {
     const { paragraphs, footnotes } = parseText(bundle.text);
     setFootnotes(footnotes);
     setPageTitle(bundle.title);
@@ -54,21 +54,7 @@ const textLoader = new TextLoader(
   }
 );
 
-function handleExport(): void {
-  const crdr = reader.exportCRDR();
-  if (!crdr.text) return;
-
-  const json = JSON.stringify(crdr);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `${crdr.title || 'text'}.crdr`;
-  a.click();
-  URL.revokeObjectURL(url);
-}
-
-const openSheet = new OpenSheet(textLoader, store, handleExport);
+const openSheet = new OpenSheet(textLoader, store);
 const settingsSheet = new SettingsSheet(store);
 new Navbar(() => openSheet.toggle(), () => settingsSheet.toggle(), store);
 

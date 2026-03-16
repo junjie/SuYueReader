@@ -18,7 +18,7 @@ interface RawEntry {
   t: string;
   p: string;
   d: string[];
-  s?: DictSource; // present in .crdr bundles with source info
+  s?: DictSource; // present in .sy bundles with source info
   b?: string;     // bopomofo (moedict)
   rd?: string;    // rich definition text (moedict)
 }
@@ -304,12 +304,12 @@ export function hasFootnote(word: string): boolean {
   return footnoteMap?.has(word) ?? false;
 }
 
-/** Get the footnote map (for .crdr export, script conversion) */
+/** Get the footnote map (for .sy export, script conversion) */
 export function getFootnoteMap(): Map<string, string> | null {
   return footnoteMap;
 }
 
-/** Load dictionary entries from a .crdr bundle into the text cache for instant display.
+/** Load dictionary entries from a .sy bundle into the text cache for instant display.
  *  Does NOT replace the full dictionaries — they load normally for drill-down and future texts. */
 export function loadFromBundle(entries: Record<string, RawEntry[]>): void {
   textCache = new Map();
@@ -329,7 +329,7 @@ export function loadFromBundle(entries: Record<string, RawEntry[]>): void {
   }
 }
 
-/** Export cached dictionary entries (for .crdr export) */
+/** Export cached dictionary entries (for .sy export) */
 export function exportCache(): Record<string, RawEntry[]> | null {
   if (!textCache) return null;
   const result: Record<string, RawEntry[]> = {};
