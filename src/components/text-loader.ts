@@ -1,4 +1,5 @@
 import type { SYFile } from '../types/index.ts';
+import { extractText } from '../services/file-extract.ts';
 
 type TextLoadCallback = (text: string, title?: string, builtInId?: string) => void;
 type BundleLoadCallback = (bundle: SYFile) => void;
@@ -44,23 +45,40 @@ export class TextLoader {
   }
 
   setupFileInput(input: HTMLInputElement): void {
-    input.addEventListener('change', () => {
+    input.addEventListener('change', async () => {
       const file = input.files?.[0];
       if (!file) return;
+      input.value = '';
+      const name = file.name;
+      const nameLower = name.toLowerCase();
+
+      // Binary formats: .docx, .pdf
+      if (nameLower.endsWith('.docx') || nameLower.endsWith('.pdf')) {
+        try {
+          const text = await extractText(file);
+          if (!text || !text.trim()) {
+            alert('No extractable text found in this file.');
+            return;
+          }
+          const title = name.replace(/\.(docx|pdf)$/i, '');
+          this.onLoad(text, title);
+        } catch (err) {
+          alert(err instanceof Error ? err.message : 'Failed to extract text from file.');
+        }
+        return;
+      }
+
+      // Text formats: .sy and plain text
       const reader = new FileReader();
       reader.onload = () => {
         const content = reader.result as string;
-        const name = file.name;
-
-        // Detect .sy files
-        if (name.endsWith('.sy')) {
+        if (nameLower.endsWith('.sy')) {
           this.handleSY(content, name);
         } else {
           this.onLoad(content, name.replace(/\.txt$/, ''));
         }
       };
       reader.readAsText(file);
-      input.value = '';
     });
   }
 

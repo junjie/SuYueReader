@@ -16,7 +16,9 @@
     "xlsx": "^0.18.5"
   },
   "dependencies": {
+    "mammoth": "^1.12.0",
     "opencc-js": "^1.0.5",
+    "pdfjs-dist": "^4.10.38",
     "pinyin-pro": "^3.26.0"
   }
 }

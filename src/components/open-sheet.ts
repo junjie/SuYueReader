@@ -14,7 +14,7 @@ export class OpenSheet {
 
     this.fileInput = document.createElement('input');
     this.fileInput.type = 'file';
-    this.fileInput.accept = '.txt,.text,.sy';
+    this.fileInput.accept = '.txt,.text,.sy,.docx,.pdf';
     this.fileInput.hidden = true;
     document.body.appendChild(this.fileInput);
     this.textLoader.setupFileInput(this.fileInput);
