@@ -94,7 +94,7 @@ export class OpenSheet {
         </button>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" data-action="file">
-          <span>上傳檔案<span class="row-sub">Upload File</span></span>
+          <span>開啟檔案<span class="row-sub">Open File</span></span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>
@@ -185,7 +185,7 @@ export class OpenSheet {
     overlay.innerHTML = this.t(`
       <div class="modal">
         <h3>貼上文本<span class="row-sub" style="display:inline; margin-left:6px">Paste Text</span></h3>
-        <textarea id="paste-area" rows="12" placeholder="在此貼上文本…"></textarea>
+        <textarea id="paste-area" rows="12" placeholder="在此貼上文本（所有內容僅在裝置上處理，不會傳輸或儲存至任何伺服器）&#10;&#10;Paste text here (everything is processed on your device — nothing is transmitted or stored)"></textarea>
         <div class="modal-actions">
           <button class="sheet-action-btn" id="modal-cancel">取消</button>
           <button class="sheet-action-btn primary" id="modal-load">載入</button>
