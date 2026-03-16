@@ -18,10 +18,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Only intercept dictionary JSON requests (local or CDN)
-  const isDictRequest =
-    url.pathname.match(/\/dict\/.*\.json$/) ||
-    (url.hostname === 'cdn.jsdelivr.net' && url.pathname.includes('/dict/') && url.pathname.endsWith('.json'));
+  // Only intercept dictionary JSON requests
+  const isDictRequest = url.pathname.match(/\/dict\/.*\.json$/);
 
   if (!isDictRequest) return;
 

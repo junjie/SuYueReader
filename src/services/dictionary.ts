@@ -1,8 +1,6 @@
 import type { DictSource } from '../types/index.ts';
 
-const DICT_BASE_URL = import.meta.env.PROD
-  ? 'https://cdn.jsdelivr.net/gh/junjie/SuYueReader@main/public/dict/'
-  : `${import.meta.env.BASE_URL}dict/`;
+const DICT_BASE_URL = `${import.meta.env.BASE_URL}dict/`;
 
 export interface DictEntry {
   traditional: string;
