@@ -551,6 +551,10 @@ export class DefinitionPopup {
     return this.pinned;
   }
 
+  get anchor(): HTMLElement | null {
+    return this.activeAnchor;
+  }
+
   /** Render footnote text: \n\n → paragraph break, \n → line break */
   private renderFootnote(text: string): string {
     return text

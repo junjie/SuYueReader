@@ -8,6 +8,29 @@ import { preloadWords, clearCache, hasFootnote, exportCache, loadFromBundle, ens
 
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
 
+/** Check if two word elements are on the same visual line */
+function isSameLine(a: HTMLElement, b: HTMLElement, isVertical: boolean): boolean {
+  const ra = a.getBoundingClientRect();
+  const rb = b.getBoundingClientRect();
+  const tolerance = Math.min(ra.height, rb.height, ra.width, rb.width) / 2;
+  if (isVertical) {
+    return Math.abs(ra.left - rb.left) < tolerance;
+  }
+  return Math.abs(ra.top - rb.top) < tolerance;
+}
+
+/** Check if two word elements are DOM-adjacent within the same paragraph */
+function isDomAdjacent(a: HTMLElement, b: HTMLElement): boolean {
+  const paraA = a.closest('[data-index]');
+  const paraB = b.closest('[data-index]');
+  if (!paraA || !paraB || paraA !== paraB) return false;
+  const words = Array.from(paraA.querySelectorAll('.word'));
+  const idxA = words.indexOf(a);
+  const idxB = words.indexOf(b);
+  if (idxA === -1 || idxB === -1) return false;
+  return Math.abs(idxA - idxB) === 1;
+}
+
 /**
  * Segment text with footnote ranges taking priority.
  * Footnote ranges become single forced word segments;
@@ -92,6 +115,12 @@ export class Reader {
       this.popup.scheduleHide();
     });
 
+    // Track pointer type so click handler knows touch vs mouse
+    let lastPointerType = '';
+    this.container.addEventListener('pointerdown', (e) => {
+      lastPointerType = e.pointerType;
+    });
+
     // Click: pin popup (desktop) or toggle (touch)
     this.container.addEventListener('click', (e) => {
       const target = (e.target as HTMLElement).closest('.word') as HTMLElement | null;
@@ -101,6 +130,20 @@ export class Reader {
       if (!word) return;
 
       const isVertical = this.store.get().writingMode === 'vertical';
+
+      // On touch devices, if a popup is pinned and the tap is on a different
+      // word that isn't nearby, just dismiss the popup instead of showing
+      // the new word's definition.
+      if (lastPointerType !== 'mouse' && this.popup.isPinned) {
+        const currentAnchor = this.popup.anchor;
+        if (currentAnchor && currentAnchor !== target) {
+          if (!isSameLine(currentAnchor, target, isVertical) && !isDomAdjacent(currentAnchor, target)) {
+            this.popup.hide();
+            return;
+          }
+        }
+      }
+
       this.popup.show(word, target, isVertical, true);
     });
   }
