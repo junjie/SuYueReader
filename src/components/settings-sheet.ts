@@ -110,9 +110,9 @@ export class SettingsSheet {
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
       <div class="settings-tabs" id="s-tabs">
-        <button class="settings-tab" data-tab="appearance">外觀</button>
-        <button class="settings-tab" data-tab="typography">排版</button>
-        <button class="settings-tab" data-tab="dictionaries">詞典</button>
+        <button class="settings-tab" data-tab="appearance">外觀<span class="settings-tab-sub">Appearance</span></button>
+        <button class="settings-tab" data-tab="typography">排版<span class="settings-tab-sub">Typography</span></button>
+        <button class="settings-tab" data-tab="dictionaries">詞典<span class="settings-tab-sub">Dictionaries</span></button>
       </div>
       <div class="settings-tab-content" id="tab-appearance"></div>
       <div class="settings-tab-content hidden" id="tab-typography"></div>
@@ -165,15 +165,7 @@ export class SettingsSheet {
             </button>
           </div>
         </div>
-      </div>
-
-      <div class="font-scroll-row" id="s-font-list">
-        ${displayFonts.map((f) => `<button class="font-card" data-font="${f}"><span class="font-card-preview" style="font-family:'${previewFontName(f)}',serif">文字</span><span class="font-card-name">${f}</span></button>`).join('')}
-      </div>
-
-      <div id="s-sysfont-section"></div>
-
-      <div class="sheet-group">
+        <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
           <label>字號<span class="sub">Font Size</span></label>
           <div class="font-size-controls">
@@ -218,6 +210,14 @@ export class SettingsSheet {
           </div>
         </div>
       </div>
+
+      <div class="font-scroll-wrapper">
+        <button class="font-scroll-arrow font-scroll-left" aria-label="Scroll left">‹</button>
+        <div class="font-scroll-row" id="s-font-list">
+          ${displayFonts.map((f) => `<button class="font-card" data-font="${f}"><span class="font-card-preview" style="font-family:'${previewFontName(f)}',serif">文字</span><span class="font-card-name">${f}</span></button>`).join('')}
+        </div>
+        <button class="font-scroll-arrow font-scroll-right" aria-label="Scroll right">›</button>
+      </div>
     `);
 
     // Force reflow for font row layout
@@ -229,24 +229,20 @@ export class SettingsSheet {
       if (btn) this.store.update({ theme: btn.dataset.theme as ThemeMode });
     });
 
-    // Font selection
-    const fontClickHandler = (e: Event) => {
+    // Font selection (web + system fonts on same row)
+    const fontList = container.querySelector('#s-font-list')!;
+    const available = getAvailableSystemFonts();
+    if (available.length > 0) {
+      fontList.insertAdjacentHTML('beforeend',
+        available.map((sf) => `<button class="font-card" data-font="${sf.display}"><span class="font-card-preview" style="font-family:'${sf.sc}','${sf.tc}',${sf.family}">文字</span><span class="font-card-name">${sf.display}</span></button>`).join(''));
+    }
+    fontList.addEventListener('click', (e: Event) => {
       const btn = (e.target as HTMLElement).closest<HTMLElement>('[data-font]');
       if (btn) this.store.update({ fontFamily: btn.dataset.font! });
-    };
-    container.querySelector('#s-font-list')!.addEventListener('click', fontClickHandler);
+    });
 
-    // System fonts
-    const available = getAvailableSystemFonts();
-    const sysSection = container.querySelector('#s-sysfont-section')!;
-    if (available.length > 0) {
-      sysSection.innerHTML = `
-        <div class="font-section-label">${this.t('系統字體')} System</div>
-        <div class="font-scroll-row" id="s-sysfont-list">
-          ${available.map((sf) => `<button class="font-card" data-font="${sf.display}"><span class="font-card-preview" style="font-family:'${sf.sc}','${sf.tc}',${sf.family}">文字</span><span class="font-card-name">${sf.display}</span></button>`).join('')}
-        </div>`;
-      container.querySelector('#s-sysfont-list')!.addEventListener('click', fontClickHandler);
-    }
+    // Scroll arrows (desktop only)
+    this.setupFontScrollArrows(container, fontList as HTMLElement);
 
     // Load font previews
     displayFonts.forEach((f) => loadFontPreview(f));
@@ -280,6 +276,31 @@ export class SettingsSheet {
 
     // Pinyin size
     this.bindStepper(container, 's-pysize', 8, 20, 1, 'pinyinSize');
+  }
+
+  private setupFontScrollArrows(container: HTMLElement, row: HTMLElement): void {
+    const leftBtn = container.querySelector<HTMLElement>('.font-scroll-left')!;
+    const rightBtn = container.querySelector<HTMLElement>('.font-scroll-right')!;
+
+    const updateArrows = () => {
+      const atStart = row.scrollLeft <= 0;
+      const atEnd = row.scrollLeft + row.clientWidth >= row.scrollWidth - 1;
+      leftBtn.classList.toggle('hidden', atStart);
+      rightBtn.classList.toggle('hidden', atEnd);
+    };
+
+    row.addEventListener('scroll', updateArrows, { passive: true });
+    // Initial state after layout
+    requestAnimationFrame(updateArrows);
+
+    const scrollBy = (dir: number) => {
+      // Scroll by roughly the visible width minus one card for context
+      const amount = row.clientWidth - 40;
+      row.scrollBy({ left: dir * amount, behavior: 'smooth' });
+    };
+
+    leftBtn.addEventListener('click', () => scrollBy(-1));
+    rightBtn.addEventListener('click', () => scrollBy(1));
   }
 
   private buildTypographyTab(container: HTMLElement): void {

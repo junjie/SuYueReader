@@ -363,7 +363,7 @@
   padding: 6px 0;
   border: none;
   background: transparent;
-  color: var(--fg-muted);
+  color: var(--fg);
   font-size: 13px;
   cursor: pointer;
   border-radius: 6px;
@@ -374,6 +374,13 @@
 .settings-tab.active {
   background: var(--btn-active-bg);
   color: var(--btn-active-fg);
+}
+
+.settings-tab-sub {
+  display: block;
+  font-size: 9px;
+  opacity: 0.55;
+  line-height: 1.2;
 }
 
 /* Tab content — per-tab scrolling */
@@ -421,37 +428,67 @@
   margin-top: 4px;
 }
 
+/* Font scroll wrapper with arrow buttons */
+.font-scroll-wrapper {
+  position: relative;
+}
+
 /* Font card horizontal scroll */
 .font-scroll-row {
   display: flex;
   gap: 8px;
   overflow-x: auto;
   padding: 12px 0;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border) transparent;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
 }
 
 .font-scroll-row::-webkit-scrollbar {
-  height: 4px;
+  display: none;
 }
 
-.font-scroll-row::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 4px;
+/* Scroll arrow buttons — desktop only */
+.font-scroll-arrow {
+  display: none;
 }
 
-.font-scroll-row::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-/* Hide scrollbar on touch devices */
-@media (pointer: coarse) {
-  .font-scroll-row {
-    scrollbar-width: none;
+@media (pointer: fine) {
+  .font-scroll-arrow {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: var(--settings-bg);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    color: var(--fg);
+    font-size: 18px;
+    font-weight: 300;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: opacity 0.15s;
   }
-  .font-scroll-row::-webkit-scrollbar {
+
+  .font-scroll-arrow:active {
+    opacity: 0.6;
+  }
+
+  .font-scroll-arrow.hidden {
     display: none;
+  }
+
+  .font-scroll-left {
+    left: 2px;
+  }
+
+  .font-scroll-right {
+    right: 2px;
   }
 }
 
