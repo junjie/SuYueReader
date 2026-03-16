@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 
 export default defineConfig({
-  base: '/suyue/',
+  base: '/SuYueReader/',
   server: {
     allowedHosts: ['lins-mbp-14.local'],
   },
