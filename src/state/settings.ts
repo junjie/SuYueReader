@@ -82,6 +82,10 @@ export class SettingsStore {
     this.update({ ...defaultSettings });
   }
 
+  isDefault(): boolean {
+    return JSON.stringify(this.settings) === JSON.stringify(defaultSettings);
+  }
+
   private syncCSS(): void {
     const s = this.settings;
     const root = document.documentElement.style;

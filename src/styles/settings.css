@@ -128,15 +128,24 @@
   font-weight: 300;
 }
 
-.reset-row > span {
-  color: #e53e3e;
-  width: 100%;
-  text-align: center;
+.reset-link-row {
+  text-align: right;
+  padding: 4px 4px 0;
 }
 
-.reset-row .row-sub {
-  color: #e53e3e;
-  opacity: 0.6;
+.reset-link-row.hidden {
+  display: none;
+}
+
+.reset-link {
+  font-size: 12px;
+  color: var(--fg-muted);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.reset-link:hover {
+  text-decoration: underline;
 }
 
 /* Load buttons row */

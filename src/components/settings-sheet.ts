@@ -218,6 +218,7 @@ export class SettingsSheet {
         </div>
         <button class="font-scroll-arrow font-scroll-right" aria-label="Scroll right">›</button>
       </div>
+      ${this.resetLinkHTML()}
     `);
 
     // Force reflow for font row layout
@@ -276,6 +277,8 @@ export class SettingsSheet {
 
     // Pinyin size
     this.bindStepper(container, 's-pysize', 8, 20, 1, 'pinyinSize');
+
+    this.bindResetLink(container);
   }
 
   private setupFontScrollArrows(container: HTMLElement, row: HTMLElement): void {
@@ -361,6 +364,7 @@ export class SettingsSheet {
           </label>
         </div>
       </div>
+      ${this.resetLinkHTML()}
     `);
 
     const isVertical = this.store.get().writingMode === 'vertical';
@@ -373,6 +377,8 @@ export class SettingsSheet {
     container.querySelector<HTMLInputElement>('#s-numbering')!.addEventListener('change', (e) => {
       this.store.update({ showNumbering: (e.target as HTMLInputElement).checked });
     });
+
+    this.bindResetLink(container);
   }
 
   private static DICT_LABELS: Record<string, { name: string; desc: string; license: string; licenseUrl: string; attribution: string; url: string }> = {
@@ -422,24 +428,13 @@ export class SettingsSheet {
         </div>
       </div>
 
-      <div class="sheet-group">
-        <button class="sheet-group-row reset-row" id="s-reset">
-          <span>恢復預設<span class="row-sub">Reset to Defaults</span></span>
-        </button>
-      </div>
+      ${this.resetLinkHTML()}
     `);
 
     this.bindStepper(container, 's-popupsize', 10, 24, 1, 'popupFontSize');
     this.bindDictListEvents(container);
 
-    container.querySelector('#s-reset')!.addEventListener('click', () => {
-      this.store.reset();
-      const panel = this.overlay?.querySelector<HTMLElement>('.sheet-panel');
-      if (panel) {
-        this.buildTabs(panel);
-        this.syncUI(panel);
-      }
-    });
+    this.bindResetLink(container);
   }
 
   private buildDictRow(id: string, index: number, total: number): string {
@@ -553,6 +548,57 @@ export class SettingsSheet {
     }
   }
 
+  private resetLinkHTML(): string {
+    return '<div class="reset-link-row hidden"><a href="#" class="reset-link">↺ 恢復預設 Reset to Defaults</a></div>';
+  }
+
+  private bindResetLink(container: HTMLElement): void {
+    const link = container.querySelector('.reset-link');
+    if (!link) return;
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.showResetConfirmModal();
+    });
+  }
+
+  private showResetConfirmModal(): void {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = this.t(`
+      <div class="modal" style="width: min(90vw, 400px);">
+        <h3>確定恢復預設？</h3>
+        <p style="font-size:14px;color:var(--fg-muted);margin:0">Reset all settings to defaults?</p>
+        <div class="modal-actions">
+          <button class="sheet-action-btn" id="reset-modal-cancel">Cancel</button>
+          <button class="sheet-action-btn primary" id="reset-modal-confirm">Confirm</button>
+        </div>
+      </div>
+    `);
+    document.body.appendChild(overlay);
+
+    const close = () => overlay.remove();
+
+    overlay.querySelector('#reset-modal-cancel')!.addEventListener('click', close);
+    overlay.querySelector('#reset-modal-confirm')!.addEventListener('click', () => {
+      close();
+      this.store.reset();
+      const panel = this.overlay?.querySelector<HTMLElement>('.sheet-panel');
+      if (panel) {
+        this.buildTabs(panel);
+        this.syncUI(panel);
+      }
+    });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+    overlay.addEventListener('touchstart', (e) => {
+      if (e.target === overlay) {
+        e.preventDefault();
+        close();
+      }
+    }, { passive: false });
+  }
+
   private bindStepper(container: HTMLElement, id: string, min: number, max: number, step: number, key: keyof Settings): void {
     container.querySelector(`#${id}-down`)!.addEventListener('click', () => {
       const cur = this.store.get()[key] as number;
@@ -613,6 +659,12 @@ export class SettingsSheet {
       if (toggle) toggle.checked = s[key] as boolean;
     }
     this.setStepperVal(panel, 's-popupsize', `${s.popupFontSize}px`);
+
+    // Show/hide reset link
+    const isDefault = this.store.isDefault();
+    panel.querySelectorAll('.reset-link-row').forEach((el) => {
+      el.classList.toggle('hidden', isDefault);
+    });
   }
 
   private setStepperVal(panel: HTMLElement, id: string, display: string): void {
