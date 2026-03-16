@@ -89,21 +89,21 @@ export class OpenSheet {
       </div>
       <div class="sheet-group">
         <button class="sheet-group-row" data-action="builtin">
-          <span>從文庫選擇<span class="row-sub">Choose from Library</span></span>
+          <span>从文库选择<span class="row-sub">Choose from Library</span></span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" data-action="file">
-          <span>開啟檔案<span class="row-sub">Open File</span></span>
+          <span>开启档案<span class="row-sub">Open File</span></span>
           <span class="row-chevron">›</span>
         </button>
         <div class="sheet-group-divider"></div>
         <button class="sheet-group-row" data-action="paste">
-          <span>貼上文本<span class="row-sub">Paste Text</span></span>
+          <span>贴上文本<span class="row-sub">Paste Text</span></span>
           <span class="row-chevron">›</span>
         </button>
       </div>
-      <div class="open-sheet-footer">素閱 ${__BUILD_DATE__}<br><a href="https://mastodon.social/@junjielin" target="_blank" rel="noopener noreferrer">林雋傑</a></div>
+      <div class="open-sheet-footer"><a href="https://github.com/junjie/SuYueReader" target="_blank" rel="noopener noreferrer">素阅</a> ${__BUILD_DATE__}<br><a href="https://mastodon.social/@junjielin" target="_blank" rel="noopener noreferrer">林隽杰</a></div>
     `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
@@ -111,8 +111,13 @@ export class OpenSheet {
       this.buildLibraryView(panel);
     });
     panel.querySelector('[data-action="file"]')!.addEventListener('click', () => {
-      this.close();
-      this.fileInput.click();
+      if (!this.store.get().fileInfoShown) {
+        this.close();
+        this.showFileInfoModal();
+      } else {
+        this.close();
+        this.fileInput.click();
+      }
     });
     panel.querySelector('[data-action="paste"]')!.addEventListener('click', () => {
       this.close();
@@ -127,7 +132,7 @@ export class OpenSheet {
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
       <div class="sheet-group" id="lib-list">
-        <div class="sheet-group-row static" style="justify-content:center;color:var(--fg-muted)">載入中…</div>
+        <div class="sheet-group-row static" style="justify-content:center;color:var(--fg-muted)">载入中…</div>
       </div>
     `);
 
@@ -179,16 +184,58 @@ export class OpenSheet {
     }
   }
 
+  private showFileInfoModal(): void {
+    const overlay = document.createElement('div');
+    overlay.className = 'modal-overlay';
+    overlay.innerHTML = this.t(`
+      <div class="modal">
+        <h3>开启档案<span class="row-sub" style="display:inline; margin-left:6px">Open File</span></h3>
+        <div class="modal-info-body">
+          <p class="modal-info-heading">支持格式 <span class="modal-info-heading-sub">Supported formats</span></p>
+          <p class="modal-info-text">纯文本（.txt）与 Word 文档（.docx）效果最佳。PDF 因文字重排问题，可能无法呈现理想的阅读体验。</p>
+          <p class="modal-info-text sub">Plain text (.txt) and Word (.docx) documents work best. PDFs may not display ideally due to text reflow limitations.</p>
+          <p class="modal-info-heading" style="margin-top:12px">隐私 <span class="modal-info-heading-sub">Privacy</span></p>
+          <p class="modal-info-text">所有文件全程在你的设备上处理，不会上传至任何服务器。</p>
+          <p class="modal-info-text sub">All files are processed entirely on your device and are never uploaded to any server.</p>
+        </div>
+        <div class="modal-actions">
+          <button class="sheet-action-btn primary modal-btn-bilingual" id="modal-file-ok">开启档案<span class="modal-btn-sub">Open File</span></button>
+        </div>
+      </div>
+    `);
+    document.body.appendChild(overlay);
+
+    const close = () => {
+      overlay.remove();
+      document.dispatchEvent(new CustomEvent('sheet-closed'));
+    };
+
+    overlay.querySelector('#modal-file-ok')!.addEventListener('click', () => {
+      this.store.update({ fileInfoShown: true });
+      close();
+      this.fileInput.click();
+    });
+    overlay.addEventListener('touchstart', (e) => {
+      if (e.target === overlay) {
+        e.preventDefault();
+        close();
+      }
+    }, { passive: false });
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+  }
+
   private showPasteModal(): void {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = this.t(`
       <div class="modal">
-        <h3>貼上文本<span class="row-sub" style="display:inline; margin-left:6px">Paste Text</span></h3>
-        <textarea id="paste-area" rows="12" placeholder="在此貼上文本（所有內容僅在裝置上處理，不會傳輸或儲存至任何伺服器）&#10;&#10;Paste text here (everything is processed on your device — nothing is transmitted or stored)"></textarea>
+        <h3>贴上文本<span class="row-sub" style="display:inline; margin-left:6px">Paste Text</span></h3>
+        <textarea id="paste-area" rows="12" placeholder="在此贴上文本&#10;Paste text here&#10;&#10;所有内容全程在你的设备上处理，不会传输至任何服务器。&#10;Everything is processed entirely on your device — nothing is ever sent to a server."></textarea>
         <div class="modal-actions">
-          <button class="sheet-action-btn" id="modal-cancel">取消</button>
-          <button class="sheet-action-btn primary" id="modal-load">載入</button>
+          <button class="sheet-action-btn modal-btn-bilingual" id="modal-cancel">取消<span class="modal-btn-sub">Cancel</span></button>
+          <button class="sheet-action-btn primary modal-btn-bilingual" id="modal-load">载入<span class="modal-btn-sub">Load</span></button>
         </div>
       </div>
     `);

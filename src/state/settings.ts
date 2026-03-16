@@ -86,6 +86,18 @@ export class SettingsStore {
     return JSON.stringify(this.settings) === JSON.stringify(defaultSettings);
   }
 
+  isDefaultKeys(keys: (keyof Settings)[]): boolean {
+    return keys.every((k) => JSON.stringify(this.settings[k]) === JSON.stringify(defaultSettings[k]));
+  }
+
+  resetKeys(keys: (keyof Settings)[]): void {
+    const partial: Partial<Settings> = {};
+    for (const k of keys) {
+      (partial as any)[k] = (defaultSettings as any)[k];
+    }
+    this.update(partial);
+  }
+
   private syncCSS(): void {
     const s = this.settings;
     const root = document.documentElement.style;

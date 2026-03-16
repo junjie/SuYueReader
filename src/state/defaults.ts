@@ -24,4 +24,5 @@ export const defaultSettings: Settings = {
   popupFontSize: 14,
   hangingIndent: 0,
   boldText: false,
+  fileInfoShown: false,
 };

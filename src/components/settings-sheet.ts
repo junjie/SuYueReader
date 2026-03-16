@@ -3,10 +3,18 @@ import type { Settings, WritingMode, PinyinPosition, ThemeMode } from '../types/
 import { displayFonts, getAvailableSystemFonts, previewFontName, loadFontPreview } from '../services/fonts.ts';
 import { convertScriptSync, uiVariant } from '../services/script-convert.ts';
 
+type TabName = 'appearance' | 'typography' | 'dictionaries';
+
+const TAB_KEYS: Record<TabName, (keyof Settings)[]> = {
+  appearance: ['theme', 'fontSize', 'writingMode', 'showPinyin', 'pinyinPosition', 'pinyinSize', 'fontFamily', 'fileInfoShown'],
+  typography: ['boldText', 'lineHeight', 'lineLength', 'paragraphSpacing', 'verticalParagraphSpacing', 'hangingIndent', 'marginV', 'verticalMarginV', 'showNumbering'],
+  dictionaries: ['showCedict', 'showCvdict', 'showMoedict', 'dictOrder', 'popupFontSize'],
+};
+
 export class SettingsSheet {
   private overlay: HTMLElement | null = null;
   private store: SettingsStore;
-  private activeTab: 'appearance' | 'typography' | 'dictionaries' = 'appearance';
+  private activeTab: TabName = 'appearance';
 
   constructor(store: SettingsStore) {
     this.store = store;
@@ -105,9 +113,9 @@ export class SettingsSheet {
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
       <div class="settings-tabs" id="s-tabs">
-        <button class="settings-tab" data-tab="appearance">外觀<span class="settings-tab-sub">Appearance</span></button>
+        <button class="settings-tab" data-tab="appearance">外观<span class="settings-tab-sub">Appearance</span></button>
         <button class="settings-tab" data-tab="typography">排版<span class="settings-tab-sub">Typography</span></button>
-        <button class="settings-tab" data-tab="dictionaries">詞典<span class="settings-tab-sub">Dictionaries</span></button>
+        <button class="settings-tab" data-tab="dictionaries">词典<span class="settings-tab-sub">Dictionaries</span></button>
       </div>
       <div class="settings-tab-content" id="tab-appearance"></div>
       <div class="settings-tab-content hidden" id="tab-typography"></div>
@@ -147,7 +155,7 @@ export class SettingsSheet {
     container.innerHTML = this.t(`
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>主題<span class="sub">Theme</span></label>
+          <label>主题<span class="sub">Theme</span></label>
           <div class="theme-swatches" id="s-theme-group">
             <button data-theme="light" class="theme-swatch" style="background:#faf8f5;border-color:#ccc" aria-label="Light">
               <span class="swatch-char" style="color:#1a1a1a">文</span>
@@ -162,7 +170,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>字號<span class="sub">Font Size</span></label>
+          <label>字号<span class="sub">Font Size</span></label>
           <div class="font-size-controls">
             <button class="size-btn" id="s-fontsize-down">小</button>
             <span id="s-fontsize-val" class="size-value"></span>
@@ -173,8 +181,8 @@ export class SettingsSheet {
         <div class="sheet-group-row static">
           <label>方向<span class="sub">Direction</span></label>
           <div class="segmented-control" id="s-mode-group">
-            <button data-mode="horizontal" class="seg-btn">橫排<span class="seg-sub">Horizontal</span></button>
-            <button data-mode="vertical" class="seg-btn">豎排<span class="seg-sub">Vertical</span></button>
+            <button data-mode="horizontal" class="seg-btn">横排<span class="seg-sub">Horizontal</span></button>
+            <button data-mode="vertical" class="seg-btn">竖排<span class="seg-sub">Vertical</span></button>
           </div>
         </div>
         <div class="sheet-group-divider"></div>
@@ -273,7 +281,7 @@ export class SettingsSheet {
     // Pinyin size
     this.bindStepper(container, 's-pysize', 8, 20, 1, 'pinyinSize');
 
-    this.bindResetLink(container);
+    this.bindResetLink(container, 'appearance');
   }
 
   private setupFontScrollArrows(container: HTMLElement, row: HTMLElement): void {
@@ -305,7 +313,7 @@ export class SettingsSheet {
     container.innerHTML = this.t(`
       <div class="sheet-group">
         <div class="sheet-group-row static toggle-row">
-          <label>粗體<span class="sub">Bold Text</span></label>
+          <label>粗体<span class="sub">Bold Text</span></label>
           <label class="ios-switch">
             <input type="checkbox" id="s-boldtext" />
             <span class="ios-switch-track"></span>
@@ -322,7 +330,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>行寬<span class="sub">Line Length</span></label>
+          <label>行宽<span class="sub">Line Length</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-linelen-down">−</button>
             <span id="s-linelen-val" class="size-value"></span>
@@ -331,7 +339,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>段間距<span class="sub">Paragraph Spacing</span></label>
+          <label>段间距<span class="sub">Paragraph Spacing</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-paraspacing-down">−</button>
             <span id="s-paraspacing-val" class="size-value"></span>
@@ -340,7 +348,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>懸掛縮排<span class="sub">Hanging Indent</span></label>
+          <label>悬挂缩排<span class="sub">Hanging Indent</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-hanging-down">−</button>
             <span id="s-hanging-val" class="size-value"></span>
@@ -349,7 +357,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static">
-          <label>垂直邊距<span class="sub">Vertical Margin</span></label>
+          <label>垂直边距<span class="sub">Vertical Margin</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-marginv-down">−</button>
             <span id="s-marginv-val" class="size-value"></span>
@@ -358,7 +366,7 @@ export class SettingsSheet {
         </div>
         <div class="sheet-group-divider"></div>
         <div class="sheet-group-row static toggle-row">
-          <label>段落編號<span class="sub">Paragraph Numbers</span></label>
+          <label>段落编号<span class="sub">Paragraph Numbers</span></label>
           <label class="ios-switch">
             <input type="checkbox" id="s-numbering" />
             <span class="ios-switch-track"></span>
@@ -383,7 +391,7 @@ export class SettingsSheet {
       this.store.update({ boldText: (e.target as HTMLInputElement).checked });
     });
 
-    this.bindResetLink(container);
+    this.bindResetLink(container, 'typography');
   }
 
   private static DICT_LABELS: Record<string, { name: string; desc: string; license: string; licenseUrl: string; attribution: string; url: string }> = {
@@ -404,11 +412,11 @@ export class SettingsSheet {
       url: 'https://github.com/ph0ngp/CVDICT',
     },
     moedict: {
-      name: '國語辭典',
+      name: '国语辞典',
       desc: 'Chinese (Traditional)',
       license: 'CC BY-ND 3.0 TW',
       licenseUrl: 'https://creativecommons.org/licenses/by-nd/3.0/tw/',
-      attribution: '教育部《重編國語辭典修訂本》',
+      attribution: '教育部《重编国语辞典修订本》',
       url: 'https://dict.revised.moe.edu.tw/',
     },
   };
@@ -424,7 +432,7 @@ export class SettingsSheet {
 
       <div class="sheet-group">
         <div class="sheet-group-row static">
-          <label>字號<span class="sub">Text Size</span></label>
+          <label>字号<span class="sub">Text Size</span></label>
           <div class="stepper-controls">
             <button class="size-btn" id="s-popupsize-down">−</button>
             <span id="s-popupsize-val" class="size-value"></span>
@@ -439,7 +447,7 @@ export class SettingsSheet {
     this.bindStepper(container, 's-popupsize', 10, 24, 1, 'popupFontSize');
     this.bindDictListEvents(container);
 
-    this.bindResetLink(container);
+    this.bindResetLink(container, 'dictionaries');
   }
 
   private buildDictRow(id: string, index: number, total: number): string {
@@ -554,25 +562,31 @@ export class SettingsSheet {
   }
 
   private resetLinkHTML(): string {
-    return '<div class="reset-link-row hidden"><a href="#" class="reset-link">↺ 恢復預設 Reset to Defaults</a></div>';
+    return '<div class="reset-link-row hidden"><a href="#" class="reset-link">↺ 恢复预设 Reset to Defaults</a></div>';
   }
 
-  private bindResetLink(container: HTMLElement): void {
+  private isTabDefault(tab: TabName): boolean {
+    return this.store.isDefaultKeys(TAB_KEYS[tab]);
+  }
+
+  private bindResetLink(container: HTMLElement, tab: TabName): void {
+    const row = container.querySelector('.reset-link-row');
+    if (row) row.classList.toggle('hidden', this.isTabDefault(tab));
     const link = container.querySelector('.reset-link');
     if (!link) return;
     link.addEventListener('click', (e) => {
       e.preventDefault();
-      this.showResetConfirmModal();
+      this.showResetConfirmModal(tab);
     });
   }
 
-  private showResetConfirmModal(): void {
+  private showResetConfirmModal(tab: TabName): void {
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = this.t(`
       <div class="modal" style="width: min(90vw, 400px);">
-        <h3>確定恢復預設？</h3>
-        <p style="font-size:14px;color:var(--fg-muted);margin:0">Reset all settings to defaults?</p>
+        <h3>确定恢复预设？</h3>
+        <p style="font-size:14px;color:var(--fg-muted);margin:0">Reset this page to defaults?</p>
         <div class="modal-actions">
           <button class="sheet-action-btn" id="reset-modal-cancel">Cancel</button>
           <button class="sheet-action-btn primary" id="reset-modal-confirm">Confirm</button>
@@ -586,7 +600,7 @@ export class SettingsSheet {
     overlay.querySelector('#reset-modal-cancel')!.addEventListener('click', close);
     overlay.querySelector('#reset-modal-confirm')!.addEventListener('click', () => {
       close();
-      this.store.reset();
+      this.store.resetKeys(TAB_KEYS[tab]);
       const panel = this.overlay?.querySelector<HTMLElement>('.sheet-panel');
       if (panel) {
         this.buildTabs(panel);
@@ -668,11 +682,13 @@ export class SettingsSheet {
     }
     this.setStepperVal(panel, 's-popupsize', `${s.popupFontSize}px`);
 
-    // Show/hide reset link
-    const isDefault = this.store.isDefault();
-    panel.querySelectorAll('.reset-link-row').forEach((el) => {
-      el.classList.toggle('hidden', isDefault);
-    });
+    // Show/hide reset links per tab
+    const tabs: TabName[] = ['appearance', 'typography', 'dictionaries'];
+    for (const tab of tabs) {
+      const tabEl = panel.querySelector(`#tab-${tab}`);
+      const row = tabEl?.querySelector('.reset-link-row');
+      if (row) row.classList.toggle('hidden', this.isTabDefault(tab));
+    }
   }
 
   private setStepperVal(panel: HTMLElement, id: string, display: string): void {

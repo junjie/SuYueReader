@@ -33,9 +33,9 @@ function convertPunctuation(text: string, mappings: [string, string][]): string 
   return text;
 }
 
-/** Map script variant for UI: "original" defaults to simplified. */
+/** Map script variant for UI: "original" needs no conversion (UI is authored in simplified). */
 export function uiVariant(variant: ScriptVariant): ScriptVariant {
-  return variant === 'original' ? 'simplified' : variant;
+  return variant === 'original' ? 'original' : variant;
 }
 
 /** Sync conversion — returns text unchanged if converters haven't loaded yet. */

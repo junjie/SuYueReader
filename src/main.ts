@@ -33,7 +33,7 @@ let currentTextTitle = '';
 function setPageTitle(title?: string): void {
   if (title !== undefined) currentTextTitle = title;
   const variant = uiVariant(store.get().scriptVariant);
-  const appName = convertScriptSync('素閱', variant);
+  const appName = convertScriptSync('素阅', variant);
   document.title = currentTextTitle
     ? `${appName}：${convertScriptSync(currentTextTitle, variant)}`
     : appName;

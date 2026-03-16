@@ -265,7 +265,7 @@ export class Reader {
 
     if (this.paragraphs.length === 0) {
       this.container.innerHTML =
-        '<p class="reader-placeholder">載入文本開始閱讀<br><span style="font-size:0.6em;opacity:0.6">Load a text to begin reading.</span></p>';
+        '<p class="reader-placeholder">载入文本开始阅读<br><span style="font-size:0.6em;opacity:0.6">Load a text to begin reading.</span></p>';
       return;
     }
 

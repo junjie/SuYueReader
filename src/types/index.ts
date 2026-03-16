@@ -65,4 +65,5 @@ export interface Settings {
   popupFontSize: number;
   hangingIndent: number;
   boldText: boolean;
+  fileInfoShown: boolean;
 }

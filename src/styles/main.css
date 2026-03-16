@@ -50,8 +50,52 @@ html, body {
   font-family: var(--reader-font-family);
 }
 
+.modal-info-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.modal-info-heading {
+  font-weight: 600;
+  font-size: 15px;
+  margin: 0;
+}
+
+.modal-info-heading-sub {
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+
+.modal-info-text {
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.modal-info-text.sub {
+  font-size: 12px;
+  color: var(--fg-muted);
+}
+
 .modal-actions {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+}
+
+.modal-info-body + .modal-actions {
+  justify-content: center;
+}
+
+.modal-btn-bilingual {
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.modal-btn-sub {
+  display: block;
+  font-size: 10px;
+  opacity: 0.7;
 }
