@@ -5,6 +5,7 @@ import { convertScript } from '../services/script-convert.ts';
 import { segmentText, refineSegments, type Segment } from '../services/segmenter.ts';
 import { DefinitionPopup } from './definition-popup.ts';
 import { preloadWords, clearCache, hasFootnote, exportCache, loadFromBundle, ensureReady, hasEntry } from '../services/dictionary.ts';
+import { ttsGetState, ttsJumpTo } from '../services/tts.ts';
 
 const CJK_RE = /[\u4e00-\u9fff\u3400-\u4dbf]/;
 
@@ -130,6 +131,18 @@ export class Reader {
       if (!word) return;
 
       const isVertical = this.store.get().writingMode === 'vertical';
+
+      // During TTS (playing or paused): tap jumps reading to that word.
+      // Exception: tapping the currently-highlighted word shows the popup.
+      const ttsState = ttsGetState();
+      if (ttsState !== 'stopped') {
+        if (target.classList.contains('tts-active')) {
+          // Already the active TTS word — show definition popup
+        } else {
+          ttsJumpTo(target);
+          return;
+        }
+      }
 
       // On touch devices, if a popup is pinned and the tap is on a different
       // word that isn't nearby, just dismiss the popup instead of showing

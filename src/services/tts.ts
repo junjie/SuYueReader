@@ -240,6 +240,38 @@ export function ttsPreview(name: string): void {
   speechSynthesis.speak(utterance);
 }
 
+export function ttsJumpTo(wordSpan: HTMLElement): void {
+  if (state === 'stopped') return;
+  // Find which paragraph contains this span
+  const parent = wordSpan.closest('[data-index]') as HTMLElement | null;
+  if (!parent) return;
+  const paraIdx = paragraphs.indexOf(parent);
+  if (paraIdx === -1) return;
+
+  // Calculate char offset of this span within the paragraph
+  const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
+  let offset = 0;
+  let node: Text | null;
+  let found = false;
+  while ((node = walker.nextNode() as Text | null)) {
+    if (wordSpan.contains(node)) {
+      found = true;
+      break;
+    }
+    offset += node.length;
+  }
+  if (!found) return;
+
+  generation++;
+  speechSynthesis.cancel();
+  clearHighlight();
+  restartOnResume = false;
+  currentIndex = paraIdx;
+  lastCharIndex = offset;
+  setState('playing');
+  speakParagraph(paraIdx, generation, offset);
+}
+
 export function ttsGetState(): TTSState {
   return state;
 }
