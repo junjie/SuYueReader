@@ -5,7 +5,7 @@ function buildVersion(): string {
   const date = new Date().toISOString().slice(0, 10).replace(/-/g, '.');
   try {
     const sha = execSync('git rev-parse --short=5 HEAD', { encoding: 'utf-8' }).trim();
-    return `${date}.${sha}`;
+    return `${date} (${sha})`;
   } catch {
     return date;
   }
