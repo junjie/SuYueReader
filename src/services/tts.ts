@@ -307,7 +307,7 @@ export function ttsJumpTo(wordSpan: HTMLElement): void {
 
   if (wasPaused) {
     // Speak only the tapped word, then pause at that position
-    const wordText = wordSpan.textContent || '';
+    const wordText = getSpokenText(wordSpan);
     const utterance = new SpeechSynthesisUtterance(wordText);
     const voice = getChineseVoice();
     if (voice) utterance.voice = voice;
