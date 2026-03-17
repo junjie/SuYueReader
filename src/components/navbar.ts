@@ -6,6 +6,7 @@ export class Navbar {
   private nav: HTMLElement;
   private lastScroll = 0;
   private ticking = false;
+  private lastToggleTime = 0;
   private scrollTarget: EventTarget = window;
   private boundScrollHandler: () => void;
   private store: SettingsStore;
@@ -98,10 +99,6 @@ export class Navbar {
     });
   }
 
-  private setNavbarOffset(visible: boolean): void {
-    document.documentElement.style.setProperty('--navbar-offset', visible ? '48px' : '0px');
-  }
-
   private attachScrollListener(): void {
     // Detach from previous target
     this.scrollTarget.removeEventListener('scroll', this.boundScrollHandler);
@@ -127,22 +124,31 @@ export class Navbar {
     return -el.scrollLeft;
   }
 
+  private isNearBottom(): boolean {
+    if (this.scrollTarget === window) {
+      return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50;
+    }
+    // Vertical mode (RTL horizontal scroll)
+    const el = this.scrollTarget as HTMLElement;
+    return el.scrollWidth + el.scrollLeft <= el.clientWidth + 50;
+  }
+
   private onScroll(): void {
     if (this.ticking) return;
     this.ticking = true;
     requestAnimationFrame(() => {
       const current = this.getScrollPosition();
       const delta = current - this.lastScroll;
+      const now = performance.now();
 
-      if (current < 50) {
+      if (current < 50 || this.isNearBottom()) {
         this.nav.classList.remove('navbar-scroll-hidden');
-        this.setNavbarOffset(true);
-      } else if (delta > 5) {
+      } else if (delta > 5 && now - this.lastToggleTime > 300) {
         this.nav.classList.add('navbar-scroll-hidden');
-        this.setNavbarOffset(false);
-      } else if (delta < -5) {
+        this.lastToggleTime = now;
+      } else if (delta < -5 && now - this.lastToggleTime > 300) {
         this.nav.classList.remove('navbar-scroll-hidden');
-        this.setNavbarOffset(true);
+        this.lastToggleTime = now;
       }
 
       this.lastScroll = current;
