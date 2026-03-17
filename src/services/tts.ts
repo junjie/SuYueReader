@@ -47,6 +47,8 @@ function mapCharIndexToSpan(paragraph: HTMLElement, charIndex: number): HTMLElem
   let offset = 0;
   let node: Text | null;
   while ((node = walker.nextNode() as Text | null)) {
+    // Skip pinyin text inside <rt> elements
+    if (node.parentElement?.closest('rt')) continue;
     const len = node.length;
     if (offset + len > charIndex) {
       let el: Node | null = node.parentElement;
@@ -61,6 +63,19 @@ function mapCharIndexToSpan(paragraph: HTMLElement, charIndex: number): HTMLElem
   return null;
 }
 
+/** Get text content excluding <rt> (pinyin) elements */
+function getSpokenText(el: HTMLElement): string {
+  let text = '';
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  let node: Text | null;
+  while ((node = walker.nextNode() as Text | null)) {
+    if (!node.parentElement?.closest('rt')) {
+      text += node.textContent;
+    }
+  }
+  return text;
+}
+
 function speakParagraph(index: number, gen: number, charOffset = 0): void {
   if (gen !== generation) return;
   if (index >= paragraphs.length) {
@@ -69,7 +84,7 @@ function speakParagraph(index: number, gen: number, charOffset = 0): void {
   }
   currentIndex = index;
   const para = paragraphs[index];
-  const fullText = para.textContent || '';
+  const fullText = getSpokenText(para);
   if (!fullText.trim()) {
     speakParagraph(index + 1, gen);
     return;
@@ -267,12 +282,13 @@ export function ttsJumpTo(wordSpan: HTMLElement): void {
   const paraIdx = paragraphs.indexOf(parent);
   if (paraIdx === -1) return;
 
-  // Calculate char offset of this span within the paragraph
+  // Calculate char offset of this span within the paragraph (excluding pinyin)
   const walker = document.createTreeWalker(parent, NodeFilter.SHOW_TEXT);
   let offset = 0;
   let node: Text | null;
   let found = false;
   while ((node = walker.nextNode() as Text | null)) {
+    if (node.parentElement?.closest('rt')) continue;
     if (wordSpan.contains(node)) {
       found = true;
       break;
