@@ -15,6 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  position: relative;
   max-inline-size: var(--reader-max-line-length-px);
   margin-inline: auto;
   padding-inline: var(--reader-margin-h);
@@ -48,12 +49,15 @@
   padding: 8px;
 }
 
-/* Script variant segmented control */
+/* Script variant segmented control — centered absolutely */
 .navbar-script-seg {
   display: flex;
   background: var(--btn-bg);
   border-radius: 8px;
   padding: 2px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
 }
 
 .nseg-btn {
@@ -100,11 +104,30 @@
 
 .navbar.navbar-vertical .navbar-script-seg {
   flex-direction: column;
+  position: static;
+  transform: none;
 }
 
 .navbar.navbar-vertical .navbar-btn {
   padding: 8px;
 }
+
+/* TTS controls */
+.navbar-tts {
+  display: flex;
+  gap: 2px;
+}
+.navbar-tts .navbar-btn-icon {
+  border-radius: 50%;
+}
+
+/* Right group: TTS + settings */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.navbar-tts-rewind.hidden { visibility: hidden; }
 
 /* Progress bar */
 .navbar-progress {

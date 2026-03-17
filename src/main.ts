@@ -8,6 +8,7 @@ import { parseText } from './services/text-parser.ts';
 import { setFootnotes, setMoedictEnabled, clearCache } from './services/dictionary.ts';
 import { preloadDefaultFont } from './services/fonts.ts';
 import { convertScriptSync, uiVariant } from './services/script-convert.ts';
+import { ttsStop } from './services/tts.ts';
 import type { SYFile } from './types/index.ts';
 import './styles/main.css';
 import './styles/themes.css';
@@ -41,12 +42,14 @@ function setPageTitle(title?: string): void {
 
 const textLoader = new TextLoader(
   (text, title, builtInId) => {
+    ttsStop();
     const { paragraphs, footnotes } = parseText(text);
     setFootnotes(footnotes);
     setPageTitle(title);
     reader.setParagraphs(paragraphs, text, title, builtInId);
   },
   (bundle: SYFile) => {
+    ttsStop();
     const { paragraphs, footnotes } = parseText(bundle.text);
     setFootnotes(footnotes);
     setPageTitle(bundle.title);

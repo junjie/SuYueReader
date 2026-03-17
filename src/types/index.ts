@@ -66,4 +66,6 @@ export interface Settings {
   hangingIndent: number;
   boldText: boolean;
   fileInfoShown: boolean;
+  ttsVoice: string;
+  ttsRate: number;
 }

@@ -1,6 +1,7 @@
-import { documentIcon, gearIcon } from './icons.ts';
+import { documentIcon, gearIcon, playIcon, pauseIcon, rewindIcon } from './icons.ts';
 import type { SettingsStore } from '../state/settings.ts';
 import type { ScriptVariant } from '../types/index.ts';
+import { ttsStart, ttsPause, ttsResume, ttsStop, ttsGetState, ttsIsSupported, ttsSetVoice, ttsSetRate } from '../services/tts.ts';
 
 export class Navbar {
   private nav: HTMLElement;
@@ -31,9 +32,19 @@ export class Navbar {
           <button data-variant="simplified" class="nseg-btn">简</button>
           <button data-variant="traditional" class="nseg-btn">繁</button>
         </div>
-        <button class="navbar-btn navbar-btn-icon" id="navbar-settings" aria-label="Settings">
-          ${gearIcon()}
-        </button>
+        <div class="navbar-right">
+          <div class="navbar-tts"${ttsIsSupported() ? '' : ' style="display:none"'}>
+            <button class="navbar-btn navbar-btn-icon navbar-tts-rewind hidden" id="navbar-tts-rewind" aria-label="Rewind">
+              ${rewindIcon()}
+            </button>
+            <button class="navbar-btn navbar-btn-icon" id="navbar-tts-play" aria-label="Play">
+              ${playIcon()}
+            </button>
+          </div>
+          <button class="navbar-btn navbar-btn-icon" id="navbar-settings" aria-label="Settings">
+            ${gearIcon()}
+          </button>
+        </div>
       </div>
       <div class="navbar-progress">
         <div class="navbar-progress-bar"></div>
@@ -46,6 +57,34 @@ export class Navbar {
 
     this.nav.querySelector('#navbar-open')!.addEventListener('click', onOpenClick);
     this.nav.querySelector('#navbar-settings')!.addEventListener('click', onSettingsClick);
+
+    // TTS controls
+    const ttsPlayBtn = this.nav.querySelector('#navbar-tts-play')!;
+    const ttsRewindBtn = this.nav.querySelector('#navbar-tts-rewind')!;
+
+    ttsPlayBtn.addEventListener('click', () => {
+      const s = ttsGetState();
+      if (s === 'stopped') {
+        const settings = this.store.get();
+        ttsSetVoice(settings.ttsVoice);
+        ttsSetRate(settings.ttsRate);
+        const els = Array.from(document.querySelectorAll<HTMLElement>('#reader [data-index]'));
+        if (els.length) ttsStart(els);
+      } else if (s === 'playing') {
+        ttsPause();
+      } else {
+        ttsResume();
+      }
+    });
+
+    ttsRewindBtn.addEventListener('click', () => ttsStop());
+
+    document.addEventListener('tts-state-changed', (e) => {
+      const { state } = (e as CustomEvent).detail;
+      ttsPlayBtn.innerHTML = state === 'playing' ? pauseIcon() : playIcon();
+      ttsPlayBtn.setAttribute('aria-label', state === 'playing' ? 'Pause' : 'Play');
+      ttsRewindBtn.classList.toggle('hidden', state === 'stopped');
+    });
 
     this.scriptSeg.addEventListener('click', (e) => {
       const btn = (e.target as HTMLElement).closest('[data-variant]') as HTMLElement | null;
@@ -90,6 +129,9 @@ export class Navbar {
       if (detail.writingModeChanged) {
         this.nav.classList.toggle('navbar-vertical', detail.settings.writingMode === 'vertical');
       }
+      // Keep TTS voice/rate in sync so mid-session changes take effect
+      ttsSetVoice(detail.settings.ttsVoice);
+      ttsSetRate(detail.settings.ttsRate);
     });
   }
 

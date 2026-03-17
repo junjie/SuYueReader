@@ -25,4 +25,6 @@ export const defaultSettings: Settings = {
   hangingIndent: 0,
   boldText: false,
   fileInfoShown: false,
+  ttsVoice: '',
+  ttsRate: 1.0,
 };

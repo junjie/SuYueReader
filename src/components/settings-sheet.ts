@@ -2,13 +2,15 @@ import type { SettingsStore } from '../state/settings.ts';
 import type { Settings, WritingMode, PinyinPosition, ThemeMode } from '../types/index.ts';
 import { displayFonts, getAvailableSystemFonts, previewFontName, loadFontPreview } from '../services/fonts.ts';
 import { convertScriptSync, uiVariant } from '../services/script-convert.ts';
+import { ttsGetVoices, ttsIsSupported, ttsPreview } from '../services/tts.ts';
 
-type TabName = 'appearance' | 'typography' | 'dictionaries';
+type TabName = 'appearance' | 'typography' | 'dictionaries' | 'tts';
 
 const TAB_KEYS: Record<TabName, (keyof Settings)[]> = {
   appearance: ['theme', 'fontSize', 'writingMode', 'showPinyin', 'pinyinPosition', 'pinyinSize', 'fontFamily', 'fileInfoShown'],
   typography: ['boldText', 'lineHeight', 'lineLength', 'paragraphSpacing', 'verticalParagraphSpacing', 'hangingIndent', 'marginV', 'verticalMarginV', 'showNumbering'],
   dictionaries: ['showCedict', 'showCvdict', 'showMoedict', 'dictOrder', 'popupFontSize'],
+  tts: ['ttsVoice', 'ttsRate'],
 };
 
 export class SettingsSheet {
@@ -113,13 +115,15 @@ export class SettingsSheet {
         <button class="sheet-close-btn" id="sheet-close" aria-label="Close">✕</button>
       </div>
       <div class="settings-tabs" id="s-tabs">
-        <button class="settings-tab" data-tab="appearance">外观<span class="settings-tab-sub">Appearance</span></button>
-        <button class="settings-tab" data-tab="typography">排版<span class="settings-tab-sub">Typography</span></button>
-        <button class="settings-tab" data-tab="dictionaries">词典<span class="settings-tab-sub">Dictionaries</span></button>
+        <button class="settings-tab" data-tab="appearance">外观<span class="settings-tab-sub">Look</span></button>
+        <button class="settings-tab" data-tab="typography">排版<span class="settings-tab-sub">Type</span></button>
+        <button class="settings-tab" data-tab="dictionaries">词典<span class="settings-tab-sub">Dict</span></button>
+        <button class="settings-tab" data-tab="tts">朗读<span class="settings-tab-sub">Read</span></button>
       </div>
       <div class="settings-tab-content" id="tab-appearance"></div>
       <div class="settings-tab-content hidden" id="tab-typography"></div>
       <div class="settings-tab-content hidden" id="tab-dictionaries"></div>
+      <div class="settings-tab-content hidden" id="tab-tts"></div>
     `);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
@@ -132,10 +136,11 @@ export class SettingsSheet {
       }
     });
 
-    // Build all three tabs
+    // Build all tabs
     this.buildAppearanceTab(panel.querySelector('#tab-appearance')!);
     this.buildTypographyTab(panel.querySelector('#tab-typography')!);
     this.buildDictionariesTab(panel.querySelector('#tab-dictionaries')!);
+    this.buildTTSTab(panel.querySelector('#tab-tts')!);
 
     // Activate initial tab
     this.switchTab(panel, this.activeTab);
@@ -549,6 +554,58 @@ export class SettingsSheet {
     }, { passive: false });
   }
 
+  private buildTTSTab(container: HTMLElement): void {
+    const supported = ttsIsSupported();
+    if (!supported) {
+      container.innerHTML = this.t(`
+        <div class="sheet-group">
+          <div class="sheet-group-row static">
+            <label style="color:var(--fg-muted)">此浏览器不支持语音合成</label>
+          </div>
+        </div>
+      `);
+      return;
+    }
+
+    container.innerHTML = this.t(`
+      <div class="sheet-group">
+        <div class="sheet-group-row static">
+          <label>语音<span class="sub">Voice</span></label>
+          <select id="s-tts-voice" class="inline-select"></select>
+        </div>
+        <div class="sheet-group-divider"></div>
+        <div class="sheet-group-row static">
+          <label>语速<span class="sub">Speed</span></label>
+          <div class="stepper-controls">
+            <button class="size-btn" id="s-ttsrate-down">−</button>
+            <span id="s-ttsrate-val" class="size-value"></span>
+            <button class="size-btn" id="s-ttsrate-up">+</button>
+          </div>
+        </div>
+      </div>
+      ${this.resetLinkHTML()}
+    `);
+
+    this.bindStepper(container, 's-ttsrate', 0.5, 2.0, 0.1, 'ttsRate');
+
+    const select = container.querySelector<HTMLSelectElement>('#s-tts-voice')!;
+    const populateVoices = () => {
+      const voices = ttsGetVoices();
+      const current = this.store.get().ttsVoice;
+      select.innerHTML = `<option value="">默认 Default</option>`
+        + voices.map((v) => `<option value="${v.name}"${v.name === current ? ' selected' : ''}>${v.name} (${v.lang})</option>`).join('');
+    };
+    populateVoices();
+    speechSynthesis.addEventListener('voiceschanged', populateVoices);
+
+    select.addEventListener('change', () => {
+      this.store.update({ ttsVoice: select.value });
+      ttsPreview(select.value);
+    });
+
+    this.bindResetLink(container, 'tts');
+  }
+
   openDictionaries(): void {
     if (!this.overlay) {
       this.activeTab = 'dictionaries';
@@ -682,8 +739,13 @@ export class SettingsSheet {
     }
     this.setStepperVal(panel, 's-popupsize', `${s.popupFontSize}px`);
 
+    // TTS tab
+    this.setStepperVal(panel, 's-ttsrate', `${s.ttsRate}x`);
+    const voiceSelect = panel.querySelector<HTMLSelectElement>('#s-tts-voice');
+    if (voiceSelect) voiceSelect.value = s.ttsVoice;
+
     // Show/hide reset links per tab
-    const tabs: TabName[] = ['appearance', 'typography', 'dictionaries'];
+    const tabs: TabName[] = ['appearance', 'typography', 'dictionaries', 'tts'];
     for (const tab of tabs) {
       const tabEl = panel.querySelector(`#tab-${tab}`);
       const row = tabEl?.querySelector('.reset-link-row');
