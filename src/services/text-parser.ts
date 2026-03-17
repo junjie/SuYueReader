@@ -183,6 +183,21 @@ export function parseText(raw: string): ParseResult {
     parts = body.split(/\n/);
   }
 
+  // 2b. Split off heading lines from multi-line blocks.
+  // e.g. "# Heading\nBody text" → ["# Heading", "Body text"]
+  const expanded: string[] = [];
+  for (const part of parts) {
+    const nl = part.indexOf('\n');
+    if (nl !== -1 && /^#{1,2}\s+/.test(part)) {
+      expanded.push(part.slice(0, nl));
+      const rest = part.slice(nl + 1).trim();
+      if (rest) expanded.push(rest);
+    } else {
+      expanded.push(part);
+    }
+  }
+  parts = expanded;
+
   // 3. Process each paragraph
   const paragraphs: Paragraph[] = [];
   let index = 1;
