@@ -14,8 +14,6 @@
 .navbar-inner {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  position: relative;
   max-inline-size: var(--reader-max-line-length-px);
   margin-inline: auto;
   padding-inline: var(--reader-margin-h);
@@ -49,15 +47,19 @@
   padding: 8px;
 }
 
-/* Script variant segmented control — centered absolutely */
+/* Left group — equal flex to balance the right group */
+.navbar-left {
+  flex: 1;
+  display: flex;
+}
+
+/* Script variant segmented control — centered by equal flanks */
 .navbar-script-seg {
   display: flex;
   background: var(--btn-bg);
   border-radius: 8px;
   padding: 2px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  flex-shrink: 0;
 }
 
 .nseg-btn {
@@ -104,12 +106,15 @@
 
 .navbar.navbar-vertical .navbar-script-seg {
   flex-direction: column;
-  position: static;
-  transform: none;
 }
 
 .navbar.navbar-vertical .navbar-btn {
   padding: 8px;
+}
+
+.navbar.navbar-vertical .navbar-left,
+.navbar.navbar-vertical .navbar-right {
+  flex: 0;
 }
 
 /* TTS controls */
@@ -121,11 +126,13 @@
   border-radius: 50%;
 }
 
-/* Right group: TTS + settings */
+/* Right group: TTS + settings — equal flex to balance the left button */
 .navbar-right {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 2px;
+  flex: 1;
 }
 .navbar-tts-rewind.hidden { visibility: hidden; }
 

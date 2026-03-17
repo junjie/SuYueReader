@@ -24,9 +24,11 @@ export class Navbar {
     this.nav.className = 'navbar';
     this.nav.innerHTML = `
       <div class="navbar-inner">
-        <button class="navbar-btn navbar-btn-icon" id="navbar-open" aria-label="Open">
-          ${documentIcon()}
-        </button>
+        <div class="navbar-left">
+          <button class="navbar-btn navbar-btn-icon" id="navbar-open" aria-label="Open">
+            ${documentIcon()}
+          </button>
+        </div>
         <div class="navbar-script-seg">
           <button data-variant="original" class="nseg-btn">原</button>
           <button data-variant="simplified" class="nseg-btn">简</button>

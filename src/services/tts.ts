@@ -81,6 +81,9 @@ function speakParagraph(index: number, gen: number, charOffset = 0): void {
     return;
   }
 
+  const tag = para.tagName.toLowerCase();
+  const isHeading = tag === 'h2' || tag === 'h3';
+
   const utterance = new SpeechSynthesisUtterance(text);
 
   const voice = getChineseVoice();
@@ -107,10 +110,26 @@ function speakParagraph(index: number, gen: number, charOffset = 0): void {
     clearHighlight();
     if (gen !== generation) return;
     if (state === 'playing') {
+      // Advance position now so any mid-delay restart targets the next paragraph
+      currentIndex = index + 1;
       lastCharIndex = 0;
       const next = paragraphs[index + 1];
       if (next) next.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      speakParagraph(index + 1, gen);
+      // Insert pauses at section boundaries, scaled by reading speed
+      const nextIsHeading = next && (next.tagName.toLowerCase() === 'h2' || next.tagName.toLowerCase() === 'h3');
+      const curIsHeading = isHeading;
+      let delay = 0;
+      if (nextIsHeading) delay = 700;       // body → heading: longest pause
+      else if (curIsHeading) delay = 400;    // heading → body: shorter pause
+      delay = Math.round(delay / rate);      // scale inversely with speed
+      if (delay) {
+        setTimeout(() => {
+          if (gen !== generation) return;
+          speakParagraph(index + 1, gen);
+        }, delay);
+      } else {
+        speakParagraph(index + 1, gen);
+      }
     }
   };
 
@@ -262,14 +281,46 @@ export function ttsJumpTo(wordSpan: HTMLElement): void {
   }
   if (!found) return;
 
+  const wasPaused = state === 'paused';
   generation++;
   speechSynthesis.cancel();
   clearHighlight();
   restartOnResume = false;
   currentIndex = paraIdx;
   lastCharIndex = offset;
-  setState('playing');
-  speakParagraph(paraIdx, generation, offset);
+
+  if (wasPaused) {
+    // Speak only the tapped word, then pause at that position
+    const wordText = wordSpan.textContent || '';
+    const utterance = new SpeechSynthesisUtterance(wordText);
+    const voice = getChineseVoice();
+    if (voice) utterance.voice = voice;
+    utterance.rate = rate;
+    utterance.lang = 'zh-CN';
+    const gen = generation;
+    utterance.onstart = () => {
+      if (gen !== generation) return;
+      clearHighlight();
+      wordSpan.classList.add('tts-active');
+      activeSpan = wordSpan;
+    };
+    utterance.onend = () => {
+      if (gen !== generation) return;
+      // Stay paused at this word; flag so play creates a fresh utterance
+      restartOnResume = true;
+      setState('paused');
+    };
+    utterance.onerror = () => {
+      if (gen !== generation) return;
+      restartOnResume = true;
+      setState('paused');
+    };
+    setState('playing');
+    speechSynthesis.speak(utterance);
+  } else {
+    setState('playing');
+    speakParagraph(paraIdx, generation, offset);
+  }
 }
 
 export function ttsGetState(): TTSState {
