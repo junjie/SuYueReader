@@ -48,7 +48,7 @@ function mapCharIndexToSpan(paragraph: HTMLElement, charIndex: number): HTMLElem
   let node: Text | null;
   while ((node = walker.nextNode() as Text | null)) {
     // Skip pinyin text inside <rt> elements
-    if (node.parentElement?.closest('rt')) continue;
+    if (node.parentElement?.closest('rt, rp')) continue;
     const len = node.length;
     if (offset + len > charIndex) {
       let el: Node | null = node.parentElement;
@@ -69,7 +69,7 @@ function getSpokenText(el: HTMLElement): string {
   const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
   let node: Text | null;
   while ((node = walker.nextNode() as Text | null)) {
-    if (!node.parentElement?.closest('rt')) {
+    if (!node.parentElement?.closest('rt, rp')) {
       text += node.textContent;
     }
   }
@@ -288,7 +288,7 @@ export function ttsJumpTo(wordSpan: HTMLElement): void {
   let node: Text | null;
   let found = false;
   while ((node = walker.nextNode() as Text | null)) {
-    if (node.parentElement?.closest('rt')) continue;
+    if (node.parentElement?.closest('rt, rp')) continue;
     if (wordSpan.contains(node)) {
       found = true;
       break;
