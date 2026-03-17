@@ -45,7 +45,15 @@ export class SettingsStore {
   }
 
   private save(): void {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.settings));
+    // Only persist settings that differ from defaults so that
+    // updated defaults automatically apply to unchanged settings.
+    const sparse: Partial<Settings> = {};
+    for (const key of Object.keys(this.settings) as (keyof Settings)[]) {
+      if (JSON.stringify(this.settings[key]) !== JSON.stringify(defaultSettings[key])) {
+        (sparse as any)[key] = this.settings[key];
+      }
+    }
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(sparse));
   }
 
   get(): Settings {

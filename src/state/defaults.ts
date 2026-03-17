@@ -21,7 +21,7 @@ export const defaultSettings: Settings = {
   showCvdict: true,
   showMoedict: false,
   dictOrder: ['cedict', 'cvdict', 'moedict'],
-  popupFontSize: 14,
+  popupFontSize: 15,
   hangingIndent: 0,
   boldText: false,
   fileInfoShown: false,
