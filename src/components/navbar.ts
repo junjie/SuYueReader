@@ -134,6 +134,8 @@ export class Navbar {
       // Keep TTS voice/rate in sync so mid-session changes take effect
       ttsSetVoice(detail.settings.ttsVoice);
       ttsSetRate(detail.settings.ttsRate);
+      // Pinyin toggle re-renders the DOM, invalidating TTS paragraph references
+      if (detail.pinyinChanged) ttsStop();
     });
   }
 
