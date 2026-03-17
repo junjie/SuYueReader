@@ -14,7 +14,7 @@ export const defaultSettings: Settings = {
   showPinyin: false,
   pinyinPosition: 'over',
   pinyinSize: 12,
-  showNumbering: true,
+  showNumbering: false,
   scriptVariant: 'original',
   lineLength: 35,
   showCedict: true,
