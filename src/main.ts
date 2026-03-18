@@ -9,7 +9,7 @@ import { setFootnotes, setMoedictEnabled, clearCache } from './services/dictiona
 import { preloadDefaultFont } from './services/fonts.ts';
 import { convertScriptSync, uiVariant } from './services/script-convert.ts';
 import { ttsStop } from './services/tts.ts';
-import type { SYFile } from './types/index.ts';
+import type { Settings, SYFile, ThemeMode, ScriptVariant } from './types/index.ts';
 import './styles/main.css';
 import './styles/themes.css';
 import './styles/navbar.css';
@@ -23,7 +23,59 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`);
 }
 
+function parseURLSettings(params: URLSearchParams): Partial<Settings> {
+  const result: Partial<Settings> = {};
+
+  const onOff = (v: string | null): boolean | undefined =>
+    v === 'on' ? true : v === 'off' ? false : undefined;
+
+  const pinyin = onOff(params.get('pinyin'));
+  if (pinyin !== undefined) result.showPinyin = pinyin;
+
+  const theme = params.get('theme');
+  if (theme === 'light' || theme === 'dark' || theme === 'sepia') {
+    result.theme = theme as ThemeMode;
+  }
+
+  const vertical = onOff(params.get('vertical'));
+  if (vertical !== undefined) result.writingMode = vertical ? 'vertical' : 'horizontal';
+
+  const script = params.get('script');
+  if (script === 'original' || script === 'simplified' || script === 'traditional') {
+    result.scriptVariant = script as ScriptVariant;
+  }
+
+  const cedict = onOff(params.get('cedict'));
+  if (cedict !== undefined) result.showCedict = cedict;
+
+  const cvdict = onOff(params.get('cvdict'));
+  if (cvdict !== undefined) result.showCvdict = cvdict;
+
+  const moedict = onOff(params.get('moedict'));
+  if (moedict !== undefined) result.showMoedict = moedict;
+
+  const font = params.get('font');
+  if (font) result.fontFamily = font;
+
+  const fontSize = params.get('fontSize');
+  if (fontSize) {
+    const n = Number(fontSize);
+    if (n >= 14 && n <= 48) result.fontSize = n;
+  }
+
+  return result;
+}
+
 const store = new SettingsStore();
+
+// Apply URL settings for first-time visitors
+if (store.isFirstVisit()) {
+  const urlSettings = parseURLSettings(new URLSearchParams(window.location.search));
+  if (Object.keys(urlSettings).length > 0) {
+    store.update(urlSettings);
+  }
+}
+
 setMoedictEnabled(store.get().showMoedict);
 
 const readerEl = document.getElementById('reader')!;

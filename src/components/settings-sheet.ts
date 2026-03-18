@@ -637,17 +637,28 @@ export class SettingsSheet {
     });
   }
 
+  private static TAB_LABELS: Record<TabName, { zh: string; en: string }> = {
+    appearance: { zh: '外观', en: 'Look' },
+    typography: { zh: '排版', en: 'Type' },
+    dictionaries: { zh: '词典', en: 'Dict' },
+    tts: { zh: '朗读', en: 'Read' },
+  };
+
   private showResetConfirmModal(tab: TabName): void {
+    const { zh, en } = SettingsSheet.TAB_LABELS[tab];
     const overlay = document.createElement('div');
     overlay.className = 'modal-overlay';
     overlay.innerHTML = this.t(`
       <div class="modal" style="width: min(90vw, 400px);">
-        <h3>确定恢复预设？</h3>
-        <p style="font-size:14px;color:var(--fg-muted);margin:0">Reset this page to defaults?</p>
-        <div class="modal-actions">
-          <button class="sheet-action-btn" id="reset-modal-cancel">Cancel</button>
-          <button class="sheet-action-btn primary" id="reset-modal-confirm">Confirm</button>
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <h3 style="margin:0">恢复「${zh}」预设？</h3>
+          <p style="font-size:12px;color:var(--fg-muted);margin:0">Reset to default settings for ${en}?</p>
         </div>
+        <div class="modal-actions">
+          <button class="sheet-action-btn modal-btn-bilingual" id="reset-modal-cancel">取消<span class="modal-btn-sub">Cancel</span></button>
+          <button class="sheet-action-btn danger modal-btn-bilingual" id="reset-modal-tab">重置${zh}<span class="modal-btn-sub">Reset ${en}</span></button>
+        </div>
+        <div style="text-align:right"><a href="#" id="reset-modal-all" class="reset-link" style="color:#d33">↺ 全部重置 Reset All</a></div>
       </div>
     `);
     document.body.appendChild(overlay);
@@ -655,9 +666,19 @@ export class SettingsSheet {
     const close = () => overlay.remove();
 
     overlay.querySelector('#reset-modal-cancel')!.addEventListener('click', close);
-    overlay.querySelector('#reset-modal-confirm')!.addEventListener('click', () => {
+    overlay.querySelector('#reset-modal-tab')!.addEventListener('click', () => {
       close();
       this.store.resetKeys(TAB_KEYS[tab]);
+      const panel = this.overlay?.querySelector<HTMLElement>('.sheet-panel');
+      if (panel) {
+        this.buildTabs(panel);
+        this.syncUI(panel);
+      }
+    });
+    overlay.querySelector('#reset-modal-all')!.addEventListener('click', (e) => {
+      e.preventDefault();
+      close();
+      this.store.reset();
       const panel = this.overlay?.querySelector<HTMLElement>('.sheet-panel');
       if (panel) {
         this.buildTabs(panel);

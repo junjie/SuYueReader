@@ -18,7 +18,7 @@ export const defaultSettings: Settings = {
   scriptVariant: 'original',
   lineLength: 35,
   showCedict: true,
-  showCvdict: true,
+  showCvdict: false,
   showMoedict: false,
   dictOrder: ['cedict', 'cvdict', 'moedict'],
   popupFontSize: 15,

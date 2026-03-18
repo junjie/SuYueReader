@@ -570,6 +570,12 @@
   border-color: var(--primary-bg);
 }
 
+.sheet-action-btn.danger {
+  background: #d33;
+  color: #fff;
+  border-color: #d33;
+}
+
 /* Dictionary row */
 .dict-row {
   gap: 10px;

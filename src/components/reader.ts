@@ -1,5 +1,6 @@
 import type { Paragraph, InlineFormat, FootnoteRange, SYFile } from '../types/index.ts';
 import type { SettingsStore } from '../state/settings.ts';
+import { defaultSettings } from '../state/defaults.ts';
 import { getPinyinArray } from '../services/pinyin.ts';
 import { convertScript } from '../services/script-convert.ts';
 import { segmentText, refineSegments, type Segment } from '../services/segmenter.ts';
@@ -310,7 +311,23 @@ export class Reader {
 
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
-      const url = `${window.location.origin}${import.meta.env.BASE_URL}?text=${textId}`;
+      const s = this.store.get();
+      const urlParams = new URLSearchParams();
+      urlParams.set('text', textId);
+
+      // Encode non-default settings as URL params
+      const bool = (v: boolean) => (v ? 'on' : 'off');
+      if (s.showPinyin !== defaultSettings.showPinyin) urlParams.set('pinyin', bool(s.showPinyin));
+      if (s.theme !== defaultSettings.theme) urlParams.set('theme', s.theme);
+      if (s.writingMode !== defaultSettings.writingMode) urlParams.set('vertical', bool(s.writingMode === 'vertical'));
+      if (s.scriptVariant !== defaultSettings.scriptVariant) urlParams.set('script', s.scriptVariant);
+      if (s.showCedict !== defaultSettings.showCedict) urlParams.set('cedict', bool(s.showCedict));
+      if (s.showCvdict !== defaultSettings.showCvdict) urlParams.set('cvdict', bool(s.showCvdict));
+      if (s.showMoedict !== defaultSettings.showMoedict) urlParams.set('moedict', bool(s.showMoedict));
+      if (s.fontFamily !== defaultSettings.fontFamily) urlParams.set('font', s.fontFamily);
+      if (s.fontSize !== defaultSettings.fontSize) urlParams.set('fontSize', String(s.fontSize));
+
+      const url = `${window.location.origin}${import.meta.env.BASE_URL}?${urlParams.toString()}`;
       const showToast = () => {
         let toast = document.querySelector('.share-toast');
         if (toast) toast.remove();

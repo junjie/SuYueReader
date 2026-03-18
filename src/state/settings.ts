@@ -6,11 +6,17 @@ const STORAGE_KEY = 'chinese-reader-settings';
 
 export class SettingsStore {
   private settings: Settings;
+  private _isFirstVisit: boolean;
 
   constructor() {
+    this._isFirstVisit = localStorage.getItem(STORAGE_KEY) === null;
     this.settings = this.load();
     this.syncCSS();
     this.syncTheme();
+  }
+
+  isFirstVisit(): boolean {
+    return this._isFirstVisit;
   }
 
   /** Migrate old SC/TC-specific font names to display names */
@@ -53,7 +59,11 @@ export class SettingsStore {
         (sparse as any)[key] = this.settings[key];
       }
     }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(sparse));
+    if (Object.keys(sparse).length === 0) {
+      localStorage.removeItem(STORAGE_KEY);
+    } else {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(sparse));
+    }
   }
 
   get(): Settings {
