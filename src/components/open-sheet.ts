@@ -82,6 +82,7 @@ export class OpenSheet {
   }
 
   private buildMainView(panel: HTMLElement): void {
+    const author = `<a href="https://mastodon.social/@junjielin" target="_blank" rel="noopener noreferrer">林雋傑</a>`;
     panel.innerHTML = this.t(`
       <div class="sheet-header">
         <span class="sheet-nav-back" style="visibility:hidden">‹</span>
@@ -103,8 +104,8 @@ export class OpenSheet {
           <span class="row-chevron">›</span>
         </button>
       </div>
-      <div class="open-sheet-footer"><a href="https://github.com/junjie/SuYueReader" target="_blank" rel="noopener noreferrer">素阅</a> ${__BUILD_DATE__}<br><a href="https://mastodon.social/@junjielin" target="_blank" rel="noopener noreferrer">林隽杰</a></div>
-    `);
+      <div class="open-sheet-footer"><a href="https://github.com/junjie/SuYueReader" target="_blank" rel="noopener noreferrer">素阅</a> ${__BUILD_DATE__}<br>__AUTHOR__</div>
+    `).replace('__AUTHOR__', author);
 
     panel.querySelector('#sheet-close')!.addEventListener('click', () => this.close());
     panel.querySelector('[data-action="builtin"]')!.addEventListener('click', () => {
