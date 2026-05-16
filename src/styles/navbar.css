@@ -87,7 +87,7 @@
   right: 0;
   left: auto;
   width: 48px;
-  padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px 8px;
+  padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
 }
 
 .navbar.navbar-vertical .navbar-inner {
@@ -104,7 +104,9 @@
   transform: translateX(100%);
 }
 
-.navbar.navbar-vertical .navbar-script-seg {
+.navbar.navbar-vertical .navbar-script-seg,
+.navbar.navbar-vertical .navbar-tts,
+.navbar.navbar-vertical .navbar-right {
   flex-direction: column;
 }
 
