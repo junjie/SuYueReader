@@ -87,16 +87,19 @@
   right: 0;
   left: auto;
   width: 48px;
-  padding: calc(env(safe-area-inset-top, 0px) + 8px) 8px calc(env(safe-area-inset-bottom, 0px) + 8px);
+  padding: 0;
 }
 
 .navbar.navbar-vertical .navbar-inner {
+  position: absolute;
+  inset-inline: 0;
+  top: var(--reader-content-top, calc(env(safe-area-inset-top, 0px) + 8px));
+  height: var(--reader-content-height, calc(100% - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 16px));
+  min-height: min-content;
   flex-direction: column;
-  justify-content: center;
   gap: 16px;
   max-inline-size: none;
-  padding-inline: 0;
-  height: 100%;
+  padding: 0 8px;
 }
 
 .navbar.navbar-vertical.hidden,
@@ -106,6 +109,7 @@
 
 .navbar.navbar-vertical .navbar-script-seg,
 .navbar.navbar-vertical .navbar-tts,
+.navbar.navbar-vertical .navbar-left,
 .navbar.navbar-vertical .navbar-right {
   flex-direction: column;
 }
@@ -114,9 +118,12 @@
   padding: 8px;
 }
 
-.navbar.navbar-vertical .navbar-left,
+.navbar.navbar-vertical .navbar-left {
+  justify-content: flex-start;
+}
+
 .navbar.navbar-vertical .navbar-right {
-  flex: 0;
+  justify-content: flex-end;
 }
 
 /* TTS controls */

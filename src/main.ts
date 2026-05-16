@@ -81,6 +81,19 @@ setMoedictEnabled(store.get().showMoedict);
 const readerEl = document.getElementById('reader')!;
 const reader = new Reader(readerEl, store);
 
+// Track the reader's rendered text bounds (excluding padding/safe-areas) so the
+// vertical navbar can align its top/bottom buttons to the visible text column.
+const updateReaderBounds = () => {
+  const rect = readerEl.getBoundingClientRect();
+  const cs = getComputedStyle(readerEl);
+  const pt = parseFloat(cs.paddingTop) || 0;
+  const pb = parseFloat(cs.paddingBottom) || 0;
+  document.documentElement.style.setProperty('--reader-content-top', `${rect.top + pt}px`);
+  document.documentElement.style.setProperty('--reader-content-height', `${rect.height - pt - pb}px`);
+};
+new ResizeObserver(updateReaderBounds).observe(readerEl);
+window.addEventListener('resize', updateReaderBounds);
+
 let currentTextTitle = '';
 
 function setPageTitle(title?: string): void {
